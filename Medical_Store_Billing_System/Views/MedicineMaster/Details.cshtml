@@ -1,0 +1,649 @@
+@model MedicalStore.Business.ViewModels.MedicineMasterVM
+
+@{
+
+    ViewData["Title"] = "Medicine Details";
+
+    Layout = null;
+
+}
+
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>@ViewData["Title"]</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js">
+
+    </script>
+
+
+
+    <style>
+
+            /* ── Reset & Base ── */
+
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+
+
+            body {
+                font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                background: linear-gradient(145deg, #f6f9fc 0%, #e9eef4 100%);
+                min-height: 100vh;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 1.5rem;
+                margin: 0;
+            }
+
+
+
+            /* ── Main Container ── */
+
+            .details-wrapper {
+                width: 100%;
+                max-width: 640px;
+                margin: 0 auto;
+                animation: fadeSlideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            }
+
+
+
+            @@keyframes fadeSlideUp {
+
+                0% {
+                    opacity: 0;
+                    transform: translateY(30px) scale(0.97);
+                }
+
+
+
+                100% {
+                    opacity: 1;
+                    transform: translateY(0) scale(1);
+                }
+            }
+
+
+
+            /* ── Card ── */
+
+            .card-custom {
+                background: #ffffff;
+                border: none;
+                border-radius: 28px;
+                box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08), 0 8px 28px rgba(0, 0, 0, 0.04), 0 0 0 1px rgba(0, 0, 0, 0.02);
+                transition: box-shadow 0.3s ease, transform 0.2s ease;
+                overflow: hidden;
+            }
+
+
+
+                .card-custom:hover {
+                    box-shadow: 0 32px 80px rgba(0, 0, 0, 0.12), 0 12px 36px rgba(0, 0, 0, 0.06), 0 0 0 1px rgba(0, 0, 0, 0.02);
+                    transform: translateY(-2px);
+                }
+
+
+
+            /* ── Card Header ── */
+
+            .card-header-custom {
+                background: #ffffff;
+                border-bottom: 1px solid #f0f3f9;
+                padding: 1.25rem 1.75rem;
+                display: flex;
+                flex-wrap: wrap;
+                align-items: center;
+                justify-content: space-between;
+                gap: 0.75rem;
+            }
+
+
+
+                .card-header-custom .header-title {
+                    font-weight: 700;
+                    font-size: 1.15rem;
+                    letter-spacing: -0.01em;
+                    color: #0b1a33;
+                    display: flex;
+                    align-items: center;
+                    gap: 0.6rem;
+                }
+
+
+
+                    .card-header-custom .header-title i {
+                        font-size: 1.4rem;
+                        color: #3d7eb9;
+                    }
+
+
+
+            /* ── Stock Badge in Header ── */
+
+            .stock-badge-header {
+                font-weight: 600;
+                font-size: 0.85rem;
+                padding: 0.4rem 1rem;
+                border-radius: 60px;
+                display: inline-flex;
+                align-items: center;
+                gap: 0.4rem;
+                white-space: nowrap;
+            }
+
+
+
+                .stock-badge-header.bg-success {
+                    background: #e3f5ec !important;
+                    color: #1e7a5a;
+                    border: 1px solid #c5e3d4;
+                }
+
+
+
+                .stock-badge-header.bg-warning {
+                    background: #fff3d6 !important;
+                    color: #a67c2b;
+                    border: 1px solid #f5e0b0;
+                }
+
+
+
+                .stock-badge-header.bg-danger {
+                    background: #fde8e8 !important;
+                    color: #b33a3a;
+                    border: 1px solid #f5d0d0;
+                }
+
+
+
+            /* ── Card Body ── */
+
+            .card-body-custom {
+                padding: 1.75rem 1.75rem 1.5rem;
+            }
+
+
+
+            /* ── Detail List ── */
+
+            .detail-list {
+                margin: 0;
+            }
+
+
+
+                .detail-list .row {
+                    padding: 0.6rem 0;
+                    border-bottom: 1px solid #f0f3f9;
+                    margin: 0;
+                }
+
+
+
+                    .detail-list .row:last-child {
+                        border-bottom: none;
+                    }
+
+
+
+                .detail-list dt {
+                    font-weight: 600;
+                    font-size: 0.8rem;
+                    text-transform: uppercase;
+                    letter-spacing: 0.04em;
+                    color: #5a6e8a;
+                    padding-right: 0.5rem;
+                }
+
+
+
+                .detail-list dd {
+                    font-weight: 500;
+                    font-size: 0.95rem;
+                    color: #0b1a33;
+                    margin-bottom: 0;
+                    word-break: break-word;
+                }
+
+
+
+                .detail-list .med-name-value {
+                    font-weight: 700;
+                    font-size: 1.1rem;
+                    color: #0b1a33;
+                }
+
+
+
+                .detail-list .rate-value {
+                    font-weight: 700;
+                    font-size: 1.25rem;
+                    color: #2a9d8f;
+                }
+
+
+
+                .detail-list .stock-value {
+                    font-weight: 600;
+                    color: #3d7eb9;
+                }
+
+
+
+                .detail-list .badge-category {
+                    background: #e3f0ef;
+                    color: #1e7a6e;
+                    font-weight: 600;
+                    font-size: 0.75rem;
+                    padding: 0.3rem 0.8rem;
+                    border-radius: 40px;
+                    border: 1px solid #cde0dd;
+                }
+
+
+
+                .detail-list .ingredients-value {
+                    color: #3d4e6b;
+                    font-weight: 400;
+                }
+
+
+
+            /* ── Card Footer ── */
+
+            .card-footer-custom {
+                background: #fafcff;
+                border-top: 1px solid #eef1f7;
+                padding: 1rem 1.75rem;
+                display: flex;
+                flex-wrap: wrap;
+                align-items: center;
+                gap: 0.75rem;
+            }
+
+
+
+            .btn-action-footer {
+                border-radius: 60px;
+                padding: 0.5rem 1.5rem;
+                font-weight: 600;
+                font-size: 0.85rem;
+                display: inline-flex;
+                align-items: center;
+                gap: 0.5rem;
+                transition: all 0.25s ease;
+                text-decoration: none;
+            }
+
+
+
+            .btn-back {
+                background: transparent;
+                border: 1.5px solid #dce3ef;
+                color: #4a5d7a;
+            }
+
+
+
+                .btn-back:hover {
+                    background: #f4f7fd;
+                    border-color: #b6c8e0;
+                    color: #4dabf7; /* ← Updated hover color as requested */
+
+                    transform: translateY(-2px);
+                }
+
+
+
+            /* ── Responsive ── */
+
+            @@media (max-width: 576px) {
+
+                body {
+                    padding: 1rem;
+                    align-items: flex-start;
+                    padding-top: 2rem;
+                }
+
+
+
+                .card-header-custom {
+                    padding: 1rem 1.25rem;
+                    flex-direction: column;
+                    align-items: stretch;
+                    gap: 0.5rem;
+                }
+
+
+
+                    .card-header-custom .header-title {
+                        font-size: 1rem;
+                        justify-content: center;
+                    }
+
+
+
+                        .card-header-custom .header-title i {
+                            font-size: 1.2rem;
+                        }
+
+
+
+                .stock-badge-header {
+                    font-size: 0.75rem;
+                    padding: 0.3rem 0.8rem;
+                    justify-content: center;
+                }
+
+
+
+                .card-body-custom {
+                    padding: 1.25rem 1.25rem 1rem;
+                }
+
+
+
+                .detail-list dt {
+                    font-size: 0.7rem;
+                }
+
+
+
+                .detail-list dd {
+                    font-size: 0.88rem;
+                }
+
+
+
+                .detail-list .med-name-value {
+                    font-size: 1rem;
+                }
+
+
+
+                .detail-list .rate-value {
+                    font-size: 1.1rem;
+                }
+
+
+
+                .detail-list .row {
+                    padding: 0.5rem 0;
+                }
+
+
+
+                .card-footer-custom {
+                    padding: 0.75rem 1.25rem;
+                    flex-direction: column;
+                    align-items: stretch;
+                }
+
+
+
+                .btn-action-footer {
+                    justify-content: center;
+                    padding: 0.5rem 1rem;
+                    font-size: 0.8rem;
+                }
+            }
+
+
+
+            @@media (max-width: 400px) {
+
+                .card-custom {
+                    border-radius: 20px;
+                }
+
+
+
+                .card-header-custom {
+                    padding: 0.85rem 1rem;
+                }
+
+
+
+                .card-body-custom {
+                    padding: 1rem 1rem 0.75rem;
+                }
+
+
+
+                .card-footer-custom {
+                    padding: 0.5rem 1rem;
+                }
+
+
+
+                .detail-list dt {
+                    font-size: 0.65rem;
+                }
+
+
+
+                .detail-list dd {
+                    font-size: 0.82rem;
+                }
+            }
+
+
+
+            /* ── Reduced Motion ── */
+
+            @@media (prefers-reduced-motion: reduce) {
+
+                *,
+                *::before,
+                *::after {
+                    animation-duration: 0.01ms !important;
+                    animation-iteration-count: 1 !important;
+                    transition-duration: 0.01ms !important;
+                }
+            }
+    </style>
+
+</head>
+
+
+
+<body>
+
+
+
+    <div class="details-wrapper">
+
+
+
+        <div class="card-custom">
+
+
+
+            <!-- Card Header -->
+
+            <div class="card-header-custom">
+
+                <span class="header-title">
+
+                    <i class="bi bi-capsule"></i>
+
+                    Medicine Details
+
+                </span>
+
+                <span class="stock-badge-header
+
+                    @(Model.Stock == 0 ? "bg-danger" : Model.Stock <= 10 ? "bg-warning" : "bg-success")">
+
+                    <i class="bi @(Model.Stock == 0 ? "bi-x-circle" : Model.Stock <= 10 ? "bi-exclamation-triangle" : "bi-check-circle")"></i>
+
+                    Stock: @Model.Stock units
+
+                </span>
+
+            </div>
+
+
+
+            <!-- Card Body -->
+
+            <div class="card-body-custom">
+
+
+
+                <dl class="detail-list">
+
+
+
+                    <!-- Medicine ID -->
+
+                    <div class="row">
+
+                        <dt class="col-sm-4">Medicine ID</dt>
+
+                        <dd class="col-sm-8">#@Model.MedId</dd>
+
+                    </div>
+
+
+
+                    <!-- Medicine Name -->
+
+                    <div class="row">
+
+                        <dt class="col-sm-4">Name</dt>
+
+                        <dd class="col-sm-8 med-name-value">@Model.MedName</dd>
+
+                    </div>
+
+
+
+                    <!-- Category -->
+
+                    <div class="row">
+
+                        <dt class="col-sm-4">Category</dt>
+
+                        <dd class="col-sm-8">
+
+                            <span class="badge-category">@Model.CategoryName</span>
+
+                        </dd>
+
+                    </div>
+
+
+
+                    <!-- Brand -->
+
+                    <div class="row">
+
+                        <dt class="col-sm-4">Brand</dt>
+
+                        <dd class="col-sm-8">@Model.BrandName</dd>
+
+                    </div>
+
+
+
+                    <!-- Ingredients -->
+
+                    <div class="row">
+
+                        <dt class="col-sm-4">Ingredients</dt>
+
+                        <dd class="col-sm-8 ingredients-value">
+
+                            @(string.IsNullOrEmpty(Model.Ingredients) ? "—" : Model.Ingredients)
+
+                        </dd>
+
+                    </div>
+
+
+
+                    <!-- Rate -->
+
+                    <div class="row">
+
+                        <dt class="col-sm-4">Rate</dt>
+
+                        <dd class="col-sm-8 rate-value">₹@Model.Rate.ToString("N2")</dd>
+
+                    </div>
+
+
+
+                    <!-- Stock Value (calculated) -->
+
+                    <div class="row">
+
+                        <dt class="col-sm-4">Stock Value</dt>
+
+                        <dd class="col-sm-8 stock-value">₹@((Model.Rate * Model.Stock).ToString("N2"))</dd>
+
+                    </div>
+
+
+
+                </dl>
+
+
+
+            </div>
+
+            <!-- /card-body -->
+            <!-- Card Footer -->
+
+            <div class="card-footer-custom">
+
+                <a asp-action="Index" class="btn-action-footer btn-back">
+
+                    <i class="bi bi-arrow-left"></i>
+
+                    Back to List
+
+                </a>
+
+            </div>
+
+
+
+        </div>
+
+        <!-- /card-custom -->
+
+
+
+    </div>
+
+    <!-- /details-wrapper -->
+
+
+
+</body>
+
+</html>

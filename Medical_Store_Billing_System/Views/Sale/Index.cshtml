@@ -1,0 +1,1007 @@
+@model IEnumerable<MedicalStore.Business.ViewModels.SaleMasterVM>
+
+@{
+    ViewData["Title"] = "Sales";
+    Layout = null;
+    var allSalesData = ViewBag.AllSales as IEnumerable<MedicalStore.Business.ViewModels.SaleMasterVM> ?? Model;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <style>
+        /* ── Reset & Base ── */
+        * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        }
+
+        body {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        background: linear-gradient(145deg, #f0f5fc 0%, #e3eaf5 100%);
+        min-height: 100vh;
+        padding: 1.5rem;
+        margin: 0;
+        }
+
+        /* ── Main Container ── */
+        .page-wrapper {
+        max-width: 1440px;
+        margin: 0 auto;
+        animation: fadeSlideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @@keyframes fadeSlideUp {
+        0% {
+        opacity: 0;
+        transform: translateY(30px) scale(0.97);
+        }
+
+        100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        }
+        }
+
+        /* ── Cards & Shadows ── */
+        .card-modern {
+        background: #ffffff;
+        border: none;
+        border-radius: 24px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.06), 0 8px 28px rgba(0, 0, 0, 0.03), 0 0 0 1px rgba(0, 0, 0, 0.02);
+        transition: box-shadow 0.3s ease, transform 0.2s ease;
+        overflow: hidden;
+        }
+
+        .card-modern:hover {
+        box-shadow: 0 32px 80px rgba(0, 0, 0, 0.08), 0 12px 36px rgba(0, 0, 0, 0.04), 0 0 0 1px rgba(0, 0, 0, 0.02);
+        transform: translateY(-2px);
+        }
+
+        .card-body-custom {
+        padding: 0;
+        }
+
+        /* ── Toolbar with Search ── */
+        .toolbar {
+        background: #ffffff;
+        border-radius: 16px;
+        padding: 0.75rem 1.25rem;
+        margin-bottom: 1.25rem;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.75rem;
+        border: 1px solid #eef1f7;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+        }
+
+        .search-wrap {
+        flex: 1 1 250px;
+        position: relative;
+        min-width: 150px;
+        }
+
+        .search-wrap .bi-search {
+        position: absolute;
+        left: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #a0b8cc;
+        font-size: 0.9rem;
+        pointer-events: none;
+        }
+
+        .search-wrap input {
+        width: 100%;
+        padding: 0.5rem 2.5rem 0.5rem 2.5rem;
+        border: 1.5px solid #e2e8f0;
+        border-radius: 40px;
+        font-size: 0.9rem;
+        background: #f8fafc;
+        transition: all 0.25s ease;
+        outline: none;
+        font-family: 'Inter', sans-serif;
+        }
+
+        .search-wrap input:focus {
+        border-color: #2e7d32;
+        background: #fff;
+        box-shadow: 0 0 0 4px rgba(46, 125, 50, 0.08);
+        }
+
+        .search-wrap input::placeholder {
+        color: #a5b9cd;
+        }
+
+        .clear-search {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        border: none;
+        background: transparent;
+        color: #9aa8b5;
+        cursor: pointer;
+        display: none;
+        font-size: 16px;
+        padding: 2px 4px;
+        transition: color 0.2s;
+        border-radius: 50%;
+        line-height: 1;
+        }
+
+        .clear-search:hover {
+        color: #dc3545;
+        }
+
+        .clear-search.show {
+        display: block;
+        }
+
+        .result-badge {
+        font-size: 0.85rem;
+        color: #5a738a;
+        background: #f0f4f9;
+        padding: 0.25rem 1rem;
+        border-radius: 40px;
+        font-weight: 500;
+        white-space: nowrap;
+        }
+
+        /* ── Table ── */
+        .table-wrapper {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        }
+
+        #salesTable {
+        width: 100%;
+        min-width: 1000px;
+        font-size: 0.9rem;
+        border-collapse: separate;
+        border-spacing: 0;
+        margin-bottom: 0;
+        }
+
+        #salesTable thead th {
+        background: #f8faff;
+        border-bottom: 2px solid #e2e8f0;
+        font-weight: 600;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        color: #4a5d7a;
+        padding: 0.75rem 0.6rem;
+        white-space: nowrap;
+        position: sticky;
+        top: 0;
+        z-index: 5;
+        }
+
+        #salesTable thead th:first-child {
+        border-radius: 0 0 0 0;
+        }
+
+        #salesTable tbody td {
+        padding: 0.6rem 0.6rem;
+        vertical-align: middle;
+        border-bottom: 1px solid #f0f3f9;
+        }
+
+        #salesTable tbody tr {
+        background: #ffffff;
+        transition: background 0.15s;
+        }
+
+        #salesTable tbody tr:hover {
+        background: #f8fbff;
+        }
+
+        /* ── Rowspan grouping separator ── */
+        #salesTable tbody tr.sale-group-start td {
+        border-top: 2px solid #dce3ef !important;
+        }
+
+        #salesTable td[rowspan] {
+        vertical-align: middle;
+        }
+
+        /* ── Empty state ── */
+        .empty-state {
+        color: #9aabbe;
+        padding: 2.5rem 0;
+        }
+
+        .empty-state i {
+        font-size: 3rem;
+        display: block;
+        margin-bottom: 0.5rem;
+        opacity: 0.6;
+        }
+
+        /* ── Header & Buttons ── */
+        .header-icon {
+        background: #e8f5e9;
+        padding: 0.6rem;
+        border-radius: 14px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        }
+
+        .header-icon i {
+        font-size: 1.6rem;
+        color: #2e7d32;
+        }
+
+        .btn-success-custom {
+        background: #2e7d32;
+        border: none;
+        border-radius: 60px;
+        padding: 0.5rem 1.5rem;
+        font-weight: 600;
+        font-size: 0.9rem;
+        color: #fff;
+        transition: all 0.25s ease;
+        box-shadow: 0 4px 12px rgba(46, 125, 50, 0.25);
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        text-decoration: none;
+        }
+
+        .btn-success-custom:hover {
+        background: #1b5e20;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(46, 125, 50, 0.30);
+        color: #fff;
+        }
+
+        .btn-outline-custom {
+        border: 1.5px solid #dce3ef;
+        border-radius: 60px;
+        padding: 0.25rem 0.9rem;
+        font-weight: 600;
+        font-size: 0.8rem;
+        color: #4a5d7a;
+        transition: all 0.2s ease;
+        background: transparent;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.3rem;
+        }
+
+        .btn-outline-custom:hover {
+        background: #f4f7fd;
+        border-color: #b6c8e0;
+        color: #1f3a5f;
+        }
+
+        /* ── Alert styling ── */
+        .alert-custom {
+        border-radius: 16px;
+        border: none;
+        padding: 0.7rem 1rem;
+        font-size: 0.9rem;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        }
+
+        /* ── Pagination ── */
+        .pagination-container {
+        padding: 0.9rem 1.5rem;
+        background: #fafcff;
+        border-top: 1px solid #eef1f7;
+        }
+
+        .pagination .page-link {
+        color: #1a4a6b;
+        border-radius: 8px;
+        margin: 0 3px;
+        border: 1px solid #e9edf4;
+        padding: 0.4rem 0.85rem;
+        font-size: 0.85rem;
+        font-family: 'Inter', sans-serif;
+        }
+
+        .pagination .page-link:hover {
+        background: #f0f4f9;
+        border-color: #2e7d32;
+        color: #2e7d32;
+        }
+
+        .pagination .page-item.active .page-link {
+        background: #2e7d32;
+        border-color: #2e7d32;
+        color: #fff;
+        }
+
+        .pagination .page-item.disabled .page-link {
+        color: #a0b8cc;
+        cursor: not-allowed;
+        }
+
+        /* ── Table Footer ── */
+        .table-footer {
+        background: #fafcfe;
+        padding: 0.7rem 1.5rem;
+        border-top: 1px solid #eef1f7;
+        font-size: 0.8rem;
+        color: #6b7a93;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.5rem;
+        }
+
+        .table-footer .total-badge {
+        background: #e9edf4;
+        padding: 0.15rem 0.7rem;
+        border-radius: 40px;
+        font-weight: 600;
+        color: #1d2b44;
+        font-size: 0.75rem;
+        }
+
+        /* ── Responsive tweaks ── */
+        @@media (max-width: 768px) {
+        body {
+        padding: 1rem;
+        }
+
+        .toolbar {
+        padding: 0.6rem 0.75rem;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.5rem;
+        }
+
+        .search-wrap {
+        min-width: 0;
+        }
+
+        .result-badge {
+        text-align: center;
+        }
+
+        #salesTable {
+        min-width: 800px;
+        font-size: 0.8rem;
+        }
+
+        #salesTable thead th {
+        font-size: 0.65rem;
+        padding: 0.5rem 0.4rem;
+        }
+
+        #salesTable tbody td {
+        padding: 0.4rem 0.4rem;
+        }
+
+        .btn-success-custom {
+        font-size: 0.8rem;
+        padding: 0.4rem 1.2rem;
+        }
+
+        .btn-outline-custom {
+        font-size: 0.7rem;
+        padding: 0.2rem 0.6rem;
+        }
+
+        .pagination-container {
+        padding: 0.6rem 0.75rem;
+        }
+
+        .pagination .page-link {
+        padding: 0.3rem 0.6rem;
+        font-size: 0.75rem;
+        }
+
+        .table-footer {
+        font-size: 0.7rem;
+        padding: 0.5rem 0.75rem;
+        flex-direction: column;
+        align-items: flex-start;
+        }
+        }
+
+        @@media (max-width: 576px) {
+        .header-icon i {
+        font-size: 1.2rem;
+        }
+
+        h5 {
+        font-size: 1.1rem;
+        }
+
+        .d-flex.justify-content-between {
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        }
+
+        #salesTable {
+        min-width: 700px;
+        font-size: 0.7rem;
+        }
+
+        #salesTable thead th {
+        padding: 0.3rem 0.2rem;
+        }
+
+        #salesTable tbody td {
+        padding: 0.3rem 0.2rem;
+        }
+
+        .btn-outline-custom {
+        padding: 0.15rem 0.5rem;
+        font-size: 0.65rem;
+        }
+
+        .btn-outline-custom i {
+        font-size: 0.8rem;
+        }
+        }
+
+        /* ── Reduced Motion ── */
+        @@media (prefers-reduced-motion: reduce) {
+        * {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+        }
+        }
+
+        /* ── Fade Animation for Rows ── */
+        .fade-in {
+        animation: fadeIn 0.3s ease forwards;
+        opacity: 0;
+        }
+
+        @@keyframes fadeIn {
+        to {
+        opacity: 1;
+        }
+        }
+
+        .fade-in:nth-child(1) {
+        animation-delay: 0.02s;
+        }
+
+        .fade-in:nth-child(2) {
+        animation-delay: 0.04s;
+        }
+
+        .fade-in:nth-child(3) {
+        animation-delay: 0.06s;
+        }
+
+        .fade-in:nth-child(4) {
+        animation-delay: 0.08s;
+        }
+
+        .fade-in:nth-child(5) {
+        animation-delay: 0.10s;
+        }
+
+        .fade-in:nth-child(6) {
+        animation-delay: 0.12s;
+        }
+
+        .fade-in:nth-child(7) {
+        animation-delay: 0.14s;
+        }
+
+        .fade-in:nth-child(8) {
+        animation-delay: 0.16s;
+        }
+
+        .fade-in:nth-child(9) {
+        animation-delay: 0.18s;
+        }
+
+        .fade-in:nth-child(10) {
+        animation-delay: 0.20s;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="page-wrapper">
+
+        <!-- ── Header ── -->
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+            <div class="d-flex align-items-center gap-3">
+                <div class="header-icon">
+                    <i class="bi bi-cart-check"></i>
+                </div>
+                <div>
+                    <h5 class="mb-0 fw-bold">
+                        Sales
+                        <span class="badge bg-success ms-2" style="font-size:0.7rem;">
+                            <i class="bi bi-database me-1"></i>@ViewBag.TotalRecords total
+                        </span>
+                    </h5>
+                    <small class="text-muted">Manage all sales transactions</small>
+                </div>
+            </div>
+            <a asp-action="Create" class="btn btn-success-custom">
+                <i class="bi bi-plus-lg"></i> New Sale
+            </a>
+        </div>
+
+        <!-- ── Alerts ── -->
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show alert-custom" role="alert">
+                <i class="bi bi-check-circle"></i>@TempData["Success"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-danger alert-dismissible fade show alert-custom" role="alert">
+                <i class="bi bi-exclamation-circle"></i>@TempData["Error"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+
+        <!-- ── TOOLBAR WITH SEARCH ── -->
+        <div class="toolbar">
+            <div class="search-wrap">
+                <i class="bi bi-search"></i>
+                <input type="text" id="saleSearch"
+                       placeholder="Search by ID, Customer, Medicine, Date..."
+                       autocomplete="off"
+                       value="@ViewBag.CurrentSearch" />
+                <button type="button" id="clearSearch" class="clear-search" title="Clear Search">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+            <span class="result-badge" id="resultCount">
+                @ViewBag.TotalRecords results
+            </span>
+        </div>
+
+        <!-- ── Table Card ── -->
+        <div class="card-modern">
+            <div class="card-body-custom">
+                <div class="table-wrapper">
+                    <table class="table" id="salesTable">
+                        <thead>
+                            <tr>
+                                <th class="ps-3">#</th>
+                                <th>Date</th>
+                                <th>Customer</th>
+                                <th>Medicine</th>
+                                <th class="text-end">Rate (₹)</th>
+                                <th class="text-end">Qty</th>
+                                <th class="text-end">Amount (₹)</th>
+                                <th class="text-end">GST (₹)</th>
+                                <th class="text-end">Line Total (₹)</th>
+                                <th class="text-end">Grand Total (₹)</th>
+                                <th class="text-center">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="salesTableBody">
+                            @if (!Model.Any())
+                            {
+                                <tr>
+                                    <td colspan="11" class="text-center empty-state">
+                                        @if (!string.IsNullOrEmpty(ViewBag.CurrentSearch))
+                                        {
+                                            <i class="bi bi-search"></i>
+                                            <div>No sales found matching "<strong>@ViewBag.CurrentSearch</strong>"</div>
+                                            <div style="margin-top:0.25rem; font-size:0.9rem;">
+                                                Try adjusting your search or <a asp-action="Index" class="text-decoration-none">clear the filter</a>.
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <i class="bi bi-inbox"></i>
+                                            <div>No sales found.</div>
+                                            <div style="margin-top:0.25rem; font-size:0.9rem;">
+                                                Click <strong>New Sale</strong> to get started.
+                                            </div>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                            else
+                            {
+                                foreach (var sale in Model)
+                                {
+                                    var details = sale.SaleDetails?.ToList()
+                                                   ?? new List<MedicalStore.Business.ViewModels.SaleDetailVM>();
+                                    int rowCount = details.Count > 0 ? details.Count : 1;
+                                    bool isFirst = true;
+
+                                    if (details.Count == 0)
+                                    {
+                                        <!-- ── Sale with NO detail lines ── -->
+                                        <tr class="fade-in sale-group-start" data-search="@sale.SaleId @sale.CustomerName @sale.SaleDate.ToString("dd-MM-yyyy")">
+                                            <td class="ps-3 fw-semibold text-muted">@sale.SaleId</td>
+                                            <td>@sale.SaleDate.ToString("dd-MM-yyyy")</td>
+                                            <td class="fw-semibold">@sale.CustomerName</td>
+                                            <td colspan="6" class="text-muted fst-italic">No items</td>
+                                            <td class="text-end fw-bold text-success">
+                                                ₹@sale.GrandTotal.ToString("N2")
+                                            </td>
+                                            <td class="text-center">
+                                                <a asp-action="Details" asp-route-id="@sale.SaleId"
+                                                   class="btn btn-outline-custom me-1" title="View">
+                                                    <i class="bi bi-eye"></i>
+                                                </a>
+                                                <a asp-action="Invoice" asp-route-id="@sale.SaleId"
+                                                   class="btn btn-outline-custom me-1" title="Invoice">
+                                                    <i class="bi bi-receipt"></i>
+                                                </a>
+                                                <form asp-action="Delete" asp-route-id="@sale.SaleId"
+                                                      method="post" class="d-inline"
+                                                      onsubmit="return confirm('Delete Sale #@sale.SaleId?')">
+                                                    @Html.AntiForgeryToken()
+                                                    <button type="submit" class="btn btn-outline-custom" title="Delete">
+                                                        <i class="bi bi-trash"></i>
+                                                    </button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    }
+                                    else
+                                    {
+                                        <!-- ── Sale WITH detail lines ── -->
+                                        foreach (var detail in details)
+                                        {
+                                            <tr class="fade-in @(isFirst ? "sale-group-start" : "")"
+                                                data-search="@sale.SaleId @sale.CustomerName @sale.SaleDate.ToString("dd-MM-yyyy") @detail.MedicineName">
+
+                                                @if (isFirst)
+                                                {
+                                                    <!-- Sale header cells — span all detail rows -->
+                                                    <td class="ps-3 fw-semibold" rowspan="@rowCount">
+                                                        @sale.SaleId
+                                                    </td>
+                                                    <td rowspan="@rowCount">
+                                                        @sale.SaleDate.ToString("dd-MM-yyyy")
+                                                    </td>
+                                                    <td rowspan="@rowCount" class="fw-semibold">
+                                                        @sale.CustomerName
+                                                    </td>
+                                                }
+
+                                                <!-- Detail columns -->
+                                                <td>@detail.MedicineName</td>
+                                                <td class="text-end">@detail.Rate.ToString("N2")</td>
+                                                <td class="text-end">@detail.Qty.ToString("N0")</td>
+                                                <td class="text-end">@detail.Amt.ToString("N2")</td>
+                                                <td class="text-end">@detail.GstAmt.ToString("N2")</td>
+                                                <td class="text-end fw-semibold">@detail.Total.ToString("N2")</td>
+
+                                                @if (isFirst)
+                                                {
+                                                    <!-- Grand total + action buttons — span all detail rows -->
+                                                    <td class="text-end fw-bold text-success" rowspan="@rowCount">
+                                                        ₹@sale.GrandTotal.ToString("N2")
+                                                    </td>
+                                                    <td class="text-center" rowspan="@rowCount">
+                                                        <a asp-action="Details" asp-route-id="@sale.SaleId"
+                                                           class="btn btn-outline-custom me-1" title="View Details">
+                                                            <i class="bi bi-eye"></i>
+                                                        </a>
+                                                        <a asp-action="Invoice" asp-route-id="@sale.SaleId"
+                                                           class="btn btn-outline-custom me-1" title="Invoice">
+                                                            <i class="bi bi-receipt"></i>
+                                                        </a>
+                                                        <form asp-action="Delete" asp-route-id="@sale.SaleId"
+                                                              method="post" class="d-inline"
+                                                              onsubmit="return confirm('Delete Sale #@sale.SaleId? This cannot be undone.')">
+                                                            @Html.AntiForgeryToken()
+                                                            <button type="submit" class="btn btn-outline-custom" title="Delete">
+                                                                <i class="bi bi-trash"></i>
+                                                            </button>
+                                                        </form>
+                                                    </td>
+                                                }
+
+                                            </tr>
+                                            isFirst = false;
+                                        }
+                                    }
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- ─── PAGINATION ─── -->
+                @if (ViewBag.TotalPages > 1)
+                {
+                    <div class="pagination-container" id="paginationContainer">
+                        <nav>
+                            <ul class="pagination justify-content-center mb-0">
+                                <li class="page-item @(ViewBag.CurrentPage == 1 ? "disabled" : "")">
+                                    <a class="page-link" asp-action="Index"
+                                       asp-route-page="@(ViewBag.CurrentPage - 1)"
+                                       asp-route-searchTerm="@ViewBag.CurrentSearch">
+                                        <i class="bi bi-chevron-left"></i> Previous
+                                    </a>
+                                </li>
+
+                                @for (int i = 1; i <= ViewBag.TotalPages; i++)
+                                {
+                                    <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                                        <a class="page-link" asp-action="Index"
+                                           asp-route-page="@i"
+                                           asp-route-searchTerm="@ViewBag.CurrentSearch">@i</a>
+                                    </li>
+                                }
+
+                                <li class="page-item @(ViewBag.CurrentPage == ViewBag.TotalPages ? "disabled" : "")">
+                                    <a class="page-link" asp-action="Index"
+                                       asp-route-page="@(ViewBag.CurrentPage + 1)"
+                                       asp-route-searchTerm="@ViewBag.CurrentSearch">
+                                        Next <i class="bi bi-chevron-right"></i>
+                                    </a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                }
+
+                <!-- ─── TABLE FOOTER ─── -->
+                <div class="table-footer">
+                    <span>
+                        <i class="bi bi-list-ul me-1"></i>
+                        Showing <strong id="visibleCount">@Model.Count()</strong> of <strong id="totalCount">@ViewBag.TotalRecords</strong> sales
+                    </span>
+                    <span class="total-badge">
+                        <i class="bi bi-clock-history me-1"></i> Page @ViewBag.CurrentPage of @ViewBag.TotalPages
+                    </span>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        (function() {
+        'use strict';
+
+        // Store ALL sales for searching across all pages
+        const allSales = @Html.Raw(Json.Serialize(allSalesData));
+        const searchInput = document.getElementById('saleSearch');
+        const clearButton = document.getElementById('clearSearch');
+        const tbody = document.getElementById('salesTableBody');
+        const visibleCount = document.getElementById('visibleCount');
+        const totalCount = document.getElementById('totalCount');
+        const resultCount = document.getElementById('resultCount');
+        const paginationContainer = document.getElementById('paginationContainer');
+        const currentPage = @ViewBag.CurrentPage;
+
+        // ── Escape HTML to prevent XSS ──
+        function escapeHtml(text) {
+        if (!text) return '';
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+        }
+
+        // ── Toggle clear button visibility ──
+        function toggleClearButton() {
+        if (searchInput.value.trim().length > 0) {
+        clearButton.classList.add('show');
+        } else {
+        clearButton.classList.remove('show');
+        }
+        }
+
+        // ── Format date ──
+        function formatDate(dateString) {
+        if (!dateString) return '';
+        const date = new Date(dateString);
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const year = date.getFullYear();
+        return `${day}-${month}-${year}`;
+        }
+
+        // ── Render filtered sales (client-side search across ALL records) ──
+        function renderFilteredSales(searchTerm) {
+        const trimmedTerm = searchTerm.trim();
+
+        // If search is empty, reload the page to show server-side pagination
+        if (trimmedTerm === "") {
+        window.location.href = '@Url.Action("Index", new { page = -1 })'.replace('-1', currentPage);
+        return;
+        }
+
+        const lowerSearch = trimmedTerm.toLowerCase();
+
+        // Filter sales from ALL data
+        const filtered = allSales.filter(s =>
+        (s.saleId && s.saleId.toString().includes(lowerSearch)) ||
+        (s.customerName && s.customerName.toLowerCase().includes(lowerSearch)) ||
+        (s.purchaseDate && formatDate(s.purchaseDate).includes(lowerSearch)) ||
+        (s.saleDetails && s.saleDetails.some(d =>
+        d.medicineName && d.medicineName.toLowerCase().includes(lowerSearch)
+        ))
+        );
+
+        // Update counts
+        const total = allSales.length;
+        const shown = filtered.length;
+
+        if (visibleCount) visibleCount.textContent = shown;
+        if (totalCount) totalCount.textContent = total;
+        if (resultCount) {
+        resultCount.textContent = shown + ' result' + (shown !== 1 ? 's' : '');
+        }
+
+        // Hide pagination when searching
+        if (paginationContainer) {
+        paginationContainer.style.display = 'none';
+        }
+
+        // Show clear button
+        toggleClearButton();
+
+        // Show "no results" message
+        if (filtered.length === 0) {
+        tbody.innerHTML = `
+        <tr>
+        <td colspan="11" class="text-center empty-state">
+        <i class="bi bi-search"></i>
+        <div>No sales found matching "<strong>${escapeHtml(trimmedTerm)}</strong>"</div>
+        <div style="margin-top:0.25rem; font-size:0.9rem;">
+        Try adjusting your search or
+        <button type="button" id="clearSearchFromMsg"
+        class="btn btn-link btn-sm text-decoration-none p-0"
+        style="color:#2e7d32;">
+        clear the filter
+        </button>.
+        </div>
+        </td>
+        </tr>
+        `;
+        const clearBtnMsg = document.getElementById('clearSearchFromMsg');
+        if (clearBtnMsg) {
+        clearBtnMsg.addEventListener('click', function() {
+        clearButton.click();
+        });
+        }
+        return;
+        }
+
+        // Build results HTML
+        let html = '';
+        filtered.forEach(function(s) {
+        const details = s.saleDetails || [];
+        const rowCount = details.length > 0 ? details.length : 1;
+        let isFirst = true;
+
+        if (details.length === 0) {
+        html += `
+        <tr class="fade-in sale-group-start">
+        <td class="ps-3 fw-semibold text-muted">${s.saleId}</td>
+        <td>${formatDate(s.purchaseDate)}</td>
+        <td class="fw-semibold">${escapeHtml(s.customerName)}</td>
+        <td colspan="6" class="text-muted fst-italic">No items</td>
+        <td class="text-end fw-bold text-success">₹${parseFloat(s.grandTotal).toFixed(2)}</td>
+        <td class="text-center">
+        <a href="/Sale/Details/${s.saleId}" class="btn btn-outline-custom me-1" title="View">
+        <i class="bi bi-eye"></i>
+        </a>
+        <a href="/Sale/Invoice/${s.saleId}" class="btn btn-outline-custom me-1" title="Invoice">
+        <i class="bi bi-receipt"></i>
+        </a>
+        <form action="/Sale/Delete/${s.saleId}" method="post" class="d-inline"
+        onsubmit="return confirm('Delete Sale #${s.saleId}?')">
+        <button type="submit" class="btn btn-outline-custom" title="Delete">
+        <i class="bi bi-trash"></i>
+        </button>
+        </form>
+        </td>
+        </tr>
+        `;
+        } else {
+        details.forEach(function(d) {
+        html += `
+        <tr class="fade-in ${isFirst ? 'sale-group-start' : ''}">
+        ${isFirst ? `
+        <td class="ps-3 fw-semibold" rowspan="${rowCount}">${s.saleId}</td>
+        <td rowspan="${rowCount}">${formatDate(s.purchaseDate)}</td>
+        <td rowspan="${rowCount}" class="fw-semibold">${escapeHtml(s.customerName)}</td>
+        ` : ''}
+        <td>${escapeHtml(d.medicineName)}</td>
+        <td class="text-end">${parseFloat(d.rate).toFixed(2)}</td>
+        <td class="text-end">${parseInt(d.qty).toFixed(0)}</td>
+        <td class="text-end">${parseFloat(d.amt).toFixed(2)}</td>
+        <td class="text-end">${parseFloat(d.gstAmt).toFixed(2)}</td>
+        <td class="text-end fw-semibold">${parseFloat(d.total).toFixed(2)}</td>
+        ${isFirst ? `
+        <td class="text-end fw-bold text-success" rowspan="${rowCount}">
+        ₹${parseFloat(s.grandTotal).toFixed(2)}
+        </td>
+        <td class="text-center" rowspan="${rowCount}">
+        <a href="/Sale/Details/${s.saleId}" class="btn btn-outline-custom me-1" title="View Details">
+        <i class="bi bi-eye"></i>
+        </a>
+        <a href="/Sale/Invoice/${s.saleId}" class="btn btn-outline-custom me-1" title="Invoice">
+        <i class="bi bi-receipt"></i>
+        </a>
+        <form action="/Sale/Delete/${s.saleId}" method="post" class="d-inline"
+        onsubmit="return confirm('Delete Sale #${s.saleId}? This cannot be undone.')">
+        <button type="submit" class="btn btn-outline-custom" title="Delete">
+        <i class="bi bi-trash"></i>
+        </button>
+        </form>
+        </td>
+        ` : ''}
+        </tr>
+        `;
+        isFirst = false;
+        });
+        }
+        });
+
+        tbody.innerHTML = html;
+        }
+
+        // ── Debounce search ──
+        let debounceTimer;
+        searchInput.addEventListener('input', function() {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(function() {
+        renderFilteredSales(searchInput.value);
+        }, 300);
+        });
+
+        // ── Clear button click ──
+        clearButton.addEventListener('click', function() {
+        searchInput.value = '';
+        clearButton.classList.remove('show');
+        window.location.href = '@Url.Action("Index", new { page = -1 })'.replace('-1', currentPage);
+        });
+
+        // ── Enter key to search ──
+        searchInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+        e.preventDefault();
+        renderFilteredSales(searchInput.value);
+        }
+        if (e.key === 'Escape') {
+        clearButton.click();
+        }
+        });
+
+        // ── Initial state ──
+        toggleClearButton();
+
+        // If there's a search term from server, trigger client-side filter
+        const currentSearchTerm = '@ViewBag.CurrentSearch';
+        if (currentSearchTerm && currentSearchTerm.trim() !== '') {
+        searchInput.value = currentSearchTerm;
+        setTimeout(function() {
+        renderFilteredSales(currentSearchTerm);
+        }, 100);
+        }
+
+        })();
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,479 @@
+@model MedicalStore.Business.ViewModels.PurchaseMasterVM
+@{
+    ViewData["Title"] = $"Purchase #{Model.PurId} Details";
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <style>
+        /* ── Reset & Base ── */
+        * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        }
+
+        body {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        background: linear-gradient(145deg, #f0f5fc 0%, #e3eaf5 100%);
+        min-height: 100vh;
+        padding: 1.5rem;
+        margin: 0;
+        }
+
+        /* ── Main Container ── */
+        .page-wrapper {
+        max-width: 1280px;
+        margin: 0 auto;
+        animation: fadeSlideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @@keyframes fadeSlideUp {
+        0% {
+        opacity: 0;
+        transform: translateY(30px) scale(0.97);
+        }
+
+        100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        }
+        }
+
+        /* ── Card ── */
+        .card-modern {
+        background: #ffffff;
+        border: none;
+        border-radius: 24px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.06), 0 8px 28px rgba(0, 0, 0, 0.03), 0 0 0 1px rgba(0, 0, 0, 0.02);
+        transition: box-shadow 0.3s ease, transform 0.2s ease;
+        overflow: hidden;
+        }
+
+        .card-modern:hover {
+        box-shadow: 0 32px 80px rgba(0, 0, 0, 0.08), 0 12px 36px rgba(0, 0, 0, 0.04), 0 0 0 1px rgba(0, 0, 0, 0.02);
+        transform: translateY(-2px);
+        }
+
+        .card-header-custom {
+        background: transparent;
+        border-bottom: 1px solid #f0f3f9;
+        padding: 1rem 1.5rem;
+        font-weight: 600;
+        font-size: 1rem;
+        color: #1f3a5f;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.75rem;
+        }
+
+        .card-body-custom {
+        padding: 1.5rem;
+        }
+
+        /* ── Info Cards ── */
+        .info-box {
+        background: #f8faff;
+        border-radius: 16px;
+        padding: 0.75rem 1rem;
+        border: 1px solid #eef3f9;
+        height: 100%;
+        transition: background 0.2s;
+        }
+
+        .info-box:hover {
+        background: #f0f6fe;
+        }
+
+        .info-box .label {
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        color: #6b7a93;
+        display: block;
+        margin-bottom: 0.15rem;
+        }
+
+        .info-box .value {
+        font-weight: 700;
+        font-size: 1.05rem;
+        color: #0b1a33;
+        }
+
+        .info-box .value .currency {
+        font-weight: 400;
+        color: #5a6e8a;
+        font-size: 0.9rem;
+        }
+
+        .info-box.total-box {
+        background: #e8f4fd;
+        border-color: #cde0f0;
+        }
+
+        .info-box.total-box .value {
+        color: #1f5a8a;
+        font-size: 1.25rem;
+        }
+
+        /* ── Table ── */
+        .table-wrapper {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        margin-top: 0.5rem;
+        }
+
+        .table-purchase {
+        width: 100%;
+        min-width: 700px;
+        font-size: 0.9rem;
+        border-collapse: separate;
+        border-spacing: 0 4px;
+        }
+
+        .table-purchase thead th {
+        background: #f8faff;
+        border: none;
+        font-weight: 600;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        color: #4a5d7a;
+        padding: 0.6rem 0.75rem;
+        white-space: nowrap;
+        border-bottom: 2px solid #e2e8f0;
+        }
+
+        .table-purchase tbody tr {
+        background: #ffffff;
+        transition: background 0.15s;
+        border-radius: 12px;
+        box-shadow: 0 1px 4px rgba(0,0,0,0.02);
+        }
+
+        .table-purchase tbody tr:hover {
+        background: #f8fbff;
+        }
+
+        .table-purchase tbody td {
+        padding: 0.6rem 0.75rem;
+        vertical-align: middle;
+        border: none;
+        border-bottom: 1px solid #f0f3f9;
+        }
+
+        .table-purchase tbody tr:last-child td {
+        border-bottom: none;
+        }
+
+        .table-purchase .text-end {
+        text-align: right;
+        }
+
+        .table-purchase .text-center {
+        text-align: center;
+        }
+
+        /* ── Table foot ── */
+        .table-purchase tfoot td {
+        padding: 0.6rem 0.75rem;
+        border: none;
+        font-weight: 600;
+        border-top: 2px solid #e2e8f0;
+        }
+
+        .table-purchase tfoot .total-row td {
+        border-top: 2px solid #3d7eb9;
+        background: #f0f6fe;
+        font-weight: 700;
+        color: #1f3a5f;
+        border-radius: 0 0 12px 12px;
+        }
+
+        /* ── Empty state ── */
+        .empty-state {
+        color: #9aabbe;
+        padding: 2rem 0;
+        }
+
+        .empty-state i {
+        font-size: 2.5rem;
+        display: block;
+        margin-bottom: 0.5rem;
+        opacity: 0.5;
+        }
+
+        /* ── Buttons ── */
+        .btn-outline-custom {
+        border: 1.5px solid #dce3ef;
+        border-radius: 60px;
+        padding: 0.4rem 1.2rem;
+        font-weight: 600;
+        font-size: 0.85rem;
+        color: #4a5d7a;
+        background: transparent;
+        transition: all 0.2s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        }
+
+        .btn-outline-custom:hover {
+        background: #f4f7fd;
+        border-color: #b6c8e0;
+        color: #1f3a5f;
+        }
+
+        .btn-primary-custom {
+        background: #3d7eb9;
+        border: none;
+        border-radius: 60px;
+        padding: 0.4rem 1.2rem;
+        font-weight: 600;
+        font-size: 0.85rem;
+        color: #fff;
+        transition: all 0.25s ease;
+        box-shadow: 0 4px 12px rgba(61,126,185,0.25);
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        }
+
+        .btn-primary-custom:hover {
+        background: #3269a0;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(61,126,185,0.30);
+        color: #fff;
+        }
+
+        /* ── Responsive ── */
+        @@media (max-width: 768px) {
+        body {
+        padding: 1rem;
+        }
+
+        .card-header-custom {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.5rem;
+        }
+
+        .card-header-custom .btn-group {
+        display: flex;
+        gap: 0.5rem;
+        }
+
+        .card-header-custom .btn-group .btn {
+        flex: 1;
+        justify-content: center;
+        }
+
+        .card-body-custom {
+        padding: 1rem;
+        }
+
+        .info-box .value {
+        font-size: 0.95rem;
+        }
+
+        .info-box.total-box .value {
+        font-size: 1.1rem;
+        }
+
+        .table-purchase {
+        font-size: 0.8rem;
+        min-width: 600px;
+        }
+
+        .table-purchase thead th, .table-purchase tbody td {
+        padding: 0.4rem 0.5rem;
+        }
+        }
+
+        @@media (max-width: 576px) {
+        .info-box {
+        padding: 0.5rem 0.75rem;
+        }
+
+        .info-box .value {
+        font-size: 0.9rem;
+        }
+
+        .table-purchase {
+        min-width: 500px;
+        font-size: 0.75rem;
+        }
+
+        .table-purchase thead th, .table-purchase tbody td {
+        padding: 0.3rem 0.4rem;
+        }
+        }
+
+        /* ── Reduced Motion ── */
+        @@media (prefers-reduced-motion: reduce) {
+        * {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+        }
+        }
+
+        /* ── Misc ── */
+        .text-accent {
+        color: #3d7eb9;
+        }
+
+        .bg-soft-primary {
+        background: #e8f4fd;
+        }
+
+        .fw-500 {
+        font-weight: 500;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="page-wrapper">
+
+        <!-- Main Card -->
+        <div class="card-modern">
+
+            <!-- Card Header -->
+            <div class="card-header-custom">
+                <span>
+                    <i class="bi bi-box-seam me-2 text-primary"></i>
+                    <span class="fw-bold">Purchase #@Model.PurId</span>
+                    <span class="text-muted fw-normal ms-2 small">
+                        <i class="bi bi-calendar3 me-1"></i>@Model.PurchaseDate.ToString("dd MMM yyyy")
+                    </span>
+                </span>
+                <div class="btn-group">
+                    <a asp-action="Index" class="btn btn-outline-custom">
+                        <i class="bi bi-arrow-left"></i> Back
+                    </a>
+                   
+                </div>
+            </div>
+
+            <!-- Card Body -->
+            <div class="card-body-custom">
+
+                <!-- Summary Info Cards -->
+                <div class="row g-3 mb-4">
+                    <div class="col-6 col-md-3">
+                        <div class="info-box">
+                            <span class="label"><i class="bi bi-calendar-event me-1"></i>Date</span>
+                            <span class="value">@Model.PurchaseDate.ToString("dd-MM-yyyy")</span>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="info-box">
+                            <span class="label"><i class="bi bi-receipt me-1"></i>Invoice</span>
+                            <span class="value">@(string.IsNullOrEmpty(Model.InvoiceNo) ? "—" : Model.InvoiceNo)</span>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="info-box">
+                            <span class="label"><i class="bi bi-building me-1"></i>Supplier</span>
+                            <span class="value">@Model.SupplierName</span>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="info-box total-box">
+                            <span class="label"><i class="bi bi-currency-rupee me-1"></i>Grand Total</span>
+                            <span class="value">₹@Model.GrandTotal.ToString("N2")</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Purchase Details Table -->
+                <div class="table-wrapper">
+                    <table class="table table-purchase">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Medicine</th>
+                                <th class="text-end">Rate (₹)</th>
+                                <th class="text-center">Qty</th>
+                                <th class="text-end">Amount (₹)</th>
+                                <th class="text-end">GST %</th>
+                                <th class="text-end">GST (₹)</th>
+                                <th class="text-end">Total (₹)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model.PurchaseDetails != null && Model.PurchaseDetails.Any())
+                            {
+                                int i = 1;
+                                foreach (var d in Model.PurchaseDetails)
+                                {
+                                    <tr>
+                                        <td>@(i++)</td>
+                                        <td>@d.MedicineName</td>
+                                        <td class="text-end">@d.Rate.ToString("N2")</td>
+                                        <td class="text-center">@d.Qty</td>
+                                        <td class="text-end">@d.Amt.ToString("N2")</td>
+                                        <td class="text-end">@d.GstPct.ToString("N2")</td>
+                                        <td class="text-end">@d.GstAmt.ToString("N2")</td>
+                                        <td class="text-end fw-semibold">@d.Total.ToString("N2")</td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="8" class="text-center empty-state">
+                                        <i class="bi bi-inbox"></i>
+                                        No items in this purchase.
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                        <tfoot>
+                            @if (Model.PurchaseDetails != null && Model.PurchaseDetails.Any())
+                            {
+                                <tr>
+                                    <td colspan="7" class="text-end fw-semibold">Sub Total</td>
+                                    <td class="text-end fw-semibold">₹@Model.GrandTotal.ToString("N2")</td>
+                                </tr>
+                                @if (Model.Discount > 0)
+                                {
+                                    <tr>
+                                        <td colspan="7" class="text-end fw-semibold text-danger">Discount</td>
+                                        <td class="text-end text-danger">- ₹@Model.Discount.ToString("N2")</td>
+                                    </tr>
+                                }
+                                <tr class="total-row">
+                                    <td colspan="7" class="text-end fw-bold">Net Total</td>
+                                    <td class="text-end fw-bold">₹@Model.NetTotal.ToString("N2")</td>
+                                </tr>
+                            }
+                        </tfoot>
+                    </table>
+                </div>
+
+            </div>
+            <!-- /card-body -->
+
+        </div>
+        <!-- /card-modern -->
+
+    </div>
+    <!-- /page-wrapper -->
+
+</body>
+</html>

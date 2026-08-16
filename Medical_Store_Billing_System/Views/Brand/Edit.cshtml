@@ -1,0 +1,418 @@
+@model MedicalStore.Business.ViewModels.BrandVM
+@{
+    ViewData["Title"] = "Edit Brand";
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Medical Store</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet" />
+
+    <style>
+            * {
+                font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            }
+
+            body {
+                background: #f0f4f9;
+                min-height: 100vh;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 20px;
+                margin: 0;
+            }
+
+            .edit-card {
+                border: none;
+                border-radius: 24px;
+                overflow: hidden;
+                background: #ffffff;
+                width: 100%;
+                max-width: 480px;
+                margin: 0 auto;
+                transition: transform 0.25s ease, box-shadow 0.3s ease;
+                /* Enhanced Box Shadow */
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08), 0 12px 30px rgba(0, 0, 0, 0.12), 0 24px 60px rgba(10, 40, 60, 0.16);
+            }
+
+                .edit-card:hover {
+                    transform: translateY(-2px);
+                    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.10), 0 20px 45px rgba(0, 0, 0, 0.16), 0 35px 75px rgba(10, 40, 60, 0.22);
+                }
+
+            .card-header-custom {
+                background: linear-gradient(135deg, #0b2a3e 0%, #1a4a6b 100%);
+                color: #fff;
+                padding: 20px 28px;
+                border-bottom: 0;
+                display: flex;
+                align-items: center;
+                gap: 12px;
+            }
+
+                .card-header-custom .header-icon {
+                    width: 44px;
+                    height: 44px;
+                    background: rgba(255, 255, 255, 0.15);
+                    backdrop-filter: blur(4px);
+                    border-radius: 14px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 22px;
+                    flex-shrink: 0;
+                }
+
+                .card-header-custom h5 {
+                    font-weight: 700;
+                    font-size: 1.2rem;
+                    margin: 0;
+                    letter-spacing: -0.02em;
+                }
+
+                .card-header-custom .sub {
+                    font-size: 0.8rem;
+                    opacity: 0.7;
+                    font-weight: 400;
+                    margin: 0;
+                    line-height: 1.2;
+                }
+
+            .card-body-custom {
+                padding: 28px 28px 32px;
+            }
+
+            .form-label-custom {
+                font-weight: 600;
+                font-size: 0.82rem;
+                letter-spacing: 0.4px;
+                text-transform: uppercase;
+                color: #3a5a7a;
+                margin-bottom: 6px;
+            }
+
+            .form-control-custom {
+                border: 1.5px solid #e2e8f0;
+                border-radius: 14px;
+                padding: 12px 16px;
+                font-size: 0.95rem;
+                transition: all 0.25s ease;
+                background: #fafcfe;
+                color: #0b2a3e;
+            }
+
+                .form-control-custom:focus {
+                    border-color: #1a4a6b;
+                    box-shadow: 0 0 0 4px rgba(26, 74, 107, 0.08);
+                    background: #fff;
+                }
+
+                .form-control-custom.is-invalid {
+                    border-color: #dc3545;
+                    background-image: none;
+                }
+
+                    .form-control-custom.is-invalid:focus {
+                        box-shadow: 0 0 0 4px rgba(220, 53, 69, 0.12);
+                    }
+
+            .validation-message {
+                font-size: 0.8rem;
+                margin-top: 6px;
+                display: flex;
+                align-items: center;
+                gap: 4px;
+            }
+
+            .btn-primary-custom {
+                background: linear-gradient(135deg, #0b2a3e, #1a4a6b);
+                border: none;
+                padding: 11px 28px;
+                border-radius: 40px;
+                font-weight: 600;
+                font-size: 0.9rem;
+                color: #fff;
+                transition: all 0.25s ease;
+                box-shadow: 0 4px 16px rgba(26, 74, 107, 0.3);
+                display: inline-flex;
+                align-items: center;
+                gap: 8px;
+            }
+
+                .btn-primary-custom:hover {
+                    transform: translateY(-2px);
+                    box-shadow: 0 8px 28px rgba(26, 74, 107, 0.35);
+                    color: #fff;
+                }
+
+                .btn-primary-custom:active {
+                    transform: translateY(0);
+                }
+
+            .btn-outline-secondary-custom {
+                border: 1.5px solid #dce2ea;
+                border-radius: 40px;
+                padding: 11px 28px;
+                font-weight: 500;
+                font-size: 0.9rem;
+                color: #5a738a;
+                background: transparent;
+                transition: all 0.2s ease;
+                display: inline-flex;
+                align-items: center;
+                gap: 8px;
+            }
+
+                .btn-outline-secondary-custom:hover {
+                    background: #f0f4f9;
+                    border-color: #b8c8da;
+                    color: #0b2a3e;
+                }
+
+            .alert-validation {
+                border-radius: 14px;
+                font-size: 0.85rem;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                padding: 12px 16px;
+                border: 0;
+                background: #fde8e8;
+                color: #b02a37;
+            }
+
+            .brand-id-badge {
+                background: #eef2f6;
+                padding: 4px 14px;
+                border-radius: 40px;
+                font-size: 0.75rem;
+                font-weight: 600;
+                color: #3a5a7a;
+                display: inline-block;
+                letter-spacing: 0.3px;
+            }
+
+            /* ── Responsive ── */
+            @@media (max-width: 576px) {
+                body {
+                    padding: 12px;
+                    align-items: flex-start;
+                    padding-top: 30px;
+                }
+
+                .edit-card {
+                    border-radius: 20px;
+                }
+
+                .card-header-custom {
+                    padding: 16px 20px;
+                    flex-wrap: wrap;
+                }
+
+                    .card-header-custom .header-icon {
+                        width: 38px;
+                        height: 38px;
+                        font-size: 18px;
+                    }
+
+                    .card-header-custom h5 {
+                        font-size: 1rem;
+                    }
+
+                .card-body-custom {
+                    padding: 20px 18px 24px;
+                }
+
+                .form-control-custom {
+                    padding: 10px 14px;
+                    font-size: 0.9rem;
+                    border-radius: 12px;
+                }
+
+                .btn-primary-custom,
+                .btn-outline-secondary-custom {
+                    width: 100%;
+                    justify-content: center;
+                    padding: 12px 16px;
+                }
+
+                .d-flex.gap-2 {
+                    flex-direction: column;
+                    gap: 10px !important;
+                }
+
+                    .d-flex.gap-2 .btn {
+                        width: 100%;
+                    }
+            }
+
+            @@media (max-width: 400px) {
+                .card-header-custom h5 {
+                    font-size: 0.9rem;
+                }
+
+                .card-header-custom .sub {
+                    font-size: 0.7rem;
+                }
+            }
+
+            /* fade-in animation */
+            .fade-in {
+                animation: fadeIn 0.35s ease forwards;
+            }
+
+            @@keyframes fadeIn {
+                from {
+                    opacity: 0;
+                    transform: translateY(10px);
+                }
+
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            /* loading spinner on submit */
+            .btn-primary-custom .spinner-border-sm {
+                width: 1rem;
+                height: 1rem;
+                border-width: 0.15em;
+            }
+
+            .btn-primary-custom.loading {
+                pointer-events: none;
+                opacity: 0.8;
+            }
+    </style>
+</head>
+
+<body>
+
+    <div class="edit-card fade-in">
+        <!-- Header -->
+        <div class="card-header-custom">
+            <div class="header-icon">
+                <i class="bi bi-pencil-square"></i>
+            </div>
+            <div>
+                <h5>Edit Brand</h5>
+                <p class="sub">Update brand information</p>
+            </div>
+            <div class="ms-auto">
+                <span class="brand-id-badge">
+                    <i class="bi bi-hash me-1"></i>@Model.BrandId
+                </span>
+            </div>
+        </div>
+
+        <!-- Body -->
+        <div class="card-body-custom">
+            <form asp-action="Edit" method="post" id="editForm" novalidate>
+                @Html.AntiForgeryToken()
+                <input type="hidden" asp-for="BrandId" />
+
+                <!-- Validation Summary -->
+                <div asp-validation-summary="ModelOnly"
+                     class="alert-validation mb-3 @(ViewData.ModelState.IsValid ? "d-none" : "")">
+                    <i class="bi bi-exclamation-circle"></i>
+                    <span>Please fix the errors below.</span>
+                </div>
+
+                <!-- Brand Name -->
+                <div class="mb-4">
+                    <label asp-for="BrandName" class="form-label-custom">
+                        <i class="bi bi-tag me-1"></i>Brand Name
+                    </label>
+                    <input asp-for="BrandName"
+                           class="form-control form-control-custom"
+                           placeholder="e.g. GlaxoSmithKline"
+                           autofocus />
+                    <span asp-validation-for="BrandName" class="validation-message text-danger">
+                       
+                    </span>
+                    
+                </div>
+
+                <!-- Actions -->
+                <div class="d-flex gap-2 pt-2">
+                    <button type="submit" class="btn btn-primary-custom" id="submitBtn">
+                        <i class="bi bi-check-lg"></i>
+                        <span>Update Brand</span>
+                    </button>
+                    <a asp-action="Index" class="btn btn-outline-secondary-custom">
+                        <i class="bi bi-arrow-left"></i> Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Scripts: jQuery + Validation (for better client-side UX) -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+            integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
+            crossorigin="anonymous">
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.5/dist/jquery.validate.min.js">
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery-validation-unobtrusive@4.0.0/dist/jquery.validate.unobtrusive.min.js">
+    </script>
+
+    <script>
+            (function () {
+                'use strict';
+
+                const form = document.getElementById('editForm');
+                const submitBtn = document.getElementById('submitBtn');
+
+                // ── Loading state on submit ──
+                form.addEventListener('submit', function (e) {
+                    // If client-side validation fails, don't show loading
+                    if (!form.checkValidity()) {
+                        return;
+                    }
+
+                    // Add loading state
+                    submitBtn.classList.add('loading');
+                    const originalHtml = submitBtn.innerHTML;
+                    submitBtn.innerHTML = `
+                            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                            <span>Updating...</span>
+                        `;
+
+                    // Re-enable after a while (in case of error/redirect, but will be replaced)
+                    // We can't easily revert because page will reload/redirect, but fine.
+                });
+
+                // ── Auto-hide validation summary on input change ──
+                const summary = document.querySelector('.alert-validation');
+                if (summary) {
+                    const inputs = form.querySelectorAll('input, select, textarea');
+                    inputs.forEach(input => {
+                        input.addEventListener('input', function () {
+                            if (summary && !summary.classList.contains('d-none')) {
+                                // Check if all fields are valid
+                                const isValid = form.checkValidity();
+                                if (isValid) {
+                                    summary.classList.add('d-none');
+                                }
+                            }
+                        });
+                    });
+                }
+
+                // ── Add dynamic validation styling (optional) ──
+                // Bootstrap 5 validation classes are handled by the framework,
+                // but we can add custom behavior.
+                // The unobtrusive validation adds .is-invalid automatically.
+            })();
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,1346 @@
+@model IEnumerable<MedicalStore.Business.ViewModels.StockReportVM>
+@{
+    ViewData["Title"] = "Stock Report";
+    Layout = null;
+    var allStockItemsData = ViewBag.AllStockItems as IEnumerable<MedicalStore.Business.ViewModels.StockReportVM> ?? Model;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5">
+    <title>@ViewData["Title"]</title>
+    <!-- Bootstrap 5 + Icons + Google Font -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <style>
+            /* ── Reset & Base ── */
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            body {
+                font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                background: linear-gradient(145deg, #f0fdf4 0%, #dcfce7 100%);
+                min-height: 100vh;
+                padding: 1.5rem;
+                margin: 0;
+            }
+
+            /* ── Main Container ── */
+            .page-wrapper {
+                max-width: 1200px;
+                margin: 0 auto;
+                animation: fadeSlideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            }
+
+            @@keyframes fadeSlideUp {
+                0% {
+                    opacity: 0;
+                    transform: translateY(30px) scale(0.97);
+                }
+
+                100% {
+                    opacity: 1;
+                    transform: translateY(0) scale(1);
+                }
+            }
+
+            /* ── Card ── */
+            .report-card {
+                background: #ffffff;
+                border: none;
+                border-radius: 24px;
+                box-shadow: 0 20px 60px rgba(0, 0, 0, 0.06), 0 8px 28px rgba(0, 0, 0, 0.03), 0 0 0 1px rgba(0, 0, 0, 0.02);
+                transition: box-shadow 0.3s ease, transform 0.2s ease;
+                overflow: hidden;
+            }
+
+                .report-card:hover {
+                    box-shadow: 0 32px 80px rgba(0, 0, 0, 0.08), 0 12px 36px rgba(0, 0, 0, 0.04), 0 0 0 1px rgba(0, 0, 0, 0.02);
+                    transform: translateY(-2px);
+                }
+
+            /* ── Card Header ── */
+            .card-header-custom {
+                background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+                border-bottom: 2px solid rgba(21, 128, 61, 0.15);
+                padding: 1.35rem 2rem;
+                border-radius: 24px 24px 0 0 !important;
+                position: relative;
+            }
+
+                .card-header-custom::after {
+                    content: '';
+                    position: absolute;
+                    bottom: 0;
+                    left: 2rem;
+                    right: 2rem;
+                    height: 3px;
+                    background: linear-gradient(90deg, #15803d, #4ade80);
+                    border-radius: 3px;
+                }
+
+                .card-header-custom h5 {
+                    font-weight: 700;
+                    font-size: 1.3rem;
+                    letter-spacing: -0.02em;
+                    color: #14532d;
+                    display: flex;
+                    align-items: center;
+                    gap: 0.6rem;
+                    margin: 0;
+                    flex-wrap: wrap;
+                }
+
+                    .card-header-custom h5 i {
+                        color: #15803d;
+                        font-size: 1.6rem;
+                        filter: drop-shadow(0 2px 6px rgba(21, 128, 61, 0.30));
+                    }
+
+            .record-count {
+                background: #ffffff;
+                padding: 0.2rem 0.9rem;
+                border-radius: 60px;
+                font-size: 0.75rem;
+                font-weight: 600;
+                color: #14532d;
+                border: 1px solid #86efac;
+                box-shadow: 0 2px 8px rgba(21, 128, 61, 0.10);
+            }
+
+            .btn-print-header {
+                background: #ffffff;
+                border: 1px solid #86efac;
+                border-radius: 60px;
+                padding: 0.2rem 1rem;
+                font-weight: 600;
+                font-size: 0.8rem;
+                color: #14532d;
+                transition: all 0.2s ease;
+                display: inline-flex;
+                align-items: center;
+                gap: 0.4rem;
+                margin-left: 0.5rem;
+            }
+
+                .btn-print-header:hover {
+                    background: #dcfce7;
+                    border-color: #15803d;
+                    transform: scale(1.03);
+                    color: #14532d;
+                }
+
+            /* ── Card Body ── */
+            .card-body-custom {
+                padding: 2rem;
+            }
+
+            /* ── Summary Cards ── */
+            .summary-card {
+                border: none;
+                border-radius: 16px;
+                padding: 1.2rem 1rem;
+                text-align: center;
+                transition: transform 0.2s ease, box-shadow 0.2s ease;
+            }
+
+                .summary-card:hover {
+                    transform: translateY(-4px);
+                    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+                }
+
+                .summary-card .number {
+                    font-size: 2rem;
+                    font-weight: 700;
+                    line-height: 1.2;
+                }
+
+                .summary-card .label {
+                    font-size: 0.8rem;
+                    text-transform: uppercase;
+                    letter-spacing: 0.04em;
+                    color: #6b7f94;
+                    margin-top: 0.2rem;
+                }
+
+                .summary-card.success {
+                    background: #dcfce7;
+                }
+
+                    .summary-card.success .number {
+                        color: #15803d;
+                    }
+
+                .summary-card.danger {
+                    background: #fee2e2;
+                }
+
+                    .summary-card.danger .number {
+                        color: #dc2626;
+                    }
+
+                .summary-card.warning {
+                    background: #fef3c7;
+                }
+
+                    .summary-card.warning .number {
+                        color: #d97706;
+                    }
+
+                .summary-card.primary {
+                    background: #dbeafe;
+                }
+
+                    .summary-card.primary .number {
+                        color: #2563eb;
+                    }
+
+            /* ── Toolbar with Search ── */
+            .toolbar {
+                background: #ffffff;
+                border-radius: 16px;
+                padding: 0.75rem 1.25rem;
+                margin-bottom: 1.25rem;
+                display: flex;
+                flex-wrap: wrap;
+                align-items: center;
+                gap: 0.75rem;
+                border: 1px solid #eef1f7;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+            }
+
+            .search-wrap {
+                flex: 1 1 250px;
+                position: relative;
+                min-width: 150px;
+            }
+
+                .search-wrap .bi-search {
+                    position: absolute;
+                    left: 12px;
+                    top: 50%;
+                    transform: translateY(-50%);
+                    color: #a0b8cc;
+                    font-size: 0.9rem;
+                    pointer-events: none;
+                }
+
+                .search-wrap input {
+                    width: 100%;
+                    padding: 0.5rem 2.5rem 0.5rem 2.5rem;
+                    border: 1.5px solid #e2e8f0;
+                    border-radius: 40px;
+                    font-size: 0.9rem;
+                    background: #f8fafc;
+                    transition: all 0.25s ease;
+                    outline: none;
+                    font-family: 'Inter', sans-serif;
+                }
+
+                    .search-wrap input:focus {
+                        border-color: #15803d;
+                        background: #fff;
+                        box-shadow: 0 0 0 4px rgba(21, 128, 61, 0.08);
+                    }
+
+                    .search-wrap input::placeholder {
+                        color: #a5b9cd;
+                    }
+
+            .clear-search {
+                position: absolute;
+                right: 10px;
+                top: 50%;
+                transform: translateY(-50%);
+                border: none;
+                background: transparent;
+                color: #9aa8b5;
+                cursor: pointer;
+                display: none;
+                font-size: 16px;
+                padding: 2px 4px;
+                transition: color 0.2s;
+                border-radius: 50%;
+                line-height: 1;
+            }
+
+                .clear-search:hover {
+                    color: #dc3545;
+                }
+
+                .clear-search.show {
+                    display: block;
+                }
+
+            .result-badge {
+                font-size: 0.85rem;
+                color: #5a738a;
+                background: #f0f4f9;
+                padding: 0.25rem 1rem;
+                border-radius: 40px;
+                font-weight: 500;
+                white-space: nowrap;
+            }
+
+            /* ── Filter Tabs ── */
+            .filter-tabs {
+                margin-bottom: 1.5rem;
+            }
+
+                .filter-tabs .btn-group {
+                    gap: 0.5rem;
+                }
+
+            .btn-filter {
+                border-radius: 60px !important;
+                padding: 0.4rem 1.5rem;
+                font-weight: 600;
+                font-size: 0.85rem;
+                border: 2px solid #e2e9f3;
+                transition: all 0.2s ease;
+                background: #fff;
+            }
+
+                .btn-filter:hover {
+                    transform: translateY(-2px);
+                }
+
+                .btn-filter.active {
+                    background: #15803d;
+                    border-color: #15803d;
+                    color: #ffffff;
+                    box-shadow: 0 4px 12px rgba(21, 128, 61, 0.25);
+                }
+
+                    .btn-filter.active:hover {
+                        background: #166534;
+                        border-color: #166534;
+                    }
+
+            .btn-filter-danger.active {
+                background: #dc2626;
+                border-color: #dc2626;
+                color: #ffffff;
+                box-shadow: 0 4px 12px rgba(220, 38, 38, 0.25);
+            }
+
+                .btn-filter-danger.active:hover {
+                    background: #b91c1c;
+                    border-color: #b91c1c;
+                }
+
+            /* ── Table ── */
+            .table-wrapper {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .table-custom {
+                width: 100%;
+                min-width: 700px;
+                font-size: 0.9rem;
+                border-collapse: separate;
+                border-spacing: 0;
+                margin-bottom: 0;
+            }
+
+                .table-custom thead th {
+                    background: #f8faff;
+                    border-bottom: 2px solid #e2e8f0;
+                    font-weight: 600;
+                    font-size: 0.75rem;
+                    text-transform: uppercase;
+                    letter-spacing: 0.04em;
+                    color: #4a5d7a;
+                    padding: 0.75rem 0.75rem;
+                    white-space: nowrap;
+                    position: sticky;
+                    top: 0;
+                    z-index: 5;
+                }
+
+                .table-custom tbody td {
+                    padding: 0.7rem 0.75rem;
+                    vertical-align: middle;
+                    border-bottom: 1px solid #f0f3f9;
+                }
+
+                .table-custom tbody tr {
+                    background: #ffffff;
+                    transition: background 0.15s;
+                }
+
+                    .table-custom tbody tr:hover {
+                        background: #f8fbff;
+                    }
+
+                    .table-custom tbody tr.stock-low {
+                        background: #fef2f2;
+                    }
+
+                        .table-custom tbody tr.stock-low:hover {
+                            background: #fee2e2;
+                        }
+
+                    .table-custom tbody tr.stock-zero {
+                        background: #fee2e2;
+                    }
+
+                        .table-custom tbody tr.stock-zero:hover {
+                            background: #fecaca;
+                        }
+
+                .table-custom tfoot td {
+                    padding: 0.7rem 0.75rem;
+                    border-top: 2px solid #e2e8f0;
+                    font-weight: 600;
+                    background: #dcfce7;
+                }
+
+            .text-amount {
+                font-weight: 700;
+                color: #15803d;
+            }
+
+            /* ── Badge Styles ── */
+            .badge-category {
+                background: #dcfce7;
+                color: #15803d;
+                padding: 0.2rem 0.8rem;
+                border-radius: 40px;
+                font-size: 0.75rem;
+                font-weight: 500;
+            }
+
+            .badge-stock {
+                padding: 0.3rem 0.8rem;
+                border-radius: 40px;
+                font-size: 0.85rem;
+                font-weight: 700;
+            }
+
+                .badge-stock.success {
+                    background: #dcfce7;
+                    color: #15803d;
+                }
+
+                .badge-stock.warning {
+                    background: #fef3c7;
+                    color: #d97706;
+                }
+
+                .badge-stock.danger {
+                    background: #fee2e2;
+                    color: #dc2626;
+                }
+
+            .badge-status {
+                padding: 0.25rem 0.8rem;
+                border-radius: 40px;
+                font-size: 0.75rem;
+                font-weight: 600;
+            }
+
+                .badge-status.success {
+                    background: #dcfce7;
+                    color: #15803d;
+                }
+
+                .badge-status.warning {
+                    background: #fef3c7;
+                    color: #d97706;
+                }
+
+                .badge-status.danger {
+                    background: #fee2e2;
+                    color: #dc2626;
+                }
+
+            /* ── Pagination ── */
+            .pagination-container {
+                padding: 0.9rem 1.5rem;
+                background: #fafcff;
+                border-top: 1px solid #eef1f7;
+            }
+
+            .pagination .page-link {
+                color: #1a4a6b;
+                border-radius: 8px;
+                margin: 0 3px;
+                border: 1px solid #e9edf4;
+                padding: 0.4rem 0.85rem;
+                font-size: 0.85rem;
+                font-family: 'Inter', sans-serif;
+            }
+
+                .pagination .page-link:hover {
+                    background: #f0f4f9;
+                    border-color: #15803d;
+                    color: #15803d;
+                }
+
+            .pagination .page-item.active .page-link {
+                background: #15803d;
+                border-color: #15803d;
+                color: #fff;
+            }
+
+            .pagination .page-item.disabled .page-link {
+                color: #a0b8cc;
+                cursor: not-allowed;
+            }
+
+            /* ── Footer ── */
+            .table-footer {
+                background: #fafcfe;
+                padding: 0.7rem 1.5rem;
+                border-top: 1px solid #eef1f7;
+                font-size: 0.8rem;
+                color: #6b7a93;
+                display: flex;
+                flex-wrap: wrap;
+                align-items: center;
+                justify-content: space-between;
+                gap: 0.5rem;
+            }
+
+                .table-footer .total-badge {
+                    background: #e9edf4;
+                    padding: 0.15rem 0.7rem;
+                    border-radius: 40px;
+                    font-weight: 600;
+                    color: #1d2b44;
+                    font-size: 0.75rem;
+                }
+
+            /* ── Empty State ── */
+            .empty-state {
+                color: #9aabbe;
+                padding: 2.5rem 0;
+            }
+
+                .empty-state i {
+                    font-size: 3rem;
+                    display: block;
+                    margin-bottom: 0.5rem;
+                    opacity: 0.6;
+                }
+
+            /* ── Print Button (Footer) ── */
+            .btn-print {
+                background: #eef2f7;
+                border: 1px solid #d6dfea;
+                border-radius: 60px;
+                padding: 0.4rem 1.2rem;
+                font-weight: 600;
+                font-size: 0.85rem;
+                color: #1f3a5f;
+                transition: all 0.2s ease;
+                display: inline-flex;
+                align-items: center;
+                gap: 0.4rem;
+            }
+
+                .btn-print:hover {
+                    background: #e2eaf5;
+                    border-color: #bcc9da;
+                    transform: scale(1.03);
+                    color: #0b2a4a;
+                }
+
+            /* ── Footer Info ── */
+            .footer-info {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-top: 1rem;
+            }
+
+            /* ── Responsive ── */
+            @@media (max-width: 768px) {
+                body {
+                    padding: 1rem;
+                }
+
+                .card-body-custom {
+                    padding: 1.2rem;
+                }
+
+                .card-header-custom {
+                    padding: 1rem 1.2rem;
+                }
+
+                    .card-header-custom h5 {
+                        font-size: 1.1rem;
+                    }
+
+                        .card-header-custom h5 i {
+                            font-size: 1.3rem;
+                        }
+
+                .record-count {
+                    font-size: 0.65rem;
+                    padding: 0.15rem 0.6rem;
+                }
+
+                .btn-print-header {
+                    font-size: 0.7rem;
+                    padding: 0.15rem 0.7rem;
+                }
+
+                .summary-card .number {
+                    font-size: 1.5rem;
+                }
+
+                .summary-card {
+                    padding: 0.8rem 0.5rem;
+                }
+
+                .toolbar {
+                    padding: 0.6rem 0.75rem;
+                    flex-direction: column;
+                    align-items: stretch;
+                    gap: 0.5rem;
+                }
+
+                .search-wrap {
+                    min-width: 0;
+                }
+
+                .result-badge {
+                    text-align: center;
+                }
+
+                .filter-tabs .btn-group {
+                    flex-wrap: wrap;
+                }
+
+                .btn-filter {
+                    font-size: 0.75rem;
+                    padding: 0.3rem 1rem;
+                }
+
+                .table-custom {
+                    min-width: 550px;
+                    font-size: 0.8rem;
+                }
+
+                    .table-custom thead th {
+                        font-size: 0.65rem;
+                        padding: 0.5rem 0.4rem;
+                    }
+
+                    .table-custom tbody td {
+                        padding: 0.4rem 0.4rem;
+                    }
+
+                    .table-custom tfoot td {
+                        padding: 0.4rem 0.4rem;
+                        font-size: 0.8rem;
+                    }
+
+                .pagination-container {
+                    padding: 0.6rem 0.75rem;
+                }
+
+                .pagination .page-link {
+                    padding: 0.3rem 0.6rem;
+                    font-size: 0.75rem;
+                }
+
+                .table-footer {
+                    font-size: 0.7rem;
+                    padding: 0.5rem 0.75rem;
+                    flex-direction: column;
+                    align-items: flex-start;
+                }
+
+                .footer-info {
+                    flex-direction: column;
+                    gap: 0.5rem;
+                    align-items: flex-start;
+                }
+
+                .btn-print {
+                    font-size: 0.8rem;
+                    padding: 0.3rem 1rem;
+                }
+            }
+
+            @@media (max-width: 576px) {
+                .summary-card .number {
+                    font-size: 1.2rem;
+                }
+
+                .summary-card .label {
+                    font-size: 0.65rem;
+                }
+
+                .table-custom {
+                    min-width: 450px;
+                    font-size: 0.7rem;
+                }
+
+                    .table-custom thead th {
+                        padding: 0.3rem 0.2rem;
+                        font-size: 0.6rem;
+                    }
+
+                    .table-custom tbody td {
+                        padding: 0.3rem 0.2rem;
+                    }
+
+                    .table-custom tfoot td {
+                        padding: 0.3rem 0.2rem;
+                        font-size: 0.7rem;
+                    }
+
+                .btn-print {
+                    font-size: 0.75rem;
+                    padding: 0.3rem 0.8rem;
+                }
+
+                .btn-print-header {
+                    font-size: 0.65rem;
+                    padding: 0.1rem 0.6rem;
+                }
+
+                .badge-stock {
+                    font-size: 0.7rem;
+                    padding: 0.2rem 0.6rem;
+                }
+
+                .badge-status {
+                    font-size: 0.65rem;
+                    padding: 0.15rem 0.5rem;
+                }
+            }
+
+            /* ── Print Styles ── */
+            @@media print {
+                .no-print {
+                    display: none !important;
+                }
+
+                body {
+                    background: white !important;
+                    padding: 0.5in !important;
+                }
+
+                .report-card {
+                    box-shadow: none !important;
+                    border: 1px solid #ddd !important;
+                    border-radius: 8px !important;
+                }
+
+                .card-header-custom {
+                    background: #f0fdf4 !important;
+                    border-bottom: 2px solid #15803d !important;
+                }
+
+                    .card-header-custom::after {
+                        display: none !important;
+                    }
+
+                .table-custom thead th {
+                    background: #f1f5f9 !important;
+                    border-bottom: 2px solid #d1d5db !important;
+                    color: #111827 !important;
+                }
+
+                .table-custom tfoot td {
+                    background: #f0fdf4 !important;
+                    border-top: 2px solid #15803d !important;
+                }
+
+                .report-card:hover {
+                    transform: none !important;
+                    box-shadow: none !important;
+                }
+
+                .summary-card {
+                    border: 1px solid #e2e8f0 !important;
+                }
+            }
+
+            /* ── Reduced Motion ── */
+            @@media (prefers-reduced-motion: reduce) {
+                * {
+                    animation-duration: 0.01ms !important;
+                    transition-duration: 0.01ms !important;
+                }
+            }
+
+            /* Custom Scrollbar for table */
+            .table-wrapper::-webkit-scrollbar {
+                height: 6px;
+            }
+
+            .table-wrapper::-webkit-scrollbar-track {
+                background: #f1f5f9;
+                border-radius: 10px;
+            }
+
+            .table-wrapper::-webkit-scrollbar-thumb {
+                background: #d1dbe8;
+                border-radius: 10px;
+            }
+
+                .table-wrapper::-webkit-scrollbar-thumb:hover {
+                    background: #b8c6d6;
+                }
+
+            /* Table row animation */
+            .fade-in {
+                animation: fadeInRow 0.3s ease forwards;
+                opacity: 0;
+            }
+
+                .fade-in:nth-child(1) {
+                    animation-delay: 0.02s;
+                }
+
+                .fade-in:nth-child(2) {
+                    animation-delay: 0.04s;
+                }
+
+                .fade-in:nth-child(3) {
+                    animation-delay: 0.06s;
+                }
+
+                .fade-in:nth-child(4) {
+                    animation-delay: 0.08s;
+                }
+
+                .fade-in:nth-child(5) {
+                    animation-delay: 0.10s;
+                }
+
+                .fade-in:nth-child(6) {
+                    animation-delay: 0.12s;
+                }
+
+                .fade-in:nth-child(7) {
+                    animation-delay: 0.14s;
+                }
+
+                .fade-in:nth-child(8) {
+                    animation-delay: 0.16s;
+                }
+
+                .fade-in:nth-child(9) {
+                    animation-delay: 0.18s;
+                }
+
+                .fade-in:nth-child(10) {
+                    animation-delay: 0.20s;
+                }
+
+            @@keyframes fadeInRow {
+                from {
+                    opacity: 0;
+                    transform: translateX(-10px);
+                }
+
+                to {
+                    opacity: 1;
+                    transform: translateX(0);
+                }
+            }
+    </style>
+</head>
+<body>
+
+    <div class="page-wrapper">
+
+        <!-- ── Report Card ── -->
+        <div class="report-card">
+            <!-- Card Header -->
+            <div class="card-header-custom">
+                <h5>
+                    <i class="bi bi-clipboard-data"></i>
+                    <span>Stock Report</span>
+                    <span class="record-count">
+                        <i class="bi bi-database me-1"></i>@ViewBag.TotalRecords medicines
+                    </span>
+                    <button class="btn-print-header no-print" onclick="printReport('Stock Report')">
+                        <i class="bi bi-printer"></i> Print
+                    </button>
+                </h5>
+            </div>
+
+            <!-- Card Body -->
+            <div class="card-body-custom">
+                <!-- Summary Cards -->
+                <div class="row g-3 mb-4">
+                    <div class="col-md-3 col-6">
+                        <div class="summary-card success">
+                            <div class="number">@ViewBag.NormalStock</div>
+                            <div class="label"><i class="bi bi-check-circle me-1"></i>Normal Stock</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-6">
+                        <div class="summary-card danger">
+                            <div class="number">@ViewBag.LowStock</div>
+                            <div class="label"><i class="bi bi-exclamation-triangle me-1"></i>Low Stock (≤10)</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-6">
+                        <div class="summary-card warning">
+                            <div class="number">@ViewBag.OutOfStock</div>
+                            <div class="label"><i class="bi bi-x-circle me-1"></i>Out of Stock</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-6">
+                        <div class="summary-card primary">
+                            <div class="number">₹@ViewBag.TotalStockValue.ToString("N0")</div>
+                            <div class="label"><i class="bi bi-coin me-1"></i>Total Stock Value</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ─── TOOLBAR WITH SEARCH ─── -->
+                <div class="toolbar no-print">
+                    <div class="search-wrap">
+                        <i class="bi bi-search"></i>
+                        <input type="text" id="stockSearch"
+                               placeholder="Search by Medicine, Category, Brand..."
+                               autocomplete="off"
+                               value="@ViewBag.CurrentSearch" />
+                        <button type="button" id="clearSearch" class="clear-search" title="Clear Search">
+                            <i class="bi bi-x-lg"></i>
+                        </button>
+                    </div>
+                    <span class="result-badge" id="resultCount">
+                        @ViewBag.TotalRecords results
+                    </span>
+                </div>
+
+                <!-- Filter Tabs -->
+                <div class="filter-tabs no-print">
+                    <div class="btn-group" role="group">
+                        <button type="button" class="btn btn-filter active" id="btnAll">
+                            <i class="bi bi-list me-1"></i>All
+                        </button>
+                        <button type="button" class="btn btn-filter btn-filter-danger" id="btnLow">
+                            <i class="bi bi-exclamation-triangle me-1"></i>Low Stock Only
+                        </button>
+                        <button type="button" class="btn btn-filter" id="btnOutOfStock">
+                            <i class="bi bi-x-circle me-1"></i>Out of Stock
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Table -->
+                <div class="table-wrapper">
+                    <table class="table-custom" id="stockTable">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th><i class="bi bi-capsule me-1"></i>Medicine</th>
+                                <th><i class="bi bi-tag me-1"></i>Category</th>
+                                <th><i class="bi bi-building me-1"></i>Brand</th>
+                                <th class="text-end"><i class="bi bi-coin me-1"></i>Rate (₹)</th>
+                                <th class="text-center"><i class="bi bi-box me-1"></i>Stock</th>
+                                <th class="text-end"><i class="bi bi-cash me-1"></i>Value (₹)</th>
+                                <th class="text-center"><i class="bi bi-info-circle me-1"></i>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="stockTableBody">
+                            @if (!Model.Any())
+                            {
+                                <tr>
+                                    <td colspan="8" class="text-center empty-state">
+                                        @if (!string.IsNullOrEmpty(ViewBag.CurrentSearch))
+                                        {
+                                            <i class="bi bi-search"></i>
+                                            <div>No medicines found matching "<strong>@ViewBag.CurrentSearch</strong>"</div>
+                                            <div style="margin-top:0.25rem; font-size:0.9rem;">
+                                                Try adjusting your search or <a asp-action="StockReport" class="text-decoration-none">clear the filter</a>.
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <i class="bi bi-inbox"></i>
+                                            <div>No medicines found.</div>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                            else
+                            {
+                                int i = 1;
+                                @foreach (var m in Model)
+                                {
+                                    <tr class="fade-in @(m.Stock == 0 ? "stock-zero" : m.IsLowStock ? "stock-low" : "stock-ok")"
+                                        data-stock="@m.Stock"
+                                        data-lowstock="@(m.IsLowStock ? "true" : "false")"
+                                        data-search="@m.MedicineName @m.CategoryName @m.BrandName @m.Stock">
+                                        <td>@(i++)</td>
+                                        <td class="fw-semibold">@m.MedicineName</td>
+                                        <td><span class="badge-category">@m.CategoryName</span></td>
+                                        <td>@m.BrandName</td>
+                                        <td class="text-end">@m.Rate.ToString("N2")</td>
+                                        <td class="text-center">
+                                            <span class="badge-stock @(m.Stock == 0 ? "danger" : m.IsLowStock ? "warning" : "success")">
+                                                @m.Stock
+                                            </span>
+                                        </td>
+                                        <td class="text-end text-amount">@m.StockValue.ToString("N2")</td>
+                                        <td class="text-center">
+                                            @if (m.Stock == 0)
+                                            {
+                                                <span class="badge-status danger">Out of Stock</span>
+                                            }
+                                            else if (m.IsLowStock)
+                                            {
+                                                <span class="badge-status warning">Low Stock</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge-status success">OK</span>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                        @if (Model.Any())
+                        {
+                            <tfoot>
+                                <tr>
+                                    <td colspan="6" class="text-end">Total Stock Value</td>
+                                    <td class="text-end text-amount" id="totalValue">₹@Model.Sum(m => m.StockValue).ToString("N2")</td>
+                                    <td></td>
+                                </tr>
+                            </tfoot>
+                        }
+                    </table>
+                </div>
+
+                <!-- ─── PAGINATION ─── -->
+                @if (ViewBag.TotalPages > 1)
+                {
+                    <div class="pagination-container no-print" id="paginationContainer">
+                        <nav>
+                            <ul class="pagination justify-content-center mb-0">
+                                <li class="page-item @(ViewBag.CurrentPage == 1 ? "disabled" : "")">
+                                    <a class="page-link" asp-action="StockReport"
+                                       asp-route-page="@(ViewBag.CurrentPage - 1)"
+                                       asp-route-searchTerm="@ViewBag.CurrentSearch">
+                                        <i class="bi bi-chevron-left"></i> Previous
+                                    </a>
+                                </li>
+
+                                @for (int i = 1; i <= ViewBag.TotalPages; i++)
+                                {
+                                    <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                                        <a class="page-link" asp-action="StockReport"
+                                           asp-route-page="@i"
+                                           asp-route-searchTerm="@ViewBag.CurrentSearch">@i</a>
+                                    </li>
+                                }
+
+                                <li class="page-item @(ViewBag.CurrentPage == ViewBag.TotalPages ? "disabled" : "")">
+                                    <a class="page-link" asp-action="StockReport"
+                                       asp-route-page="@(ViewBag.CurrentPage + 1)"
+                                       asp-route-searchTerm="@ViewBag.CurrentSearch">
+                                        Next <i class="bi bi-chevron-right"></i>
+                                    </a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                }
+
+                <!-- ─── TABLE FOOTER ─── -->
+                <div class="table-footer no-print">
+                    <span>
+                        <i class="bi bi-list-ul me-1"></i>
+                        Showing <strong id="visibleCount">@Model.Count()</strong> of <strong id="totalCount">@ViewBag.TotalRecords</strong> medicines
+                    </span>
+                    <span class="total-badge">
+                        <i class="bi bi-clock-history me-1"></i> Page @ViewBag.CurrentPage of @ViewBag.TotalPages
+                    </span>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ── Footer Info ── -->
+        <div class="footer-info">
+            <small class="text-muted">
+                <i class="bi bi-clock me-1"></i>
+                Generated: @DateTime.Now.ToString("dd MMM yyyy, hh:mm tt")
+            </small>
+            <small class="text-muted">
+                <i class="bi bi-database me-1"></i>
+                @ViewBag.TotalRecords record(s) found
+            </small>
+        </div>
+
+    </div>
+
+    <!-- Bootstrap JS Bundle + jQuery -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+            integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
+            crossorigin="anonymous">
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js">
+    </script>
+
+    <script>
+            function printReport(title) {
+                window.print();
+            }
+
+            $(document).ready(function() {
+                // Store ALL stock items for searching across all pages
+                const allStockItems = @Html.Raw(Json.Serialize(allStockItemsData));
+                const searchInput = document.getElementById('stockSearch');
+                const clearButton = document.getElementById('clearSearch');
+                const tbody = document.getElementById('stockTableBody');
+                const visibleCount = document.getElementById('visibleCount');
+                const totalCount = document.getElementById('totalCount');
+                const resultCount = document.getElementById('resultCount');
+                const totalValue = document.getElementById('totalValue');
+                const paginationContainer = document.getElementById('paginationContainer');
+                const currentPage = @ViewBag.CurrentPage;
+
+                // ── Escape HTML to prevent XSS ──
+                function escapeHtml(text) {
+                    if (!text) return '';
+                    const div = document.createElement('div');
+                    div.textContent = text;
+                    return div.innerHTML;
+                }
+
+                // ── Toggle clear button visibility ──
+                function toggleClearButton() {
+                    if (searchInput.value.trim().length > 0) {
+                        clearButton.classList.add('show');
+                    } else {
+                        clearButton.classList.remove('show');
+                    }
+                }
+
+                // ── Get stock badge class ──
+                function getStockBadgeClass(stock) {
+                    if (stock === 0) return 'danger';
+                    if (stock <= 10) return 'warning';
+                    return 'success';
+                }
+
+                // ── Get stock badge text ──
+                function getStockBadgeText(stock) {
+                    if (stock === 0) return 'Out of Stock';
+                    if (stock <= 10) return 'Low Stock';
+                    return 'OK';
+                }
+
+                // ── Get stock badge class for status ──
+                function getStatusBadgeClass(stock) {
+                    if (stock === 0) return 'danger';
+                    if (stock <= 10) return 'warning';
+                    return 'success';
+                }
+
+                // ── Get row class ──
+                function getRowClass(stock) {
+                    if (stock === 0) return 'stock-zero';
+                    if (stock <= 10) return 'stock-low';
+                    return 'stock-ok';
+                }
+
+                // ── Render filtered stock items (client-side search across ALL records) ──
+                function renderFilteredStock(searchTerm) {
+                    const trimmedTerm = searchTerm.trim();
+
+                    // If search is empty, reload the page to show server-side pagination
+                    if (trimmedTerm === "") {
+                        window.location.href = '@Url.Action("StockReport", new { page = -1 })'.replace('-1', currentPage);
+                        return;
+                    }
+
+                    const lowerSearch = trimmedTerm.toLowerCase();
+
+                    // Filter stock items from ALL data
+                    const filtered = allStockItems.filter(item =>
+                        (item.medicineName && item.medicineName.toLowerCase().includes(lowerSearch)) ||
+                        (item.categoryName && item.categoryName.toLowerCase().includes(lowerSearch)) ||
+                        (item.brandName && item.brandName.toLowerCase().includes(lowerSearch)) ||
+                        (item.stock && item.stock.toString().includes(lowerSearch))
+                    );
+
+                    // Calculate total value
+                    const totalVal = filtered.reduce((sum, item) => sum + (item.stockValue || 0), 0);
+
+                    // Update counts
+                    const total = allStockItems.length;
+                    const shown = filtered.length;
+
+                    if (visibleCount) visibleCount.textContent = shown;
+                    if (totalCount) totalCount.textContent = total;
+                    if (resultCount) {
+                        resultCount.textContent = shown + ' result' + (shown !== 1 ? 's' : '');
+                    }
+
+                    // Update total value
+                    if (totalValue) {
+                        totalValue.textContent = '₹' + totalVal.toFixed(2);
+                    }
+
+                    // Hide pagination when searching
+                    if (paginationContainer) {
+                        paginationContainer.style.display = 'none';
+                    }
+
+                    // Show clear button
+                    toggleClearButton();
+
+                    // Show "no results" message
+                    if (filtered.length === 0) {
+                        tbody.innerHTML = `
+                            <tr>
+                                <td colspan="8" class="text-center empty-state">
+                                    <i class="bi bi-search"></i>
+                                    <div>No medicines found matching "<strong>${escapeHtml(trimmedTerm)}</strong>"</div>
+                                    <div style="margin-top:0.25rem; font-size:0.9rem;">
+                                        Try adjusting your search or
+                                        <button type="button" id="clearSearchFromMsg"
+                                                class="btn btn-link btn-sm text-decoration-none p-0"
+                                                style="color:#15803d;">
+                                            clear the filter
+                                        </button>.
+                                    </div>
+                                </td>
+                            </tr>
+                        `;
+                        const clearBtnMsg = document.getElementById('clearSearchFromMsg');
+                        if (clearBtnMsg) {
+                            clearBtnMsg.addEventListener('click', function() {
+                                clearButton.click();
+                            });
+                        }
+                        // Update footer total
+                        updateFooterTotal(0);
+                        return;
+                    }
+
+                    // Build results HTML
+                    let html = '';
+                    let counter = 1;
+                    filtered.forEach(function(item) {
+                        const stockClass = getStockBadgeClass(item.stock);
+                        const statusText = getStockBadgeText(item.stock);
+                        const statusClass = getStatusBadgeClass(item.stock);
+                        const rowClass = getRowClass(item.stock);
+
+                        html += `
+                            <tr class="fade-in ${rowClass}">
+                                <td>${counter++}</td>
+                                <td class="fw-semibold">${escapeHtml(item.medicineName)}</td>
+                                <td><span class="badge-category">${escapeHtml(item.categoryName)}</span></td>
+                                <td>${escapeHtml(item.brandName)}</td>
+                                <td class="text-end">${parseFloat(item.rate).toFixed(2)}</td>
+                                <td class="text-center">
+                                    <span class="badge-stock ${stockClass}">
+                                        ${item.stock}
+                                    </span>
+                                </td>
+                                <td class="text-end text-amount">${parseFloat(item.stockValue).toFixed(2)}</td>
+                                <td class="text-center">
+                                    <span class="badge-status ${statusClass}">${statusText}</span>
+                                </td>
+                            </tr>
+                        `;
+                    });
+
+                    tbody.innerHTML = html;
+
+                    // Update footer total
+                    updateFooterTotal(totalVal);
+                }
+
+                // ── Update footer total ──
+                function updateFooterTotal(value) {
+                    const tfootTotal = document.querySelector('tfoot .text-amount');
+                    if (tfootTotal) {
+                        tfootTotal.textContent = '₹' + value.toFixed(2);
+                    }
+                }
+
+                // ── Debounce search ──
+                let debounceTimer;
+                searchInput.addEventListener('input', function() {
+                    clearTimeout(debounceTimer);
+                    debounceTimer = setTimeout(function() {
+                        renderFilteredStock(searchInput.value);
+                    }, 300);
+                });
+
+                // ── Clear button click ──
+                clearButton.addEventListener('click', function() {
+                    searchInput.value = '';
+                    clearButton.classList.remove('show');
+                    window.location.href = '@Url.Action("StockReport", new { page = -1 })'.replace('-1', currentPage);
+                });
+
+                // ── Enter key to search ──
+                searchInput.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        renderFilteredStock(searchInput.value);
+                    }
+                    if (e.key === 'Escape') {
+                        clearButton.click();
+                    }
+                });
+
+                // ── Initial state ──
+                toggleClearButton();
+
+                // If there's a search term from server, trigger client-side filter
+                const currentSearchTerm = '@ViewBag.CurrentSearch';
+                if (currentSearchTerm && currentSearchTerm.trim() !== '') {
+                    searchInput.value = currentSearchTerm;
+                    setTimeout(function() {
+                        renderFilteredStock(currentSearchTerm);
+                    }, 100);
+                }
+
+                // ── Filter: All ──
+                $('#btnAll').on('click', function() {
+                    $(this).addClass('active');
+                    $('#btnLow').removeClass('active');
+                    $('#btnOutOfStock').removeClass('active');
+                    $('#stockTable tbody tr').show();
+                });
+
+                // ── Filter: Low Stock Only ──
+                $('#btnLow').on('click', function() {
+                    $(this).addClass('active');
+                    $('#btnAll').removeClass('active');
+                    $('#btnOutOfStock').removeClass('active');
+                    $('#stockTable tbody tr').hide();
+                    $('#stockTable tbody tr.stock-low').show();
+                });
+
+                // ── Filter: Out of Stock Only ──
+                $('#btnOutOfStock').on('click', function() {
+                    $(this).addClass('active');
+                    $('#btnAll').removeClass('active');
+                    $('#btnLow').removeClass('active');
+                    $('#stockTable tbody tr').hide();
+                    $('#stockTable tbody tr.stock-zero').show();
+                });
+            });
+    </script>
+
+</body>
+</html>

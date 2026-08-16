@@ -1,0 +1,405 @@
+@model MedicalStore.Business.ViewModels.CustomerVM
+@{
+    ViewData["Title"] = "Delete Customer";
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Delete Customer</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <style>
+            *, *::before, *::after {
+                box-sizing: border-box;
+            }
+
+            body {
+                min-height: 100vh;
+                background: linear-gradient(135deg, #fdecea 0%, #fdf0f0 45%, #fce8f0 100%);
+                font-family: 'Inter', system-ui, sans-serif;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 2rem 1rem;
+            }
+
+            /* ── Card ── */
+            .delete-card {
+                width: 100%;
+                max-width: 500px;
+                border-radius: 20px;
+                overflow: hidden;
+                background: #ffffff;
+                box-shadow: 0 4px 6px -1px rgba(180, 30, 30, 0.08), 0 10px 24px -4px rgba(180, 30, 30, 0.14), 0 32px 56px -8px rgba(160, 20, 20, 0.10);
+                transition: box-shadow .3s ease;
+            }
+
+                .delete-card:hover {
+                    box-shadow: 0 6px 10px -2px rgba(180, 30, 30, 0.12), 0 16px 36px -4px rgba(180, 30, 30, 0.18), 0 40px 70px -10px rgba(160, 20, 20, 0.14);
+                }
+
+            /* ── Hero Header ── */
+            .card-hero {
+                background: linear-gradient(120deg, #c0392b 0%, #e53935 100%);
+                padding: 1.6rem 1.75rem;
+                position: relative;
+                overflow: hidden;
+            }
+
+                .card-hero::after {
+                    content: '';
+                    position: absolute;
+                    inset: 0;
+                    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none'%3E%3Ccircle cx='30' cy='30' r='28' fill='%23ffffff' fill-opacity='0.04'/%3E%3C/g%3E%3C/svg%3E") repeat;
+                    pointer-events: none;
+                }
+
+            .hero-inner {
+                display: flex;
+                align-items: center;
+                gap: .95rem;
+                position: relative;
+                z-index: 1;
+            }
+
+            .avatar-ring {
+                width: 50px;
+                height: 50px;
+                border-radius: 50%;
+                background: rgba(255,255,255,0.18);
+                border: 2px solid rgba(255,255,255,0.38);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 1.4rem;
+                color: #fff;
+                flex-shrink: 0;
+            }
+
+            .hero-title {
+                font-size: 1.1rem;
+                font-weight: 700;
+                color: #fff;
+                letter-spacing: -.01em;
+            }
+
+            .hero-sub {
+                font-size: .74rem;
+                color: rgba(255,255,255,.68);
+                font-weight: 500;
+                letter-spacing: .04em;
+                text-transform: uppercase;
+                margin-top: 2px;
+            }
+
+            /* ── Body ── */
+            .card-body-inner {
+                padding: 1.5rem 1.75rem;
+            }
+
+            /* ── Warning banner ── */
+            .warn-banner {
+                display: flex;
+                align-items: flex-start;
+                gap: .65rem;
+                background: #fff8e1;
+                border: 1.5px solid #ffe082;
+                border-radius: 12px;
+                padding: .75rem 1rem;
+                margin-bottom: 1.35rem;
+            }
+
+            .warn-icon {
+                width: 32px;
+                height: 32px;
+                border-radius: 8px;
+                background: linear-gradient(135deg, #fff3c4, #ffe57a);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 1rem;
+                color: #c77700;
+                flex-shrink: 0;
+                margin-top: 1px;
+            }
+
+            .warn-text {
+                font-size: .82rem;
+                font-weight: 500;
+                color: #7a5500;
+                line-height: 1.45;
+            }
+
+                .warn-text strong {
+                    color: #5a3c00;
+                }
+
+            /* ── Info rows ── */
+            .info-group {
+                display: flex;
+                flex-direction: column;
+                gap: .6rem;
+                margin-bottom: 1.4rem;
+            }
+
+            .info-row {
+                display: flex;
+                align-items: center;
+                gap: .85rem;
+                padding: .65rem .9rem;
+                border-radius: 11px;
+                background: #fafafa;
+                border: 1px solid #f0f0f0;
+                transition: background .15s;
+            }
+
+            .info-icon {
+                width: 30px;
+                height: 30px;
+                border-radius: 8px;
+                background: linear-gradient(135deg, #fde8e8, #fdd5d5);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: .9rem;
+                color: #c0392b;
+                flex-shrink: 0;
+            }
+
+            .info-label {
+                font-size: .7rem;
+                font-weight: 700;
+                color: #94a3b0;
+                text-transform: uppercase;
+                letter-spacing: .06em;
+                line-height: 1;
+                margin-bottom: 2px;
+            }
+
+            .info-value {
+                font-size: .91rem;
+                font-weight: 600;
+                color: #1e2d3a;
+                line-height: 1.2;
+            }
+
+                .info-value.muted {
+                    color: #b0bec5;
+                    font-weight: 400;
+                }
+
+                .info-value.due {
+                    color: #c0392b;
+                }
+
+                .info-value.clear {
+                    color: #1a8a50;
+                }
+
+            /* ── Confirm box ── */
+            .confirm-box {
+                background: linear-gradient(120deg, #fff5f5, #fff0f0);
+                border: 1.5px solid #fdd5d5;
+                border-radius: 14px;
+                padding: 1.1rem 1.2rem;
+            }
+
+            .confirm-title {
+                font-size: .82rem;
+                font-weight: 700;
+                color: #c0392b;
+                text-transform: uppercase;
+                letter-spacing: .07em;
+                margin-bottom: .55rem;
+                display: flex;
+                align-items: center;
+                gap: .35rem;
+            }
+
+            .confirm-text {
+                font-size: .84rem;
+                color: #6b3030;
+                line-height: 1.5;
+                margin-bottom: 1rem;
+            }
+
+            /* ── Buttons ── */
+            .action-row {
+                display: flex;
+                flex-wrap: wrap;
+                gap: .6rem;
+                align-items: center;
+            }
+
+            .btn-action {
+                display: inline-flex;
+                align-items: center;
+                gap: .4rem;
+                padding: .55rem 1.2rem;
+                border-radius: 11px;
+                font-size: .88rem;
+                font-weight: 600;
+                border: none;
+                cursor: pointer;
+                text-decoration: none;
+                font-family: inherit;
+                transition: transform .15s, box-shadow .15s, filter .15s;
+            }
+
+                .btn-action:hover {
+                    transform: translateY(-1px);
+                    box-shadow: 0 4px 14px rgba(0,0,0,0.13);
+                    filter: brightness(1.06);
+                }
+
+                .btn-action:active {
+                    transform: translateY(0);
+                }
+
+            .btn-delete {
+                background: linear-gradient(120deg, #c0392b, #e53935);
+                color: #fff;
+            }
+
+            .btn-cancel {
+                background: #f0f4f6;
+                color: #546e7a;
+                border: 1.5px solid #dde4e8;
+            }
+
+                .btn-cancel:hover {
+                    background: #e4eaed;
+                    color: #37474f;
+                }
+
+            /* ── Responsive ── */
+            @@media (max-width: 480px) {
+                body {
+                    padding: 1rem .5rem;
+                }
+
+                .card-hero {
+                    padding: 1.3rem 1.1rem;
+                }
+
+                .card-body-inner {
+                    padding: 1.2rem 1rem;
+                }
+            }
+            @@media (prefers-reduced-motion: reduce) {
+                .delete-card, .btn-action, .info-row {
+                    transition: none;
+                }
+            }
+    </style>
+</head>
+<body>
+
+    <div class="delete-card">
+
+        <!-- ── Hero Header ── -->
+        <div class="card-hero">
+            <div class="hero-inner">
+                <div class="avatar-ring">
+                    <i class="bi bi-trash3-fill"></i>
+                </div>
+                <div>
+                    <div class="hero-title">Delete Customer</div>
+                    
+                </div>
+            </div>
+        </div>
+
+        <!-- ── Body ── -->
+        <div class="card-body-inner">
+
+            
+
+            <!-- Customer Info -->
+            <div class="info-group">
+
+                <div class="info-row">
+                    <div class="info-icon"><i class="bi bi-person-fill"></i></div>
+                    <div>
+                        <div class="info-label">Customer Name</div>
+                        <div class="info-value">@Model.CustName</div>
+                    </div>
+                </div>
+
+                <div class="info-row">
+                    <div class="info-icon"><i class="bi bi-telephone-fill"></i></div>
+                    <div>
+                        <div class="info-label">Phone</div>
+                        <div class="info-value @(string.IsNullOrEmpty(Model.CustPhone) ? "muted" : "")">
+                            @(string.IsNullOrEmpty(Model.CustPhone) ? "Not provided" : Model.CustPhone)
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-row">
+                    <div class="info-icon"><i class="bi bi-envelope-fill"></i></div>
+                    <div>
+                        <div class="info-label">Email</div>
+                        <div class="info-value @(string.IsNullOrEmpty(Model.CustEmail) ? "muted" : "")">
+                            @(string.IsNullOrEmpty(Model.CustEmail) ? "Not provided" : Model.CustEmail)
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-row">
+                    <div class="info-icon"
+                         style="background:@(Model.CustBal > 0 ? "linear-gradient(135deg,#fde8e8,#fdd5d5)" : "linear-gradient(135deg,#d4f4e2,#c0f0d0)");
+                        color:@(Model.CustBal > 0 ? "#c0392b" : "#1a8a50")">
+                        <i class="bi bi-wallet2"></i>
+                    </div>
+                    <div>
+                        <div class="info-label">Outstanding Balance</div>
+                        <div class="info-value @(Model.CustBal > 0 ? "due" : "clear")">
+                            &#8377;@Model.CustBal.ToString("N2")
+                            @if (Model.CustBal > 0)
+                            {
+                                <span style="font-size:.7rem; background:#fde8e8; color:#c0392b; padding:.15rem .45rem; border-radius:50px; font-weight:700; margin-left:.3rem;">
+                                    Dues Pending
+                                </span>
+                            }
+                            else
+                            {
+                                <span style="font-size:.7rem; background:#d4f4e2; color:#1a8a50; padding:.15rem .45rem; border-radius:50px; font-weight:700; margin-left:.3rem;">
+                                    Clear
+                                </span>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Confirm box + form -->
+            <div class="confirm-box">
+                
+
+                <form asp-action="Delete" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" asp-for="CustId" />
+
+                    <div class="action-row">
+                        <button type="submit" class="btn-action btn-delete">
+                            <i class="bi bi-trash3"></i> Yes, Delete
+                        </button>
+                        <a asp-action="Index" class="btn-action btn-cancel">
+                            <i class="bi bi-x-lg"></i> Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

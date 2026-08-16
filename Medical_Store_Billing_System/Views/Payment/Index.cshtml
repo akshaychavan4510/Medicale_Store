@@ -1,0 +1,1002 @@
+@* Payment/Index *@
+@model IEnumerable<MedicalStore.Business.ViewModels.PaymentVM>
+
+@{
+    ViewData["Title"] = "Payments";
+    Layout = null;
+    var allPaymentsData = ViewBag.AllPayments as IEnumerable<MedicalStore.Business.ViewModels.PaymentVM> ?? Model;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5">
+    <title>@ViewData["Title"]</title>
+    <!-- Bootstrap 5 + Icons + Google Font -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <style>
+            /* ── Reset & Base ── */
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            body {
+                font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                background: linear-gradient(145deg, #f0f5fc 0%, #e3eaf5 100%);
+                min-height: 100vh;
+                padding: 1.5rem;
+                margin: 0;
+            }
+
+            /* ── Main Container ── */
+            .page-wrapper {
+                max-width: 1200px;
+                margin: 0 auto;
+                animation: fadeSlideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            }
+
+            @@keyframes fadeSlideUp {
+                0% {
+                    opacity: 0;
+                    transform: translateY(30px) scale(0.97);
+                }
+
+                100% {
+                    opacity: 1;
+                    transform: translateY(0) scale(1);
+                }
+            }
+
+            /* ── Cards & Shadows ── */
+            .card-modern {
+                background: #ffffff;
+                border: none;
+                border-radius: 24px;
+                box-shadow: 0 20px 60px rgba(0, 0, 0, 0.06), 0 8px 28px rgba(0, 0, 0, 0.03), 0 0 0 1px rgba(0, 0, 0, 0.02);
+                transition: box-shadow 0.3s ease, transform 0.2s ease;
+                overflow: hidden;
+            }
+
+                .card-modern:hover {
+                    box-shadow: 0 32px 80px rgba(0, 0, 0, 0.08), 0 12px 36px rgba(0, 0, 0, 0.04), 0 0 0 1px rgba(0, 0, 0, 0.02);
+                    transform: translateY(-2px);
+                }
+
+            .card-body-custom {
+                padding: 0;
+            }
+
+            /* ── Toolbar with Search ── */
+            .toolbar {
+                background: #ffffff;
+                border-radius: 16px;
+                padding: 0.75rem 1.25rem;
+                margin-bottom: 1.25rem;
+                display: flex;
+                flex-wrap: wrap;
+                align-items: center;
+                gap: 0.75rem;
+                border: 1px solid #eef1f7;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+            }
+
+            .search-wrap {
+                flex: 1 1 250px;
+                position: relative;
+                min-width: 150px;
+            }
+
+                .search-wrap .bi-search {
+                    position: absolute;
+                    left: 12px;
+                    top: 50%;
+                    transform: translateY(-50%);
+                    color: #a0b8cc;
+                    font-size: 0.9rem;
+                    pointer-events: none;
+                }
+
+                .search-wrap input {
+                    width: 100%;
+                    padding: 0.5rem 2.5rem 0.5rem 2.5rem;
+                    border: 1.5px solid #e2e8f0;
+                    border-radius: 40px;
+                    font-size: 0.9rem;
+                    background: #f8fafc;
+                    transition: all 0.25s ease;
+                    outline: none;
+                    font-family: 'Inter', sans-serif;
+                }
+
+                    .search-wrap input:focus {
+                        border-color: #0d47a1;
+                        background: #fff;
+                        box-shadow: 0 0 0 4px rgba(13, 71, 161, 0.08);
+                    }
+
+                    .search-wrap input::placeholder {
+                        color: #a5b9cd;
+                    }
+
+            .clear-search {
+                position: absolute;
+                right: 10px;
+                top: 50%;
+                transform: translateY(-50%);
+                border: none;
+                background: transparent;
+                color: #9aa8b5;
+                cursor: pointer;
+                display: none;
+                font-size: 16px;
+                padding: 2px 4px;
+                transition: color 0.2s;
+                border-radius: 50%;
+                line-height: 1;
+            }
+
+                .clear-search:hover {
+                    color: #dc3545;
+                }
+
+                .clear-search.show {
+                    display: block;
+                }
+
+            .result-badge {
+                font-size: 0.85rem;
+                color: #5a738a;
+                background: #f0f4f9;
+                padding: 0.25rem 1rem;
+                border-radius: 40px;
+                font-weight: 500;
+                white-space: nowrap;
+            }
+
+            /* ── Table ── */
+            .table-wrapper {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            #paymentsTable {
+                width: 100%;
+                min-width: 600px;
+                font-size: 0.9rem;
+                border-collapse: separate;
+                border-spacing: 0;
+                margin-bottom: 0;
+            }
+
+                #paymentsTable thead th {
+                    background: #f8faff;
+                    border-bottom: 2px solid #e2e8f0;
+                    font-weight: 600;
+                    font-size: 0.75rem;
+                    text-transform: uppercase;
+                    letter-spacing: 0.04em;
+                    color: #4a5d7a;
+                    padding: 0.75rem 0.75rem;
+                    white-space: nowrap;
+                    position: sticky;
+                    top: 0;
+                    z-index: 5;
+                }
+
+                #paymentsTable tbody td {
+                    padding: 0.7rem 0.75rem;
+                    vertical-align: middle;
+                    border-bottom: 1px solid #f0f3f9;
+                }
+
+                #paymentsTable tbody tr {
+                    background: #ffffff;
+                    transition: background 0.15s;
+                }
+
+                    #paymentsTable tbody tr:hover {
+                        background: #f8fbff;
+                    }
+
+            /* ── Empty state ── */
+            .empty-state {
+                color: #9aabbe;
+                padding: 2.5rem 0;
+            }
+
+                .empty-state i {
+                    font-size: 3rem;
+                    display: block;
+                    margin-bottom: 0.5rem;
+                    opacity: 0.6;
+                }
+
+            /* ── Header & Buttons ── */
+            .header-icon {
+                background: #e3f2fd;
+                padding: 0.6rem;
+                border-radius: 14px;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+                .header-icon i {
+                    font-size: 1.6rem;
+                    color: #0d47a1;
+                }
+
+            .header-stats {
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                background: #f8faff;
+                padding: 0.3rem 1rem;
+                border-radius: 60px;
+                border: 1px solid #e2e8f0;
+                font-size: 0.8rem;
+                color: #4a5d7a;
+            }
+
+                .header-stats i {
+                    color: #0d47a1;
+                }
+
+            .btn-primary-custom {
+                background: #0d47a1;
+                border: none;
+                border-radius: 60px;
+                padding: 0.5rem 1.5rem;
+                font-weight: 600;
+                font-size: 0.9rem;
+                color: #fff;
+                transition: all 0.25s ease;
+                box-shadow: 0 4px 12px rgba(13, 71, 161, 0.25);
+                display: inline-flex;
+                align-items: center;
+                gap: 0.4rem;
+                text-decoration: none;
+            }
+
+                .btn-primary-custom:hover {
+                    background: #0a3a8a;
+                    transform: translateY(-2px);
+                    box-shadow: 0 8px 20px rgba(13, 71, 161, 0.30);
+                    color: #fff;
+                }
+
+            .btn-outline-info-custom {
+                border: 1.5px solid #b3d9f7;
+                border-radius: 60px;
+                padding: 0.25rem 0.9rem;
+                font-weight: 600;
+                font-size: 0.8rem;
+                color: #0d47a1;
+                transition: all 0.2s ease;
+                background: transparent;
+                text-decoration: none;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                gap: 0.3rem;
+            }
+
+                .btn-outline-info-custom:hover {
+                    background: #e3f2fd;
+                    border-color: #64b5f6;
+                    color: #0a3a8a;
+                }
+
+            .btn-outline-warning-custom {
+                border: 1.5px solid #ffe0b2;
+                border-radius: 60px;
+                padding: 0.25rem 0.9rem;
+                font-weight: 600;
+                font-size: 0.8rem;
+                color: #e65100;
+                transition: all 0.2s ease;
+                background: transparent;
+                text-decoration: none;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                gap: 0.3rem;
+            }
+
+                .btn-outline-warning-custom:hover {
+                    background: #fff3e0;
+                    border-color: #ffb74d;
+                    color: #bf360c;
+                }
+
+            .btn-outline-danger-custom {
+                border: 1.5px solid #ffcdd2;
+                border-radius: 60px;
+                padding: 0.25rem 0.9rem;
+                font-weight: 600;
+                font-size: 0.8rem;
+                color: #c62828;
+                transition: all 0.2s ease;
+                background: transparent;
+                text-decoration: none;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                gap: 0.3rem;
+            }
+
+                .btn-outline-danger-custom:hover {
+                    background: #ffebee;
+                    border-color: #ef9a9a;
+                    color: #b71c1c;
+                }
+
+            /* ── Pagination ── */
+            .pagination-container {
+                padding: 0.9rem 1.5rem;
+                background: #fafcff;
+                border-top: 1px solid #eef1f7;
+            }
+
+            .pagination .page-link {
+                color: #1a4a6b;
+                border-radius: 8px;
+                margin: 0 3px;
+                border: 1px solid #e9edf4;
+                padding: 0.4rem 0.85rem;
+                font-size: 0.85rem;
+                font-family: 'Inter', sans-serif;
+            }
+
+                .pagination .page-link:hover {
+                    background: #f0f4f9;
+                    border-color: #0d47a1;
+                    color: #0d47a1;
+                }
+
+            .pagination .page-item.active .page-link {
+                background: #0d47a1;
+                border-color: #0d47a1;
+                color: #fff;
+            }
+
+            .pagination .page-item.disabled .page-link {
+                color: #a0b8cc;
+                cursor: not-allowed;
+            }
+
+            /* ── Table Footer ── */
+            .table-footer {
+                background: #fafcfe;
+                padding: 0.7rem 1.5rem;
+                border-top: 1px solid #eef1f7;
+                font-size: 0.8rem;
+                color: #6b7a93;
+                display: flex;
+                flex-wrap: wrap;
+                align-items: center;
+                justify-content: space-between;
+                gap: 0.5rem;
+            }
+
+                .table-footer .total-badge {
+                    background: #e9edf4;
+                    padding: 0.15rem 0.7rem;
+                    border-radius: 40px;
+                    font-weight: 600;
+                    color: #1d2b44;
+                    font-size: 0.75rem;
+                }
+
+            /* ── Alert styling ── */
+            .alert-custom {
+                border-radius: 16px;
+                border: none;
+                padding: 0.7rem 1rem;
+                font-size: 0.9rem;
+                font-weight: 500;
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+            }
+
+            /* ── Footer Info ── */
+            .footer-info {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-top: 1rem;
+            }
+
+            /* ── Responsive tweaks ── */
+            @@media (max-width: 768px) {
+                body {
+                    padding: 1rem;
+                }
+
+                .toolbar {
+                    padding: 0.6rem 0.75rem;
+                    flex-direction: column;
+                    align-items: stretch;
+                    gap: 0.5rem;
+                }
+
+                .search-wrap {
+                    min-width: 0;
+                }
+
+                .result-badge {
+                    text-align: center;
+                }
+
+                #paymentsTable {
+                    min-width: 500px;
+                    font-size: 0.8rem;
+                }
+
+                    #paymentsTable thead th {
+                        font-size: 0.65rem;
+                        padding: 0.5rem 0.4rem;
+                    }
+
+                    #paymentsTable tbody td {
+                        padding: 0.4rem 0.4rem;
+                    }
+
+                .btn-primary-custom {
+                    font-size: 0.8rem;
+                    padding: 0.4rem 1.2rem;
+                }
+
+                .btn-outline-info-custom,
+                .btn-outline-warning-custom,
+                .btn-outline-danger-custom {
+                    font-size: 0.7rem;
+                    padding: 0.2rem 0.6rem;
+                }
+
+                .header-icon i {
+                    font-size: 1.2rem;
+                }
+
+                h5 {
+                    font-size: 1.1rem;
+                }
+
+                .d-flex.justify-content-between {
+                    flex-wrap: wrap;
+                    gap: 0.5rem;
+                }
+
+                .footer-info {
+                    flex-direction: column;
+                    gap: 0.5rem;
+                    align-items: flex-start;
+                }
+
+                .header-stats {
+                    font-size: 0.7rem;
+                    padding: 0.2rem 0.8rem;
+                }
+
+                .pagination-container {
+                    padding: 0.6rem 0.75rem;
+                }
+
+                .pagination .page-link {
+                    padding: 0.3rem 0.6rem;
+                    font-size: 0.75rem;
+                }
+
+                .table-footer {
+                    font-size: 0.7rem;
+                    padding: 0.5rem 0.75rem;
+                    flex-direction: column;
+                    align-items: flex-start;
+                }
+            }
+
+            @@media (max-width: 576px) {
+                #paymentsTable {
+                    min-width: 400px;
+                    font-size: 0.7rem;
+                }
+
+                    #paymentsTable thead th {
+                        padding: 0.3rem 0.2rem;
+                        font-size: 0.6rem;
+                    }
+
+                    #paymentsTable tbody td {
+                        padding: 0.3rem 0.2rem;
+                    }
+
+                .btn-outline-info-custom,
+                .btn-outline-warning-custom,
+                .btn-outline-danger-custom {
+                    padding: 0.15rem 0.4rem;
+                    font-size: 0.65rem;
+                }
+
+                    .btn-outline-info-custom i,
+                    .btn-outline-warning-custom i,
+                    .btn-outline-danger-custom i {
+                        font-size: 0.7rem;
+                    }
+
+                .header-stats {
+                    font-size: 0.65rem;
+                    padding: 0.15rem 0.6rem;
+                }
+            }
+
+            /* ── Reduced Motion ── */
+            @@media (prefers-reduced-motion: reduce) {
+                * {
+                    animation-duration: 0.01ms !important;
+                    transition-duration: 0.01ms !important;
+                }
+            }
+
+            /* Custom Scrollbar for table */
+            .table-wrapper::-webkit-scrollbar {
+                height: 6px;
+            }
+
+            .table-wrapper::-webkit-scrollbar-track {
+                background: #f1f5f9;
+                border-radius: 10px;
+            }
+
+            .table-wrapper::-webkit-scrollbar-thumb {
+                background: #d1dbe8;
+                border-radius: 10px;
+            }
+
+                .table-wrapper::-webkit-scrollbar-thumb:hover {
+                    background: #b8c6d6;
+                }
+
+            /* Table row animation - fade-in */
+            .fade-in {
+                animation: fadeInRow 0.3s ease forwards;
+                opacity: 0;
+            }
+
+                .fade-in:nth-child(1) {
+                    animation-delay: 0.02s;
+                }
+
+                .fade-in:nth-child(2) {
+                    animation-delay: 0.04s;
+                }
+
+                .fade-in:nth-child(3) {
+                    animation-delay: 0.06s;
+                }
+
+                .fade-in:nth-child(4) {
+                    animation-delay: 0.08s;
+                }
+
+                .fade-in:nth-child(5) {
+                    animation-delay: 0.10s;
+                }
+
+                .fade-in:nth-child(6) {
+                    animation-delay: 0.12s;
+                }
+
+                .fade-in:nth-child(7) {
+                    animation-delay: 0.14s;
+                }
+
+                .fade-in:nth-child(8) {
+                    animation-delay: 0.16s;
+                }
+
+                .fade-in:nth-child(9) {
+                    animation-delay: 0.18s;
+                }
+
+                .fade-in:nth-child(10) {
+                    animation-delay: 0.20s;
+                }
+
+            @@keyframes fadeInRow {
+                from {
+                    opacity: 0;
+                    transform: translateX(-10px);
+                }
+
+                to {
+                    opacity: 1;
+                    transform: translateX(0);
+                }
+            }
+    </style>
+</head>
+<body>
+
+    <div class="page-wrapper">
+
+        <!-- ── Header ── -->
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+            <div class="d-flex align-items-center gap-3">
+                <div class="header-icon">
+                    <i class="bi bi-cash-coin"></i>
+                </div>
+                <div>
+                    <h5 class="mb-0 fw-bold">
+                        Payments
+                        <span class="badge bg-primary ms-2" style="font-size:0.7rem;">
+                            <i class="bi bi-database me-1"></i>@ViewBag.TotalRecords total
+                        </span>
+                    </h5>
+                    <small class="text-muted">Manage supplier payments</small>
+                </div>
+            </div>
+            <div class="d-flex align-items-center gap-3">
+                <div class="header-stats">
+                    <i class="bi bi-currency-rupee"></i>
+                    <span>Total: ₹@ViewBag.TotalAmount.ToString("N0")</span>
+                </div>
+                <a asp-action="Create" class="btn btn-primary-custom">
+                    <i class="bi bi-plus-lg"></i> New Payment
+                </a>
+            </div>
+        </div>
+
+        <!-- ── Alerts ── -->
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show alert-custom" role="alert">
+                <i class="bi bi-check-circle-fill"></i> @TempData["Success"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-danger alert-dismissible fade show alert-custom" role="alert">
+                <i class="bi bi-exclamation-circle-fill"></i> @TempData["Error"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+
+        <!-- ── TOOLBAR WITH SEARCH ── -->
+        <div class="toolbar">
+            <div class="search-wrap">
+                <i class="bi bi-search"></i>
+                <input type="text" id="paymentSearch"
+                       placeholder="Search by ID, Supplier, Date, Amount..."
+                       autocomplete="off"
+                       value="@ViewBag.CurrentSearch" />
+                <button type="button" id="clearSearch" class="clear-search" title="Clear Search">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+            <span class="result-badge" id="resultCount">
+                @ViewBag.TotalRecords results
+            </span>
+        </div>
+
+        <!-- ── Table Card ── -->
+        <div class="card-modern">
+            <div class="card-body-custom">
+                <div class="table-wrapper">
+                    <table class="table" id="paymentsTable">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Date</th>
+                                <th>Supplier</th>
+                                <th class="text-end">Amount (₹)</th>
+                                <th class="text-center">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="paymentsTableBody">
+                            @if (!Model.Any())
+                            {
+                                <tr>
+                                    <td colspan="5" class="text-center empty-state">
+                                        @if (!string.IsNullOrEmpty(ViewBag.CurrentSearch))
+                                        {
+                                            <i class="bi bi-search"></i>
+                                            <div>No payments found matching "<strong>@ViewBag.CurrentSearch</strong>"</div>
+                                            <div style="margin-top:0.25rem; font-size:0.9rem;">
+                                                Try adjusting your search or <a asp-action="Index" class="text-decoration-none">clear the filter</a>.
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <i class="bi bi-inbox"></i>
+                                            <div>No payments found.</div>
+                                            <div style="margin-top:0.25rem; font-size:0.9rem;">
+                                                Click <strong>New Payment</strong> to get started.
+                                            </div>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                            else
+                            {
+                                @foreach (var p in Model)
+                                {
+                                    <tr class="fade-in"
+                                        data-search="@p.PaymentId @p.SupplierName @p.PaymentDate.ToString("dd-MM-yyyy") @p.Amount">
+                                        <td class="fw-semibold text-muted">@p.PaymentId</td>
+                                        <td>@p.PaymentDate.ToString("dd-MM-yyyy")</td>
+                                        <td class="fw-semibold">@p.SupplierName</td>
+                                        <td class="text-end fw-bold text-primary">₹@p.Amount.ToString("N2")</td>
+                                        <td class="text-center">
+                                            <a asp-action="Details" asp-route-id="@p.PaymentId"
+                                               class="btn-outline-info-custom me-1" title="View Details">
+                                                <i class="bi bi-eye"></i>
+                                            </a>
+                                            <a asp-action="Edit" asp-route-id="@p.PaymentId"
+                                               class="btn-outline-warning-custom me-1" title="Edit Payment">
+                                                <i class="bi bi-pencil"></i>
+                                            </a>
+                                            <a asp-action="Delete" asp-route-id="@p.PaymentId"
+                                               class="btn-outline-danger-custom" title="Delete Payment">
+                                                <i class="bi bi-trash"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- ─── PAGINATION ─── -->
+                @if (ViewBag.TotalPages > 1)
+                {
+                    <div class="pagination-container" id="paginationContainer">
+                        <nav>
+                            <ul class="pagination justify-content-center mb-0">
+                                <li class="page-item @(ViewBag.CurrentPage == 1 ? "disabled" : "")">
+                                    <a class="page-link" asp-action="Index"
+                                       asp-route-page="@(ViewBag.CurrentPage - 1)"
+                                       asp-route-searchTerm="@ViewBag.CurrentSearch">
+                                        <i class="bi bi-chevron-left"></i> Previous
+                                    </a>
+                                </li>
+
+                                @for (int i = 1; i <= ViewBag.TotalPages; i++)
+                                {
+                                    <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                                        <a class="page-link" asp-action="Index"
+                                           asp-route-page="@i"
+                                           asp-route-searchTerm="@ViewBag.CurrentSearch">@i</a>
+                                    </li>
+                                }
+
+                                <li class="page-item @(ViewBag.CurrentPage == ViewBag.TotalPages ? "disabled" : "")">
+                                    <a class="page-link" asp-action="Index"
+                                       asp-route-page="@(ViewBag.CurrentPage + 1)"
+                                       asp-route-searchTerm="@ViewBag.CurrentSearch">
+                                        Next <i class="bi bi-chevron-right"></i>
+                                    </a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                }
+
+                <!-- ─── TABLE FOOTER ─── -->
+                <div class="table-footer">
+                    <span>
+                        <i class="bi bi-list-ul me-1"></i>
+                        Showing <strong id="visibleCount">@Model.Count()</strong> of <strong id="totalCount">@ViewBag.TotalRecords</strong> payments
+                    </span>
+                    <span class="total-badge">
+                        <i class="bi bi-clock-history me-1"></i> Page @ViewBag.CurrentPage of @ViewBag.TotalPages
+                    </span>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Bootstrap JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js">
+    </script>
+
+    <script>
+            (function() {
+                'use strict';
+
+                // Store ALL payments for searching across all pages
+                const allPayments = @Html.Raw(Json.Serialize(allPaymentsData));
+                const searchInput = document.getElementById('paymentSearch');
+                const clearButton = document.getElementById('clearSearch');
+                const tbody = document.getElementById('paymentsTableBody');
+                const visibleCount = document.getElementById('visibleCount');
+                const totalCount = document.getElementById('totalCount');
+                const resultCount = document.getElementById('resultCount');
+                const paginationContainer = document.getElementById('paginationContainer');
+                const currentPage = @ViewBag.CurrentPage;
+
+                // ── Escape HTML to prevent XSS ──
+                function escapeHtml(text) {
+                    if (!text) return '';
+                    const div = document.createElement('div');
+                    div.textContent = text;
+                    return div.innerHTML;
+                }
+
+                // ── Toggle clear button visibility ──
+                function toggleClearButton() {
+                    if (searchInput.value.trim().length > 0) {
+                        clearButton.classList.add('show');
+                    } else {
+                        clearButton.classList.remove('show');
+                    }
+                }
+
+                // ── Format date ──
+                function formatDate(dateString) {
+                    if (!dateString) return '';
+                    const date = new Date(dateString);
+                    const day = String(date.getDate()).padStart(2, '0');
+                    const month = String(date.getMonth() + 1).padStart(2, '0');
+                    const year = date.getFullYear();
+                    return `${day}-${month}-${year}`;
+                }
+
+                // ── Render filtered payments (client-side search across ALL records) ──
+                function renderFilteredPayments(searchTerm) {
+                    const trimmedTerm = searchTerm.trim();
+
+                    // If search is empty, reload the page to show server-side pagination
+                    if (trimmedTerm === "") {
+                        window.location.href = '@Url.Action("Index", new { page = -1 })'.replace('-1', currentPage);
+                        return;
+                    }
+
+                    const lowerSearch = trimmedTerm.toLowerCase();
+
+                    // Filter payments from ALL data
+                    const filtered = allPayments.filter(p =>
+                        (p.paymentId && p.paymentId.toString().includes(lowerSearch)) ||
+                        (p.supplierName && p.supplierName.toLowerCase().includes(lowerSearch)) ||
+                        (p.paymentDate && formatDate(p.paymentDate).includes(lowerSearch)) ||
+                        (p.amount && p.amount.toString().includes(lowerSearch))
+                    );
+
+                    // Update counts
+                    const total = allPayments.length;
+                    const shown = filtered.length;
+
+                    if (visibleCount) visibleCount.textContent = shown;
+                    if (totalCount) totalCount.textContent = total;
+                    if (resultCount) {
+                        resultCount.textContent = shown + ' result' + (shown !== 1 ? 's' : '');
+                    }
+
+                    // Hide pagination when searching
+                    if (paginationContainer) {
+                        paginationContainer.style.display = 'none';
+                    }
+
+                    // Show clear button
+                    toggleClearButton();
+
+                    // Show "no results" message
+                    if (filtered.length === 0) {
+                        tbody.innerHTML = `
+                            <tr>
+                                <td colspan="5" class="text-center empty-state">
+                                    <i class="bi bi-search"></i>
+                                    <div>No payments found matching "<strong>${escapeHtml(trimmedTerm)}</strong>"</div>
+                                    <div style="margin-top:0.25rem; font-size:0.9rem;">
+                                        Try adjusting your search or
+                                        <button type="button" id="clearSearchFromMsg"
+                                                class="btn btn-link btn-sm text-decoration-none p-0"
+                                                style="color:#0d47a1;">
+                                            clear the filter
+                                        </button>.
+                                    </div>
+                                </td>
+                            </tr>
+                        `;
+                        const clearBtnMsg = document.getElementById('clearSearchFromMsg');
+                        if (clearBtnMsg) {
+                            clearBtnMsg.addEventListener('click', function() {
+                                clearButton.click();
+                            });
+                        }
+                        return;
+                    }
+
+                    // Build results HTML
+                    let html = '';
+                    filtered.forEach(function(p) {
+                        const formattedDate = formatDate(p.paymentDate);
+                        html += `
+                            <tr class="fade-in">
+                                <td class="fw-semibold text-muted">${p.paymentId}</td>
+                                <td>${formattedDate}</td>
+                                <td class="fw-semibold">${escapeHtml(p.supplierName)}</td>
+                                <td class="text-end fw-bold text-primary">₹${parseFloat(p.amount).toFixed(2)}</td>
+                                <td class="text-center">
+                                    <a href="/Payment/Details/${p.paymentId}"
+                                       class="btn-outline-info-custom me-1" title="View Details">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    <a href="/Payment/Edit/${p.paymentId}"
+                                       class="btn-outline-warning-custom me-1" title="Edit Payment">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <a href="/Payment/Delete/${p.paymentId}"
+                                       class="btn-outline-danger-custom" title="Delete Payment">
+                                        <i class="bi bi-trash"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        `;
+                    });
+
+                    tbody.innerHTML = html;
+                }
+
+                // ── Debounce search ──
+                let debounceTimer;
+                searchInput.addEventListener('input', function() {
+                    clearTimeout(debounceTimer);
+                    debounceTimer = setTimeout(function() {
+                        renderFilteredPayments(searchInput.value);
+                    }, 300);
+                });
+
+                // ── Clear button click ──
+                clearButton.addEventListener('click', function() {
+                    searchInput.value = '';
+                    clearButton.classList.remove('show');
+                    window.location.href = '@Url.Action("Index", new { page = -1 })'.replace('-1', currentPage);
+                });
+
+                // ── Enter key to search ──
+                searchInput.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        renderFilteredPayments(searchInput.value);
+                    }
+                    if (e.key === 'Escape') {
+                        clearButton.click();
+                    }
+                });
+
+                // ── Initial state ──
+                toggleClearButton();
+
+                // If there's a search term from server, trigger client-side filter
+                const currentSearchTerm = '@ViewBag.CurrentSearch';
+                if (currentSearchTerm && currentSearchTerm.trim() !== '') {
+                    searchInput.value = currentSearchTerm;
+                    setTimeout(function() {
+                        renderFilteredPayments(currentSearchTerm);
+                    }, 100);
+                }
+
+                // Auto-dismiss alerts after 5 seconds
+                const alerts = document.querySelectorAll('.alert');
+                alerts.forEach(function(alert) {
+                    setTimeout(function() {
+                        const bsAlert = new bootstrap.Alert(alert);
+                        bsAlert.close();
+                    }, 5000);
+                });
+
+            })();
+    </script>
+
+</body>
+</html>

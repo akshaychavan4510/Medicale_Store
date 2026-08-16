@@ -1,0 +1,486 @@
+@model MedicalStore.Business.ViewModels.CustomerVM
+@{
+    ViewData["Title"] = "Customer Details";
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Customer Details</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <style>
+            /* ── Base ── */
+            *, *::before, *::after {
+                box-sizing: border-box;
+            }
+
+            body {
+                min-height: 100vh;
+                background: linear-gradient(135deg, #e8f4f8 0%, #f0f7f4 50%, #e8f0f8 100%);
+                font-family: 'Inter', system-ui, sans-serif;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 2rem 1rem;
+            }
+
+            /* ── Card shell ── */
+            .customer-card {
+                width: 100%;
+                max-width: 560px;
+                border-radius: 20px;
+                overflow: hidden;
+                background: #ffffff;
+                box-shadow: 0 4px 6px -1px rgba(0, 120, 140, 0.07), 0 10px 24px -4px rgba(0, 120, 140, 0.13), 0 32px 56px -8px rgba(0, 100, 120, 0.10);
+                transition: box-shadow .3s ease;
+            }
+
+                .customer-card:hover {
+                    box-shadow: 0 6px 10px -2px rgba(0, 120, 140, 0.10), 0 16px 36px -4px rgba(0, 120, 140, 0.18), 0 40px 70px -10px rgba(0, 100, 120, 0.14);
+                }
+
+            /* ── Header ── */
+            .card-hero {
+                background: linear-gradient(120deg, #0d7a8a 0%, #0a9e7f 100%);
+                padding: 1.75rem 1.75rem 1.4rem;
+                position: relative;
+                overflow: hidden;
+            }
+
+                .card-hero::after {
+                    content: '';
+                    position: absolute;
+                    inset: 0;
+                    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Ccircle cx='30' cy='30' r='28'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E") repeat;
+                    pointer-events: none;
+                }
+
+            .avatar-ring {
+                width: 56px;
+                height: 56px;
+                border-radius: 50%;
+                background: rgba(255,255,255,0.18);
+                border: 2px solid rgba(255,255,255,0.40);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 1.6rem;
+                color: #fff;
+                flex-shrink: 0;
+            }
+
+            .hero-name {
+                font-size: 1.2rem;
+                font-weight: 700;
+                color: #ffffff;
+                line-height: 1.2;
+                letter-spacing: -0.01em;
+            }
+
+            .hero-id {
+                font-size: 0.78rem;
+                color: rgba(255,255,255,0.72);
+                font-weight: 500;
+                letter-spacing: 0.04em;
+                text-transform: uppercase;
+                margin-top: 2px;
+            }
+
+            /* ── Balance pill (signature element) ── */
+            .balance-pill {
+                display: inline-flex;
+                align-items: center;
+                gap: .45rem;
+                padding: .42rem .9rem;
+                border-radius: 50px;
+                font-size: .82rem;
+                font-weight: 700;
+                letter-spacing: .01em;
+                backdrop-filter: blur(6px);
+            }
+
+                .balance-pill.due {
+                    background: rgba(255, 255, 255, 0.15);
+                    border: 1.5px solid rgba(255, 220, 180, 0.55);
+                    color: #ffe0b0;
+                }
+
+                .balance-pill.clear {
+                    background: rgba(255, 255, 255, 0.15);
+                    border: 1.5px solid rgba(180, 255, 220, 0.55);
+                    color: #b0ffda;
+                }
+
+            /* ── Body ── */
+            .card-body-inner {
+                padding: 1.5rem 1.75rem;
+            }
+
+            /* ── Field rows ── */
+            .field-group {
+                display: grid;
+                grid-template-columns: 1fr;
+                gap: .85rem;
+            }
+
+            .field-row {
+                display: flex;
+                align-items: flex-start;
+                gap: 1rem;
+                padding: .75rem .9rem;
+                border-radius: 12px;
+                background: #f8fafb;
+                border: 1px solid #edf1f4;
+                transition: background .18s, border-color .18s;
+            }
+
+                .field-row:hover {
+                    background: #f0f7f9;
+                    border-color: #c8e6ec;
+                }
+
+            .field-icon {
+                width: 34px;
+                height: 34px;
+                border-radius: 9px;
+                background: linear-gradient(135deg, #e0f5f7, #d4eef2);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 1rem;
+                color: #0d7a8a;
+                flex-shrink: 0;
+                margin-top: 1px;
+            }
+
+            .field-label {
+                font-size: .72rem;
+                font-weight: 600;
+                color: #94a3b0;
+                text-transform: uppercase;
+                letter-spacing: .06em;
+                line-height: 1;
+                margin-bottom: 3px;
+            }
+
+            .field-value {
+                font-size: .93rem;
+                font-weight: 500;
+                color: #1e2d3a;
+                line-height: 1.35;
+            }
+
+                .field-value a {
+                    color: #0d7a8a;
+                    text-decoration: none;
+                    font-weight: 500;
+                }
+
+                    .field-value a:hover {
+                        text-decoration: underline;
+                    }
+
+                .field-value .muted {
+                    color: #b0bec5;
+                    font-weight: 400;
+                }
+
+            /* ── Outstanding balance row ── */
+            .balance-row {
+                background: linear-gradient(120deg, #fff8f3, #fff3f3);
+                border-color: #fddbc8;
+            }
+
+                .balance-row:hover {
+                    background: linear-gradient(120deg, #fff4ee, #ffeeee);
+                    border-color: #f9c9ae;
+                }
+
+                .balance-row.clear-row {
+                    background: linear-gradient(120deg, #f2fff8, #f0fff5);
+                    border-color: #c8f0da;
+                }
+
+                    .balance-row.clear-row:hover {
+                        background: linear-gradient(120deg, #eeffF4, #eaffe8);
+                        border-color: #b0e8c8;
+                    }
+
+            .balance-amount {
+                font-size: 1.25rem;
+                font-weight: 700;
+                line-height: 1;
+            }
+
+                .balance-amount.due-amount {
+                    color: #d44a00;
+                }
+
+                .balance-amount.clear-amount {
+                    color: #1a8a50;
+                }
+
+            .status-chip {
+                display: inline-flex;
+                align-items: center;
+                gap: .3rem;
+                font-size: .7rem;
+                font-weight: 700;
+                padding: .22rem .6rem;
+                border-radius: 50px;
+                letter-spacing: .04em;
+                text-transform: uppercase;
+                margin-left: .4rem;
+                vertical-align: middle;
+            }
+
+            .chip-due {
+                background: #fde8dc;
+                color: #c44000;
+            }
+
+            .chip-clear {
+                background: #d4f4e2;
+                color: #1a7a45;
+            }
+
+            /* ── Footer ── */
+            .card-footer-inner {
+                padding: 1rem 1.75rem 1.5rem;
+                display: flex;
+                flex-wrap: wrap;
+                gap: .6rem;
+                align-items: center;
+                border-top: 1px solid #f0f4f6;
+            }
+
+            .btn-action {
+                display: inline-flex;
+                align-items: center;
+                gap: .4rem;
+                padding: .5rem 1.1rem;
+                border-radius: 10px;
+                font-size: .85rem;
+                font-weight: 600;
+                border: none;
+                cursor: pointer;
+                text-decoration: none;
+                transition: transform .15s, box-shadow .15s, filter .15s;
+            }
+
+                .btn-action:hover {
+                    transform: translateY(-1px);
+                    filter: brightness(1.06);
+                    box-shadow: 0 4px 14px rgba(0,0,0,0.13);
+                }
+
+                .btn-action:active {
+                    transform: translateY(0);
+                }
+
+            
+
+            .btn-receipt {
+                background: linear-gradient(120deg, #1a8a50, #2eac6a);
+                color: #fff;
+            }
+
+            .btn-back {
+                background: #f0f4f6;
+                color: #546e7a;
+                border: 1px solid #dde4e8;
+                margin-left: auto;
+            }
+
+                .btn-back:hover {
+                    background: #0d6efd;
+                    color: #fff;
+                    border-color: #0d6efd;
+                }
+
+            /* ── Responsive ── */
+            @@media (max-width: 480px) {
+                body {
+                    padding: 1rem .5rem;
+                }
+
+                .card-hero {
+                    padding: 1.4rem 1.2rem 1.1rem;
+                }
+
+                .card-body-inner {
+                    padding: 1.2rem 1rem;
+                }
+
+                .card-footer-inner {
+                    padding: .9rem 1rem 1.2rem;
+                }
+
+                .hero-name {
+                    font-size: 1.05rem;
+                }
+
+                .balance-amount {
+                    font-size: 1.1rem;
+                }
+
+                .btn-back {
+                    margin-left: 0;
+                }
+            }
+
+            @@media (prefers-reduced-motion: reduce) {
+                .customer-card, .btn-action, .field-row {
+                    transition: none;
+                }
+            }
+    </style>
+</head>
+<body>
+
+    <div class="customer-card">
+
+        <!-- ── Hero Header ── -->
+        <div class="card-hero">
+            <div class="d-flex align-items-center gap-3 mb-3">
+                <div class="avatar-ring">
+                    <i class="bi bi-person-fill"></i>
+                </div>
+                <div>
+                    <div class="hero-name">@Model.CustName</div>
+                    <div class="hero-id">ID &nbsp;#@Model.CustId</div>
+                </div>
+            </div>
+            <div>
+                @if (Model.CustBal > 0)
+                {
+                    <span class="balance-pill due">
+                        <i class="bi bi-exclamation-circle-fill" style="font-size:.85rem"></i>
+                        Balance Due &nbsp;&#8377;@Model.CustBal.ToString("N2")
+                    </span>
+                }
+                else
+                {
+                    <span class="balance-pill clear">
+                        <i class="bi bi-check-circle-fill" style="font-size:.85rem"></i>
+                        Account Clear &nbsp;&#8377;@Model.CustBal.ToString("N2")
+                    </span>
+                }
+            </div>
+        </div>
+
+        <!-- ── Body ── -->
+        <div class="card-body-inner">
+            <div class="field-group">
+
+                <!-- Phone -->
+                <div class="field-row">
+                    <div class="field-icon"><i class="bi bi-telephone-fill"></i></div>
+                    <div>
+                        <div class="field-label">Phone</div>
+                        <div class="field-value">
+                            @if (!string.IsNullOrEmpty(Model.CustPhone))
+                            {
+                                <a href="tel:@Model.CustPhone">
+                                    <i class="bi bi-arrow-up-right-circle me-1" style="font-size:.75rem"></i>@Model.CustPhone
+                                </a>
+                            }
+                            else
+                            {
+
+                                <span class="muted">Not provided</span>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Email -->
+                <div class="field-row">
+                    <div class="field-icon"><i class="bi bi-envelope-fill"></i></div>
+                    <div>
+                        <div class="field-label">Email</div>
+                        <div class="field-value">
+                            @if (!string.IsNullOrEmpty(Model.CustEmail))
+                            {
+                                <a href="mailto:@Model.CustEmail">
+                                    <i class="bi bi-arrow-up-right-circle me-1" style="font-size:.75rem"></i>@Model.CustEmail
+                                </a>
+                            }
+                            else
+                            {
+
+                                <span class="muted">Not provided</span>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Address -->
+                <div class="field-row">
+                    <div class="field-icon"><i class="bi bi-geo-alt-fill"></i></div>
+                    <div>
+                        <div class="field-label">Address</div>
+                        <div class="field-value">
+                            @if (!string.IsNullOrEmpty(Model.CustAddress))
+                            {
+                                @Model.CustAddress
+                            }
+                            else
+                            {
+
+                                <span class="muted">Not provided</span>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Outstanding Balance -->
+                <div class="field-row @(Model.CustBal > 0 ? "balance-row" : "balance-row clear-row")">
+                    <div class="field-icon" style="background:@(Model.CustBal > 0 ? "linear-gradient(135deg,#fde8dc,#ffd5c0)" : "linear-gradient(135deg,#d4f4e2,#c0f0d0)"); color:@(Model.CustBal > 0 ? "#c44000" : "#1a8a50")">
+                        <i class="bi bi-wallet2"></i>
+                    </div>
+                    <div>
+                        <div class="field-label">Outstanding Balance</div>
+                        <div class="field-value">
+                            <span class="balance-amount @(Model.CustBal > 0 ? "due-amount" : "clear-amount")">
+                                &#8377;@Model.CustBal.ToString("N2")
+                            </span>
+                            @if (Model.CustBal > 0)
+                            {
+                                <span class="status-chip chip-due">
+                                    <i class="bi bi-clock-history"></i> Dues Pending
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="status-chip chip-clear">
+                                    <i class="bi bi-check2-all"></i> Clear
+                                </span>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ── Footer ── -->
+        <div class="card-footer-inner">
+           
+            <a asp-controller="Receipt" asp-action="Create" class="btn-action btn-receipt">
+                <i class="bi bi-receipt"></i> Collect Receipt
+            </a>
+            <a asp-action="Index" class="btn-action btn-back">
+                <i class="bi bi-arrow-left"></i> Back
+            </a>
+        </div>
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

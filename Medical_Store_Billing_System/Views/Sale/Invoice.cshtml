@@ -1,0 +1,482 @@
+﻿@model MedicalStore.Business.ViewModels.SaleMasterVM
+@{
+    Layout = null; // standalone print page
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Invoice #@Model.SaleId</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet" />
+    <style>
+            /* ── Base ── */
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            body {
+                font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                background: #f4f7fc;
+                padding: 30px;
+                font-size: 14px;
+                color: #1e293b;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                min-height: 100vh;
+            }
+
+            /* ── Invoice Wrapper ── */
+            .invoice-wrapper {
+                max-width: 900px;
+                width: 100%;
+                background: #ffffff;
+                border-radius: 20px;
+                box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08), 0 8px 28px rgba(0, 0, 0, 0.04), 0 0 0 1px rgba(0, 0, 0, 0.02);
+                padding: 35px 40px 30px;
+                transition: box-shadow 0.3s;
+            }
+
+                .invoice-wrapper:hover {
+                    box-shadow: 0 32px 80px rgba(0, 0, 0, 0.10), 0 12px 36px rgba(0, 0, 0, 0.05), 0 0 0 1px rgba(0, 0, 0, 0.02);
+                }
+
+            /* ── Header ── */
+            .invoice-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                border-bottom: 2px solid #e2e8f0;
+                padding-bottom: 20px;
+                margin-bottom: 25px;
+            }
+
+                .invoice-header .brand {
+                    display: flex;
+                    align-items: center;
+                    gap: 12px;
+                }
+
+                .invoice-header .brand-icon {
+                    width: 50px;
+                    height: 50px;
+                    background: linear-gradient(135deg, #2e7d32, #43a047);
+                    border-radius: 50%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    color: #fff;
+                    font-size: 26px;
+                }
+
+                .invoice-header .brand-text h2 {
+                    font-weight: 700;
+                    font-size: 24px;
+                    letter-spacing: -0.5px;
+                    color: #0f2b3d;
+                    margin: 0;
+                }
+
+                .invoice-header .brand-text span {
+                    font-size: 13px;
+                    color: #64748b;
+                    font-weight: 500;
+                }
+
+                .invoice-header .invoice-title {
+                    text-align: right;
+                }
+
+                    .invoice-header .invoice-title .label {
+                        font-size: 12px;
+                        text-transform: uppercase;
+                        letter-spacing: 0.08em;
+                        color: #94a3b8;
+                        font-weight: 600;
+                    }
+
+                    .invoice-header .invoice-title .number {
+                        font-size: 28px;
+                        font-weight: 700;
+                        color: #2e7d32;
+                        letter-spacing: -0.5px;
+                    }
+
+            /* ── Info Row ── */
+            .info-row {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: space-between;
+                background: #f8faff;
+                border-radius: 14px;
+                padding: 14px 20px;
+                margin-bottom: 30px;
+                border: 1px solid #eef3f9;
+            }
+
+                .info-row .info-item {
+                    display: flex;
+                    align-items: baseline;
+                    gap: 6px;
+                }
+
+                    .info-row .info-item .info-label {
+                        font-weight: 600;
+                        color: #475569;
+                        font-size: 13px;
+                    }
+
+                    .info-row .info-item .info-value {
+                        font-weight: 600;
+                        color: #0f2b3d;
+                    }
+
+            /* ── Table ── */
+            .table-invoice {
+                width: 100%;
+                border-collapse: separate;
+                border-spacing: 0 4px;
+                font-size: 14px;
+                margin-bottom: 0;
+            }
+
+                .table-invoice thead th {
+                    background: #f1f5f9;
+                    text-transform: uppercase;
+                    font-size: 12px;
+                    font-weight: 700;
+                    letter-spacing: 0.04em;
+                    color: #475569;
+                    padding: 10px 12px;
+                    border: none;
+                    border-radius: 8px 8px 0 0;
+                }
+
+                    .table-invoice thead th:first-child {
+                        border-radius: 8px 0 0 0;
+                    }
+
+                    .table-invoice thead th:last-child {
+                        border-radius: 0 8px 0 0;
+                    }
+
+                .table-invoice tbody tr {
+                    background: #ffffff;
+                    box-shadow: 0 1px 4px rgba(0,0,0,0.02);
+                    transition: background 0.15s;
+                }
+
+                    .table-invoice tbody tr:hover {
+                        background: #fafdff;
+                    }
+
+                .table-invoice tbody td {
+                    padding: 10px 12px;
+                    border: none;
+                    border-bottom: 1px solid #f0f3f9;
+                    vertical-align: middle;
+                }
+
+                .table-invoice tbody tr:last-child td {
+                    border-bottom: none;
+                }
+
+                .table-invoice tfoot td {
+                    padding: 12px 12px;
+                    border: none;
+                    border-top: 2px solid #e2e8f0;
+                }
+
+                .table-invoice .grand-total-row td {
+                    border-top: 2px solid #2e7d32;
+                    background: #f0fdf4;
+                    font-weight: 700;
+                    border-radius: 0 0 8px 8px;
+                }
+
+                    .table-invoice .grand-total-row td:first-child {
+                        border-radius: 0 0 0 8px;
+                    }
+
+                    .table-invoice .grand-total-row td:last-child {
+                        border-radius: 0 0 8px 0;
+                    }
+
+            .text-end {
+                text-align: right;
+            }
+
+            .text-center {
+                text-align: center;
+            }
+
+            .fw-bold {
+                font-weight: 700;
+            }
+
+            /* ── Footer ── */
+            .invoice-footer {
+                margin-top: 30px;
+                padding-top: 20px;
+                border-top: 1px solid #e2e8f0;
+                display: flex;
+                justify-content: space-between;
+                font-size: 13px;
+                color: #64748b;
+            }
+
+                .invoice-footer .terms {
+                    font-size: 12px;
+                    color: #94a3b8;
+                }
+
+            /* ── Buttons (no-print) ── */
+            .no-print {
+                margin-top: 25px;
+                display: flex;
+                gap: 12px;
+                justify-content: center;
+            }
+
+            .btn-print, .btn-back {
+                padding: 10px 28px;
+                border: none;
+                border-radius: 60px;
+                font-weight: 600;
+                font-size: 14px;
+                display: inline-flex;
+                align-items: center;
+                gap: 8px;
+                transition: all 0.25s ease;
+                text-decoration: none;
+                cursor: pointer;
+            }
+
+            .btn-print {
+                background: #2e7d32;
+                color: #fff;
+                box-shadow: 0 6px 18px rgba(46,125,50,0.30);
+            }
+
+                .btn-print:hover {
+                    background: #1b5e20;
+                    transform: translateY(-2px);
+                    box-shadow: 0 10px 28px rgba(46,125,50,0.35);
+                }
+
+            .btn-back {
+                background: #f1f5f9;
+                color: #334155;
+            }
+
+                .btn-back:hover {
+                    background: #e2e8f0;
+                    transform: translateY(-2px);
+                }
+
+            /* ── Print Styles ── */
+            @@media print {
+                body {
+                    background: #fff;
+                    padding: 15px;
+                    margin: 0;
+                }
+
+                .invoice-wrapper {
+                    box-shadow: none;
+                    border: none;
+                    padding: 20px;
+                    border-radius: 0;
+                }
+
+                .no-print {
+                    display: none !important;
+                }
+
+                .invoice-header .brand-icon {
+                    background: #2e7d32 !important;
+                    -webkit-print-color-adjust: exact !important;
+                    print-color-adjust: exact !important;
+                }
+
+                .table-invoice thead th {
+                    background: #f1f5f9 !important;
+                    -webkit-print-color-adjust: exact !important;
+                    print-color-adjust: exact !important;
+                }
+
+                .table-invoice .grand-total-row td {
+                    background: #f0fdf4 !important;
+                    -webkit-print-color-adjust: exact !important;
+                    print-color-adjust: exact !important;
+                }
+
+                .info-row {
+                    background: #f8faff !important;
+                    -webkit-print-color-adjust: exact !important;
+                    print-color-adjust: exact !important;
+                }
+
+                .invoice-wrapper:hover {
+                    box-shadow: none;
+                }
+
+                .btn-print, .btn-back {
+                    display: none;
+                }
+            }
+
+            /* ── Responsive ── */
+            @@media (max-width: 600px) {
+                body {
+                    padding: 15px;
+                }
+
+                .invoice-wrapper {
+                    padding: 20px;
+                }
+
+                .invoice-header {
+                    flex-direction: column;
+                    align-items: flex-start;
+                    gap: 12px;
+                }
+
+                    .invoice-header .invoice-title {
+                        text-align: left;
+                        width: 100%;
+                    }
+
+                        .invoice-header .invoice-title .number {
+                            font-size: 22px;
+                        }
+
+                .info-row {
+                    flex-direction: column;
+                    gap: 6px;
+                }
+
+                .table-invoice {
+                    font-size: 12px;
+                }
+
+                    .table-invoice thead th, .table-invoice tbody td {
+                        padding: 6px 8px;
+                    }
+
+                .no-print {
+                    flex-direction: column;
+                    align-items: stretch;
+                }
+
+                .invoice-footer {
+                    flex-direction: column;
+                    gap: 6px;
+                }
+            }
+    </style>
+</head>
+<body>
+
+    <div class="invoice-wrapper">
+
+        <!-- ── Header ── -->
+        <div class="invoice-header">
+            <div class="brand">
+                <div class="brand-icon">
+                    <i class="bi bi-capsule"></i>
+                </div>
+                <div class="brand-text">
+                    <h2>MediStore</h2>
+                    <span>Healthcare Solutions</span>
+                </div>
+            </div>
+            
+        </div>
+
+        <!-- ── Info Row ── -->
+        <div class="info-row">
+            <div class="info-item">
+                <span class="info-label">Invoice Date:</span>
+                <span class="info-value">@Model.SaleDate.ToString("dd-MMM-yyyy")</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Customer:</span>
+                <span class="info-value">@Model.CustomerName</span>
+            </div>
+            
+        </div>
+
+        <!-- ── Table ── -->
+        <table class="table-invoice">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Medicine</th>
+                    <th class="text-end">Rate (₹)</th>
+                    <th class="text-end">Qty</th>
+                    <th class="text-end">GST (%)</th>
+                    <th class="text-end">Total (₹)</th>
+                </tr>
+            </thead>
+            <tbody>
+                @{
+                    int sr = 1;
+                }
+                @foreach (var d in Model.SaleDetails)
+                {
+                    <tr>
+                        <td>@sr</td>
+                        <td>@d.MedicineName</td>
+                        <td class="text-end">@d.Rate.ToString("N2")</td>
+                        <td class="text-end">@d.Qty</td>
+                        <td class="text-end">@d.Gst.ToString("N2")</td>
+                        <td class="text-end">@d.Total.ToString("N2")</td>
+                    </tr>
+                    sr++;
+                }
+            </tbody>
+            <tfoot>
+                <tr class="grand-total-row">
+                    <td colspan="5" class="text-end fw-bold">Grand Total (₹)</td>
+                    <td class="text-end fw-bold">@Model.GrandTotal.ToString("N2")</td>
+                </tr>
+            </tfoot>
+        </table>
+
+        <!-- ── Footer ── -->
+        <div class="invoice-footer">
+            <div class="terms">
+                <i class="bi bi-check-circle" style="color:#2e7d32;"></i> This is a computer‑generated invoice. No signature required.
+            </div>
+            <div>
+                <i class="bi bi-clock"></i> Generated on @DateTime.Now.ToString("dd-MMM-yyyy HH:mm")
+            </div>
+        </div>
+
+        <!-- ── Buttons (no-print) ── -->
+        <div class="no-print">
+            <button class="btn-print" onclick="window.print()">
+                <i class="bi bi-printer"></i> Print Invoice
+            </button>
+            <a href="/Sale/Index" class="btn-back">
+                <i class="bi bi-arrow-left"></i> Back
+            </a>
+        </div>
+
+    </div>
+
+    <!-- Bootstrap Icons (optional, for icons) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+
+    <script>
+            // Automatically trigger print on load (like your original)
+            window.onload = function () {
+                window.print();
+            };
+    </script>
+
+</body>
+</html>

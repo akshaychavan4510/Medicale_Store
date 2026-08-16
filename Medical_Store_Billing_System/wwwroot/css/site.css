@@ -1,0 +1,233 @@
+html {
+  font-size: 14px;
+}
+
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+}
+
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+body {
+  margin-bottom: 60px;
+}
+
+.form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
+  color: var(--bs-secondary-color);
+  text-align: end;
+}
+
+.form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
+  text-align: start;
+}
+/* ================================================================
+   MEDICAL STORE BILLING SYSTEM - site.css
+   ================================================================ */
+
+/* ── Sidebar Layout ──────────────────────────────────────────────── */
+#wrapper {
+    display: flex;
+    width: 100%;
+    min-height: 100vh;
+}
+
+#sidebar-wrapper {
+    width: 240px;
+    min-width: 240px;
+    min-height: 100vh;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+    transition: width 0.25s ease, min-width 0.25s ease;
+    z-index: 1000;
+}
+
+#page-content-wrapper {
+    width: calc(100% - 240px);
+    min-width: 0;
+    background-color: #f4f6f9;
+    transition: width 0.25s ease;
+}
+
+/* Sidebar collapsed */
+#wrapper.sidebar-collapsed #sidebar-wrapper {
+    width: 0;
+    min-width: 0;
+}
+
+#wrapper.sidebar-collapsed #page-content-wrapper {
+    width: 100%;
+}
+
+/* ── Sidebar Items ───────────────────────────────────────────────── */
+#sidebar-wrapper .list-group-item {
+    border: none !important;
+    border-radius: 0 !important;
+    padding: 0.55rem 1.2rem;
+    font-size: 0.875rem;
+    transition: background-color 0.15s ease;
+    white-space: nowrap;
+}
+
+    #sidebar-wrapper .list-group-item:hover {
+        background-color: #2c3e50 !important;
+        color: #fff !important;
+    }
+
+    #sidebar-wrapper .list-group-item.active,
+    #sidebar-wrapper .list-group-item.sidebar-active {
+        background-color: #198754 !important;
+        color: #ffffff !important;
+    }
+
+.sidebar-label {
+    font-size: 0.68rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #6c757d;
+    padding: 0.8rem 1.2rem 0.3rem;
+    font-weight: 600;
+}
+
+/* ── Navbar ──────────────────────────────────────────────────────── */
+.navbar {
+    min-height: 56px;
+}
+
+/* ── Cards ───────────────────────────────────────────────────────── */
+.card {
+    border-radius: 0.6rem;
+}
+
+.card-header {
+    border-radius: 0.6rem 0.6rem 0 0 !important;
+}
+
+/* ── Dashboard Stat Cards ────────────────────────────────────────── */
+.stat-icon {
+    width: 50px;
+    height: 50px;
+    min-width: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.stat-label {
+    font-size: 0.75rem;
+    color: #6c757d;
+    font-weight: 500;
+    line-height: 1.2;
+}
+
+.stat-value {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #212529;
+    line-height: 1.3;
+}
+
+/* ── Tables ──────────────────────────────────────────────────────── */
+.table th {
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 600;
+    color: #495057;
+}
+
+.table td {
+    vertical-align: middle;
+    font-size: 0.875rem;
+}
+
+/* ── Sale / Purchase detail entry table ──────────────────────────── */
+#detailsTable .form-control,
+#detailsTable .form-select {
+    font-size: 0.82rem;
+    padding: 0.3rem 0.5rem;
+}
+
+#detailsTable th {
+    font-size: 0.75rem;
+    padding: 0.5rem 0.6rem;
+}
+
+#detailsTable td {
+    padding: 0.35rem 0.4rem;
+}
+
+/* ── Buttons ─────────────────────────────────────────────────────── */
+.btn-sm {
+    font-size: 0.8rem;
+}
+
+/* ── Alerts ──────────────────────────────────────────────────────── */
+.alert {
+    border-radius: 0.5rem;
+}
+
+/* ── Badges ──────────────────────────────────────────────────────── */
+.badge {
+    font-weight: 500;
+}
+
+/* ── Forms ───────────────────────────────────────────────────────── */
+.form-label {
+    margin-bottom: 0.3rem;
+}
+
+.input-group-text {
+    font-size: 0.875rem;
+}
+
+/* ── Login Page ──────────────────────────────────────────────────── */
+.login-card {
+    border-radius: 1rem !important;
+}
+
+/* ── Report Filter Bar ───────────────────────────────────────────── */
+.report-filter {
+    background-color: #f8f9fa;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+/* ── Responsive: Mobile ──────────────────────────────────────────── */
+@media (max-width: 768px) {
+    #sidebar-wrapper {
+        width: 0;
+        min-width: 0;
+    }
+
+    #page-content-wrapper {
+        width: 100%;
+    }
+
+    /* Show sidebar when toggled on mobile */
+    #wrapper.sidebar-collapsed #sidebar-wrapper {
+        width: 240px;
+        min-width: 240px;
+    }
+
+    #wrapper.sidebar-collapsed #page-content-wrapper {
+        width: 100%;
+    }
+
+    .stat-value {
+        font-size: 0.95rem;
+    }
+}

@@ -1,0 +1,548 @@
+﻿@* Payment/Delete *@
+@model MedicalStore.Business.ViewModels.PaymentVM
+
+@{
+    ViewData["Title"] = "Delete Payment";
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5">
+    <title>Delete Payment</title>
+    <!-- Bootstrap 5 + Icons + Google Font -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <style>
+            /* ----- global reset & base ----- */
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            body {
+                background: linear-gradient(145deg, #fef2f2 0%, #fee2e2 100%);
+                font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+                min-height: 100vh;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 1.5rem;
+                margin: 0;
+            }
+
+            /* ----- main card with deep shadow & soft radius ----- */
+            .delete-card {
+                background: #ffffff;
+                border: none;
+                border-radius: 32px;
+                box-shadow: 0 24px 48px -12px rgba(185, 28, 28, 0.25), 0 8px 24px -6px rgba(0, 0, 0, 0.08);
+                transition: box-shadow 0.3s ease, transform 0.2s ease;
+                backdrop-filter: blur(2px);
+                width: 100%;
+                overflow: hidden;
+                border-left: 4px solid #dc2626;
+            }
+
+                .delete-card:hover {
+                    box-shadow: 0 32px 64px -16px rgba(185, 28, 28, 0.35), 0 12px 32px -8px rgba(0, 0, 0, 0.12);
+                    transform: translateY(-3px);
+                }
+
+            /* ----- card header with danger gradient ----- */
+            .card-header-custom {
+                background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+                padding: 1.35rem 2rem;
+                border-radius: 32px 32px 0 0 !important;
+                position: relative;
+                border-bottom: none;
+            }
+
+                .card-header-custom::after {
+                    content: '';
+                    position: absolute;
+                    bottom: 0;
+                    left: 2rem;
+                    right: 2rem;
+                    height: 3px;
+                    background: linear-gradient(90deg, #fca5a5, #f87171);
+                    border-radius: 3px;
+                }
+
+                .card-header-custom h5 {
+                    font-weight: 700;
+                    font-size: 1.3rem;
+                    letter-spacing: -0.02em;
+                    color: #ffffff;
+                    display: flex;
+                    align-items: center;
+                    gap: 0.6rem;
+                    margin: 0;
+                }
+
+                    .card-header-custom h5 i {
+                        color: #fca5a5;
+                        font-size: 1.6rem;
+                        filter: drop-shadow(0 2px 6px rgba(220, 38, 38, 0.40));
+                    }
+
+            .payment-id-badge {
+                background: rgba(255, 255, 255, 0.15);
+                padding: 0.2rem 0.9rem;
+                border-radius: 60px;
+                font-size: 0.75rem;
+                font-weight: 600;
+                color: #fca5a5;
+                border: 1px solid rgba(255, 255, 255, 0.10);
+                margin-left: auto;
+                backdrop-filter: blur(4px);
+            }
+
+            /* ----- card body with better spacing ----- */
+            .card-body-custom {
+                padding: 2rem 2rem 1.5rem;
+            }
+
+            /* ----- warning message ----- */
+            .warning-message {
+                background: #fef2f2;
+                border: 1px solid #fecaca;
+                border-radius: 16px;
+                padding: 1rem 1.2rem;
+                display: flex;
+                align-items: flex-start;
+                gap: 0.8rem;
+                margin-bottom: 1.5rem;
+            }
+
+                .warning-message i {
+                    color: #dc2626;
+                    font-size: 1.4rem;
+                    margin-top: 0.1rem;
+                }
+
+                .warning-message p {
+                    margin: 0;
+                    color: #7f1d1d;
+                    font-size: 0.95rem;
+                    line-height: 1.5;
+                }
+
+            /* ----- details list modern styling ----- */
+            .details-grid {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 0.8rem 0.5rem;
+            }
+
+            .detail-item {
+                display: flex;
+                flex-direction: column;
+                padding: 0.6rem 0.8rem;
+                border-radius: 14px;
+                background: #fafcff;
+                transition: background 0.2s ease;
+                border: 1px solid transparent;
+            }
+
+                .detail-item:hover {
+                    background: #fef2f2;
+                    border-color: #fecaca;
+                }
+
+                .detail-item.full-width {
+                    grid-column: 1 / -1;
+                }
+
+            .detail-label {
+                font-size: 0.72rem;
+                text-transform: uppercase;
+                letter-spacing: 0.04em;
+                font-weight: 600;
+                color: #7a8fa6;
+                margin-bottom: 0.15rem;
+            }
+
+            .detail-value {
+                font-size: 0.95rem;
+                font-weight: 500;
+                color: #0b2a4a;
+                word-break: break-word;
+            }
+
+                .detail-value.amount {
+                    font-size: 1.2rem;
+                    font-weight: 700;
+                    color: #dc2626;
+                    background: #fef2f2;
+                    padding: 0.1rem 0.6rem;
+                    border-radius: 40px;
+                    display: inline-block;
+                }
+
+                .detail-value .badge-mode {
+                    background: #e8edf5;
+                    color: #1f3a5f;
+                    padding: 0.15rem 0.8rem;
+                    border-radius: 40px;
+                    font-size: 0.8rem;
+                    font-weight: 500;
+                }
+
+            /* ----- alert warning (consequence) ----- */
+            .alert-consequence {
+                background: #fffbeb;
+                border: 1px solid #fde68a;
+                border-radius: 16px;
+                padding: 0.8rem 1.2rem;
+                display: flex;
+                align-items: center;
+                gap: 0.8rem;
+                margin-top: 1.2rem;
+            }
+
+                .alert-consequence i {
+                    color: #d97706;
+                    font-size: 1.2rem;
+                }
+
+                .alert-consequence .text {
+                    font-size: 0.9rem;
+                    color: #78350f;
+                    margin: 0;
+                }
+
+                    .alert-consequence .text strong {
+                        color: #dc2626;
+                        font-weight: 700;
+                    }
+
+                    .alert-consequence .text .supplier-name {
+                        color: #1f5fcf;
+                        font-weight: 600;
+                    }
+
+            /* ----- card footer with action buttons ----- */
+            .card-footer-custom {
+                background: #ffffff;
+                border-top: 1px solid rgba(0, 0, 0, 0.03);
+                padding: 1.2rem 2rem 1.8rem;
+                border-radius: 0 0 32px 32px !important;
+                display: flex;
+                flex-wrap: wrap;
+                gap: 0.8rem;
+                align-items: center;
+            }
+
+            /* ----- buttons with elevated feel ----- */
+            .btn {
+                border-radius: 60px;
+                padding: 0.65rem 1.8rem;
+                font-weight: 600;
+                font-size: 0.95rem;
+                transition: all 0.2s ease;
+                letter-spacing: -0.01em;
+                border: none;
+                display: inline-flex;
+                align-items: center;
+                gap: 0.4rem;
+            }
+
+            .btn-danger-custom {
+                background: #dc2626;
+                color: #ffffff;
+                box-shadow: 0 8px 20px -6px rgba(220, 38, 38, 0.40);
+            }
+
+                .btn-danger-custom:hover {
+                    background: #b91c1c;
+                    transform: scale(1.03);
+                    box-shadow: 0 12px 28px -8px rgba(220, 38, 38, 0.50);
+                    color: #ffffff;
+                }
+
+            .btn-secondary-custom {
+                background: #eef2f7;
+                border: 1px solid #d6dfea;
+                color: #1f3a5f;
+            }
+
+                .btn-secondary-custom:hover {
+                    background: #e2eaf5;
+                    border-color: #bcc9da;
+                    transform: scale(1.03);
+                    color: #0b2a4a;
+                }
+
+            /* ----- responsive fine-tune ----- */
+            @@media (max-width: 768px) {
+                body {
+                    padding: 1rem;
+                }
+
+                .details-grid {
+                    grid-template-columns: 1fr;
+                    gap: 0.5rem;
+                }
+
+                .detail-item {
+                    padding: 0.5rem 0.7rem;
+                }
+
+                .card-body-custom {
+                    padding: 1.5rem 1.2rem;
+                }
+
+                .card-header-custom {
+                    padding: 1rem 1.2rem;
+                }
+
+                    .card-header-custom h5 {
+                        font-size: 1.1rem;
+                    }
+
+                        .card-header-custom h5 i {
+                            font-size: 1.3rem;
+                        }
+
+                .card-footer-custom {
+                    padding: 1rem 1.2rem 1.5rem;
+                    flex-direction: column;
+                    align-items: stretch;
+                }
+
+                .btn {
+                    justify-content: center;
+                    padding: 0.55rem 1.2rem;
+                    font-size: 0.9rem;
+                }
+
+                .payment-id-badge {
+                    font-size: 0.65rem;
+                    padding: 0.15rem 0.6rem;
+                }
+
+                .detail-value.amount {
+                    font-size: 1rem;
+                }
+
+                .warning-message {
+                    flex-direction: column;
+                    align-items: center;
+                    text-align: center;
+                }
+
+                .alert-consequence {
+                    flex-direction: column;
+                    text-align: center;
+                }
+            }
+
+            @@media (min-width: 769px) and (max-width: 991px) {
+                .delete-card {
+                    max-width: 95%;
+                }
+            }
+
+            /* ----- utility animations ----- */
+            .detail-item {
+                animation: fadeInUp 0.3s ease forwards;
+                opacity: 0;
+            }
+
+                .detail-item:nth-child(1) {
+                    animation-delay: 0.05s;
+                }
+
+                .detail-item:nth-child(2) {
+                    animation-delay: 0.10s;
+                }
+
+                .detail-item:nth-child(3) {
+                    animation-delay: 0.15s;
+                }
+
+                .detail-item:nth-child(4) {
+                    animation-delay: 0.20s;
+                }
+
+                .detail-item:nth-child(5) {
+                    animation-delay: 0.25s;
+                }
+
+                .detail-item:nth-child(6) {
+                    animation-delay: 0.30s;
+                }
+
+                .detail-item:nth-child(7) {
+                    animation-delay: 0.35s;
+                }
+
+            @@keyframes fadeInUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(8px);
+                }
+
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            /* pulse animation for delete button */
+            .btn-danger-custom {
+                animation: pulse 2s ease-in-out infinite;
+            }
+
+            @@keyframes pulse {
+                0% {
+                    box-shadow: 0 8px 20px -6px rgba(220, 38, 38, 0.40);
+                }
+
+                50% {
+                    box-shadow: 0 8px 30px -4px rgba(220, 38, 38, 0.60);
+                }
+
+                100% {
+                    box-shadow: 0 8px 20px -6px rgba(220, 38, 38, 0.40);
+                }
+            }
+
+            /* custom scroll */
+            ::-webkit-scrollbar {
+                width: 6px;
+                height: 6px;
+            }
+
+            ::-webkit-scrollbar-track {
+                background: #f1f5f9;
+                border-radius: 10px;
+            }
+
+            ::-webkit-scrollbar-thumb {
+                background: #d1dbe8;
+                border-radius: 10px;
+            }
+
+                ::-webkit-scrollbar-thumb:hover {
+                    background: #b8c6d6;
+                }
+    </style>
+</head>
+<body>
+
+    <div class="container px-0">
+        <div class="row justify-content-center">
+            <div class="col-xl-6 col-lg-7 col-md-9 col-12">
+                <!-- main card with deep shadow -->
+                <div class="delete-card">
+                    <!-- card header -->
+                    <div class="card-header-custom">
+                        <h5>
+                            <i class="bi bi-exclamation-triangle-fill"></i>
+                            <span>Confirm Delete Payment</span>
+                           
+                        </h5>
+                    </div>
+
+                    <!-- card body -->
+                    <div class="card-body-custom">
+                        <!-- warning message -->
+                      
+
+                        <!-- payment details grid -->
+                        <div class="details-grid">
+                            <!-- Payment ID -->
+                            <div class="detail-item">
+                                <span class="detail-label"><i class="bi bi-hash me-1"></i>Payment ID</span>
+                                <span class="detail-value">#@Model.PaymentId</span>
+                            </div>
+
+                            <!-- Date -->
+                            <div class="detail-item">
+                                <span class="detail-label"><i class="bi bi-calendar3 me-1"></i>Date</span>
+                                <span class="detail-value">@Model.PaymentDate.ToString("dd MMM yyyy")</span>
+                            </div>
+
+                            <!-- Supplier -->
+                            <div class="detail-item">
+                                <span class="detail-label"><i class="bi bi-building me-1"></i>Supplier</span>
+                                <span class="detail-value">@Model.SupplierName</span>
+                            </div>
+
+                            <!-- Amount -->
+                            <div class="detail-item">
+                                <span class="detail-label"><i class="bi bi-coin me-1"></i>Amount</span>
+                                <span class="detail-value amount">₹@Model.Amount.ToString("N2")</span>
+                            </div>
+
+                            <!-- Payment Mode -->
+                            <div class="detail-item">
+                                <span class="detail-label"><i class="bi bi-credit-card me-1"></i>Payment Mode</span>
+                                <span class="detail-value">
+                                    @if (!string.IsNullOrEmpty(Model.PayMode))
+                                    {
+                                        <span class="badge-mode">@Model.PayMode</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">—</span>
+                                    }
+                                </span>
+                            </div>
+
+                            <!-- Reference No -->
+                            <div class="detail-item">
+                                <span class="detail-label"><i class="bi bi-hash me-1"></i>Reference No.</span>
+                                <span class="detail-value">@(Model.RefNo ?? "—")</span>
+                            </div>
+
+                            <!-- Note -->
+                            <div class="detail-item full-width">
+                                <span class="detail-label"><i class="bi bi-pencil me-1"></i>Note</span>
+                                <span class="detail-value">@(Model.Note ?? "—")</span>
+                            </div>
+                        </div>
+
+                        <!-- consequence alert -->
+                       
+                    </div>
+
+                    <!-- card footer with actions -->
+                    <div class="card-footer-custom">
+                        <form asp-action="Delete" method="post" id="deleteForm">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="id" value="@Model.PaymentId" />
+                            <button type="submit" class="btn btn-danger-custom">
+                                <i class="bi bi-trash3"></i> Yes, Delete Payment
+                            </button>
+                        </form>
+                        <a asp-action="Index" class="btn btn-secondary-custom">
+                            <i class="bi bi-x-lg"></i> Cancel
+                        </a>
+                      
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js">
+    </script>
+
+    <!-- Optional: confirm dialog for extra safety -->
+    <script>
+            document.getElementById('deleteForm')?.addEventListener('submit', function(e) {
+                if (!confirm('⚠️ Are you absolutely sure you want to delete this payment?\n\nThis will reverse the supplier balance adjustment.')) {
+                    e.preventDefault();
+                }
+            });
+    </script>
+
+</body>
+</html>

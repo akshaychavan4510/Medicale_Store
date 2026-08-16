@@ -1,0 +1,73 @@
+﻿@model MedicalStore.Business.ViewModels.PurchaseMasterVM
+@{
+    ViewData["Title"] = $"Delete Purchase #{Model.PurId}";
+}
+
+<div class="container-fluid px-4 py-3">
+    <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white border-0 fw-semibold py-3
+            d-flex justify-content-between align-items-center">
+            <span class="text-danger">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                Delete Purchase #@Model.PurId
+            </span>
+            <a asp-action="Index" class="btn btn-sm btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i> Back to List
+            </a>
+        </div>
+
+        <div class="card-body">
+            <div class="alert alert-warning d-flex align-items-center mb-4">
+                <i class="bi bi-exclamation-triangle-fill me-2 fs-5"></i>
+                <div>
+                    This will <strong>permanently delete</strong> the purchase and
+                    reverse stock quantities. This action cannot be undone.
+                </div>
+            </div>
+
+            <!-- Purchase Summary -->
+            <div class="row g-3 mb-4">
+                <div class="col-md-3">
+                    <div class="p-3 bg-light rounded">
+                        <small class="text-muted d-block">Purchase ID</small>
+                        <strong>PUR-@Model.PurId.ToString("D4")</strong>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="p-3 bg-light rounded">
+                        <small class="text-muted d-block">Date</small>
+                        <strong>@Model.PurchaseDate.ToString("dd-MM-yyyy")</strong>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="p-3 bg-light rounded">
+                        <small class="text-muted d-block">Supplier</small>
+                        <strong>@Model.SupplierName</strong>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="p-3 bg-light rounded text-end">
+                        <small class="text-muted d-block">Grand Total</small>
+                        <strong class="text-danger fs-5">
+                            ₹@Model.GrandTotal.ToString("N2")
+                        </strong>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ✅ CORRECT: asp-action="Delete" (matches [ActionName("Delete")])
+                            name="id"  (matches int id parameter) -->
+            <form asp-action="Delete" asp-controller="Purchase" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="id" value="@Model.PurId" />
+                <button type="submit" class="btn btn-danger"
+                        onclick="return confirm('Delete PUR-@Model.PurId.ToString("D4")? This cannot be undone.');">
+                    <i class="bi bi-trash me-1"></i> Confirm Delete
+                </button>
+                <a asp-action="Index" class="btn btn-outline-secondary ms-2">
+                    <i class="bi bi-x-circle me-1"></i> Cancel
+                </a>
+            </form>
+        </div>
+    </div>
+</div>

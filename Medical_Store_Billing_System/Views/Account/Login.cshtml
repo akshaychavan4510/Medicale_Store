@@ -1,0 +1,354 @@
+@model MedicalStore.Business.ViewModels.LoginVM
+
+@{
+    Layout = null;
+    ViewData["Title"] = "Login";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Medical Store Billing System - Login</title>
+
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+
+    <style>
+
+            <style >
+                /* ==========================
+                   GLOBAL
+                ========================== */
+                html, body {
+                    width: 100%;
+                    height: 100%;
+                    margin: 0;
+                    padding: 0;
+                    overflow-x: hidden;
+                    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                }
+
+                /* ==========================
+                   VIDEO BACKGROUND
+                ========================== */
+                #bgVideo {
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    object-fit: cover;
+                    z-index: -2;
+                }
+
+                /* Dark Overlay */
+                .overlay {
+                    position: fixed;
+                    inset: 0;
+                    background: rgba(0,0,0,0.45);
+                    z-index: -1;
+                }
+
+                /* ==========================
+                   LOGIN CONTAINER
+                ========================== */
+                .login-container {
+                    min-height: 100vh;
+                    display: flex;
+                    justify-content: flex-end;
+                    align-items: center;
+                    padding: 40px;
+                }
+
+                /* ==========================
+                   LOGIN CARD
+                ========================== */
+                .login-card {
+                    position: relative;
+                    width: 100%;
+                    max-width: 450px;
+                    border-radius: 20px;
+                    overflow: hidden;
+                    box-shadow: 0 15px 40px rgba(0,0,0,0.40);
+                }
+
+                    /* Human Image */
+                    .login-card::before {
+                        content: "";
+                        position: absolute;
+                        inset: 0;
+                        background: url('/images/human.png') center center no-repeat;
+                        background-size: contain;
+                        opacity: 0.15;
+                        z-index: 0;
+                    }
+
+                    /* White Overlay */
+                    .login-card::after {
+                        content: "";
+                        position: absolute;
+                        inset: 0;
+                        background: rgba(255,255,255,0.94);
+                        z-index: 1;
+                    }
+
+                /* Card Content */
+                .card-content {
+                    position: relative;
+                    z-index: 2;
+                    padding: 35px;
+                }
+
+                /* ==========================
+                   BRAND ICON
+                ========================== */
+                .brand-icon {
+                    width: 80px;
+                    height: 80px;
+                    margin: 0 auto 15px;
+                    border-radius: 50%;
+                    background: #198754;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                }
+
+                    .brand-icon i {
+                        color: #fff;
+                        font-size: 35px;
+                    }
+
+                /* ==========================
+                   FORM
+                ========================== */
+                .form-control {
+                    height: 48px;
+                }
+
+                    .form-control:focus {
+                        border-color: #198754;
+                        box-shadow: 0 0 0 .15rem rgba(25,135,84,.25);
+                    }
+
+                .input-group-text {
+                    background: #f8f9fa;
+                }
+
+                .btn-success {
+                    border-radius: 10px;
+                    font-size: 18px;
+                    font-weight: 600;
+                    height: 50px;
+                }
+
+                /* ==========================
+                   LAPTOP
+                ========================== */
+                @@media (max-width: 1200px) {
+                    .login-container {
+                        padding: 30px;
+                    }
+
+                    .login-card {
+                        max-width: 420px;
+                    }
+                }
+
+                /* ==========================
+                   TABLET
+                ========================== */
+                @@media (max-width: 991px) {
+
+                    .login-container {
+                        justify-content: center;
+                        padding: 25px;
+                    }
+
+                    .login-card {
+                        max-width: 500px;
+                    }
+
+                    .card-content {
+                        padding: 30px;
+                    }
+                }
+
+                /* ==========================
+                   MOBILE
+                ========================== */
+                @@media (max-width: 576px) {
+
+                    .login-container {
+                        justify-content: center;
+                        align-items: center;
+                        padding: 15px;
+                    }
+
+                    .login-card {
+                        width: 100%;
+                        max-width: 100%;
+                        border-radius: 15px;
+                    }
+
+                    .card-content {
+                        padding: 20px;
+                    }
+
+                    .brand-icon {
+                        width: 65px;
+                        height: 65px;
+                    }
+
+                        .brand-icon i {
+                            font-size: 28px;
+                        }
+
+                    h2 {
+                        font-size: 1.5rem;
+                    }
+
+                    .btn-success {
+                        height: 46px;
+                        font-size: 16px;
+                    }
+
+                    .form-control {
+                        height: 44px;
+                    }
+                }
+
+                /* ==========================
+                   SMALL MOBILE
+                ========================== */
+                @@media (max-width: 375px) {
+
+                    .card-content {
+                        padding: 15px;
+                    }
+
+                    h2 {
+                        font-size: 1.3rem;
+                    }
+
+                    .brand-icon {
+                        width: 55px;
+                        height: 55px;
+                    }
+
+                        .brand-icon i {
+                            font-size: 24px;
+                        }
+                }
+        </style>
+
+    </style>
+</head>
+
+<body>
+
+    <!-- Background Video -->
+    <video id="bgVideo" autoplay muted loop playsinline>
+        <source src="@Url.Content("~/Videos/background.mp4")" type="video/mp4" />
+    </video>
+
+    <!-- Page Overlay -->
+    <div class="overlay"></div>
+
+    <!-- ═══════════════════════════
+         LOGIN WRAPPER
+         ═══════════════════════════ -->
+        <div class="container-fluid login-container">
+
+        <!--
+            login-card has TWO pseudo layers:
+              ::before  → background image (human.png fills the card)
+              ::after   → white tint so text is readable
+            .card-content → sits above both, z-index: 2
+        -->
+        <div class="login-card">
+
+            <!-- All visible content goes inside .card-content -->
+            <div class="card-content">
+
+                <div class="text-center mb-4">
+                    <div class="brand-icon">
+                        <i class="bi bi-capsule-pill"></i>
+                    </div>
+                    <h2 class="fw-bold">Medical Store</h2>
+                    <p class="text-muted">Billing Management System</p>
+                </div>
+
+                <form asp-action="Login" asp-controller="Account" method="post">
+
+                    @Html.AntiForgeryToken()
+
+                    <input type="hidden" name="returnUrl" value="@ViewData["ReturnUrl"]" />
+
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                    <!-- Email -->
+                    <div class="mb-3">
+                        <label asp-for="Email" class="form-label fw-semibold">
+                            Email Address
+                        </label>
+                        <div class="input-group">
+                            <span class="input-group-text">
+                                <i class="bi bi-envelope"></i>
+                            </span>
+                            <input asp-for="Email"
+                                   class="form-control"
+                                   placeholder="Enter Email Address" />
+                        </div>
+                        <span asp-validation-for="Email" class="text-danger"></span>
+                    </div>
+
+                    <!-- Password -->
+                    <div class="mb-3">
+                        <label asp-for="Password" class="form-label fw-semibold">
+                            Password
+                        </label>
+                        <div class="input-group">
+                            <span class="input-group-text">
+                                <i class="bi bi-lock"></i>
+                            </span>
+                            <input asp-for="Password"
+                                   type="password"
+                                   class="form-control"
+                                   placeholder="Enter Password" />
+                        </div>
+                        <span asp-validation-for="Password" class="text-danger"></span>
+                    </div>
+
+                    <!-- Remember Me -->
+                    <div class="form-check mb-4">
+                        <input asp-for="RememberMe" class="form-check-input" />
+                        <label asp-for="RememberMe" class="form-check-label">
+                            Remember Me
+                        </label>
+                    </div>
+
+                    <!-- Sign In -->
+                    <button type="submit" class="btn btn-success w-100 py-2">
+                        <i class="bi bi-box-arrow-in-right me-2"></i> Sign In
+                    </button>
+
+                </form>
+
+            </div>
+            <!-- End .card-content -->
+
+        </div>
+        <!-- End .login-card -->
+
+    </div>
+    <!-- End .login-wrapper -->
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <partial name="_ValidationScriptsPartial" />
+
+</body>
+</html>

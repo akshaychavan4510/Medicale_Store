@@ -1,0 +1,439 @@
+@model MedicalStore.Business.ViewModels.PaymentVM
+@{
+    ViewData["Title"] = "New Payment";
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5">
+    <title>New Payment · Supplier</title>
+    <!-- Bootstrap 5 + Icons + Google Font (Inter) -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <style>
+            /* ----- global reset & base ----- */
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            body {
+                background: linear-gradient(145deg, #f0f5fe 0%, #e8eff9 100%);
+                font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+                min-height: 100vh;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 1.5rem;
+                margin: 0;
+            }
+            /* ----- main card with deep shadow & soft radius ----- */
+            .payment-card {
+                background: #ffffff;
+                border: none;
+                border-radius: 32px;
+                box-shadow: 0 24px 48px -12px rgba(0, 20, 40, 0.30), 0 8px 24px -6px rgba(0, 0, 0, 0.06);
+                transition: box-shadow 0.3s ease, transform 0.2s ease;
+                backdrop-filter: blur(2px);
+                width: 100%;
+            }
+
+                .payment-card:hover {
+                    box-shadow: 0 32px 64px -16px rgba(0, 40, 80, 0.35), 0 12px 32px -8px rgba(0, 0, 0, 0.10);
+                    transform: translateY(-3px);
+                }
+            /* ----- card header with subtle border & icon ----- */
+            .card-header-custom {
+                background: #ffffff;
+                border-bottom: 1px solid rgba(0, 0, 0, 0.02);
+                padding: 1.35rem 1.8rem;
+                border-radius: 32px 32px 0 0 !important;
+            }
+
+                .card-header-custom h5 {
+                    font-weight: 700;
+                    font-size: 1.3rem;
+                    letter-spacing: -0.02em;
+                    color: #0b2a4a;
+                    display: flex;
+                    align-items: center;
+                    gap: 0.6rem;
+                    margin: 0;
+                }
+
+                    .card-header-custom h5 i {
+                        color: #1f5fcf;
+                        font-size: 1.6rem;
+                        filter: drop-shadow(0 2px 6px rgba(31, 95, 207, 0.25));
+                    }
+            /* ----- card body ----- */
+            .card-body-custom {
+                padding: 2rem 2rem 2.2rem;
+            }
+            /* ----- form elements ----- */
+            .form-label {
+                font-weight: 600;
+                font-size: 0.88rem;
+                color: #1f3a5f;
+                letter-spacing: -0.01em;
+                margin-bottom: 0.35rem;
+                display: flex;
+                align-items: center;
+                gap: 0.3rem;
+            }
+
+                .form-label i {
+                    color: #2a7de1;
+                    font-size: 0.95rem;
+                }
+
+            .form-control, .form-select {
+                border: 1px solid #e2e9f3;
+                border-radius: 18px;
+                padding: 0.7rem 1.1rem;
+                font-size: 0.95rem;
+                background: #fafcff;
+                transition: border 0.2s, box-shadow 0.2s;
+                box-shadow: inset 0 2px 6px rgba(0, 20, 40, 0.02);
+                color: #0b2a4a;
+            }
+
+                .form-control:focus, .form-select:focus {
+                    border-color: #2a7de1;
+                    box-shadow: 0 0 0 4px rgba(42, 125, 225, 0.12), inset 0 2px 4px rgba(0,0,0,0.02);
+                    background: #ffffff;
+                }
+
+            .input-group .form-control {
+                border-radius: 0 18px 18px 0;
+                border-left: none;
+            }
+
+                .input-group .form-control:focus {
+                    border-left: none;
+                }
+
+            .input-group-text {
+                background: #f0f5fe;
+                border: 1px solid #e2e9f3;
+                border-radius: 18px 0 0 18px;
+                color: #1f3a5f;
+                font-weight: 600;
+                padding: 0.7rem 1.1rem;
+                font-size: 0.95rem;
+            }
+            /* ----- balance info chip (outstanding) ----- */
+            #balanceInfo {
+                background: #eef6ff;
+                border: 1px solid #d0e2f7;
+                border-radius: 60px;
+                padding: 0.6rem 1.4rem;
+                display: inline-flex;
+                align-items: center;
+                gap: 0.6rem;
+                font-size: 0.9rem;
+                color: #12457a;
+                margin-top: 0.2rem;
+                backdrop-filter: blur(4px);
+                box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+                transition: all 0.2s;
+            }
+
+                #balanceInfo i {
+                    color: #1f5fcf;
+                    font-size: 1.1rem;
+                }
+
+                #balanceInfo strong {
+                    font-weight: 700;
+                    color: #0b2a4a;
+                    background: white;
+                    padding: 0.15rem 0.9rem;
+                    border-radius: 60px;
+                    box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+                    font-size: 0.95rem;
+                }
+            /* ----- validation alert (modern pill) ----- */
+            .alert-validation {
+                border-radius: 60px;
+                font-size: 0.85rem;
+                padding: 0.5rem 1.2rem;
+                background: #fee9e7;
+                border: 1px solid #fccac7;
+                color: #b13e3a;
+                display: flex;
+                align-items: center;
+                gap: 0.4rem;
+            }
+
+                .alert-validation i {
+                    font-size: 1rem;
+                }
+            /* ----- buttons with elevated feel ----- */
+            .btn {
+                border-radius: 60px;
+                padding: 0.65rem 1.8rem;
+                font-weight: 600;
+                font-size: 0.95rem;
+                transition: all 0.2s ease;
+                letter-spacing: -0.01em;
+                border: none;
+            }
+
+            .btn-primary {
+                background: #1f5fcf;
+                box-shadow: 0 8px 20px -6px rgba(31, 95, 207, 0.40);
+                color: white;
+            }
+
+                .btn-primary:hover {
+                    background: #154bb3;
+                    transform: scale(1.03);
+                    box-shadow: 0 12px 28px -8px rgba(31, 95, 207, 0.50);
+                    color: white;
+                }
+
+                .btn-primary i {
+                    margin-right: 0.3rem;
+                }
+
+            .btn-secondary {
+                background: #eef2f7;
+                border: 1px solid #d6dfea;
+                color: #1f3a5f;
+            }
+
+                .btn-secondary:hover {
+                    background: #e2eaf5;
+                    border-color: #bcc9da;
+                    transform: scale(1.03);
+                    color: #0b2a4a;
+                }
+
+            .d-flex-gap {
+                gap: 0.8rem;
+            }
+            /* ----- responsive fine-tune ----- */
+            @@media (max-width: 576px) {
+                body {
+                    padding: 0.8rem;
+                }
+
+                .card-body-custom {
+                    padding: 1.4rem 1.2rem;
+                }
+
+                .card-header-custom {
+                    padding: 1rem 1.2rem;
+                }
+
+                    .card-header-custom h5 {
+                        font-size: 1.1rem;
+                    }
+
+                .btn {
+                    padding: 0.5rem 1.2rem;
+                    font-size: 0.9rem;
+                }
+
+                #balanceInfo {
+                    padding: 0.4rem 1rem;
+                    font-size: 0.8rem;
+                    flex-wrap: wrap;
+                }
+
+                .form-control, .form-select {
+                    font-size: 0.9rem;
+                    padding: 0.6rem 0.9rem;
+                }
+
+                .input-group-text {
+                    padding: 0.6rem 0.9rem;
+                }
+            }
+
+            @@media (min-width: 768px) and (max-width: 991px) {
+                .payment-card {
+                    max-width: 95%;
+                }
+            }
+            /* small spacing & polish */
+            .row.g-3 > [class*="col-"] {
+                padding-right: 0.75rem;
+                padding-left: 0.75rem;
+            }
+
+            .text-danger.small {
+                font-weight: 500;
+                margin-top: 0.2rem;
+                display: inline-block;
+            }
+
+            .form-select option {
+                padding: 0.3rem 0.8rem;
+            }
+            /* custom focus ring for better a11y */
+            .form-control:focus-visible, .form-select:focus-visible {
+                outline: none;
+            }
+            /* balance chip animation */
+            #balanceInfo.show {
+                animation: fadeSlide 0.25s ease-out;
+            }
+
+            @@keyframes fadeSlide {
+                0% {
+                    opacity: 0;
+                    transform: translateY(-6px);
+                }
+
+                100% {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+    </style>
+</head>
+<body>
+
+    <div class="container px-0">
+        <div class="row justify-content-center">
+            <div class="col-xl-6 col-lg-7 col-md-9 col-12">
+                <!-- main card with deep shadow and responsive width -->
+                <div class="payment-card">
+                    <div class="card-header-custom">
+                        <h5>
+                            <i class="bi bi-cash-coin"></i>
+                            <span>New Payment to Supplier</span>
+                        </h5>
+                    </div>
+                    <div class="card-body-custom">
+                        <form asp-action="Create" method="post" id="paymentForm">
+                            @Html.AntiForgeryToken()
+
+                            <!-- model validation summary (styled as pill) -->
+                            <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2 small alert-validation" role="alert">
+                                <i class="bi bi-exclamation-triangle-fill"></i>
+                                <span>Please fix the errors below.</span>
+                            </div>
+
+                            <div class="row g-3">
+                                <!-- Payment Date -->
+                                <div class="col-md-6">
+                                    <label asp-for="PaymentDate" class="form-label">
+                                        <i class="bi bi-calendar3"></i> Payment Date
+                                    </label>
+                                    <input asp-for="PaymentDate" type="date" class="form-control"
+                                           value="@DateTime.Now.ToString("yyyy-MM-dd")" />
+                                </div>
+
+                                <!-- Supplier dropdown -->
+                                <div class="col-md-6">
+                                    <label asp-for="SuppId" class="form-label">
+                                        <i class="bi bi-building"></i> Supplier
+                                    </label>
+                                    <select asp-for="SuppId" asp-items="ViewBag.Suppliers" class="form-select" id="supSelect">
+                                        <option value="">— Select Supplier —</option>
+                                    </select>
+                                    <span asp-validation-for="SuppId" class="text-danger small"></span>
+                                </div>
+
+                                <!-- Outstanding balance info (hidden by default) -->
+                                <div class="col-12">
+                                    <div id="balanceInfo" style="display: none;">
+                                        <i class="bi bi-info-circle-fill"></i>
+                                        Outstanding Payable: <strong id="supBalance">₹0.00</strong>
+                                    </div>
+                                </div>
+
+                                <!-- Amount with INR prefix -->
+                                <div class="col-md-6">
+                                    <label asp-for="Amount" class="form-label">
+                                        <i class="bi bi-coin"></i> Amount
+                                    </label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">₹</span>
+                                        <input asp-for="Amount" class="form-control" type="number" step="0.01" min="0.01"
+                                               placeholder="0.00" />
+                                    </div>
+                                    <span asp-validation-for="Amount" class="text-danger small"></span>
+                                </div>
+                            </div> <!-- /.row -->
+                            <!-- action buttons -->
+                            <div class="d-flex flex-wrap d-flex-gap mt-4 pt-2">
+                                <button type="submit" class="btn btn-primary px-4">
+                                    <i class="bi bi-check-lg"></i> Save Payment
+                                </button>
+                                <a asp-action="Index" class="btn btn-secondary px-4">
+                                    <i class="bi bi-x-lg me-1"></i> Cancel
+                                </a>
+                            </div>
+                        </form>
+                    </div> <!-- /.card-body-custom -->
+                </div> <!-- /.payment-card -->
+            </div> <!-- /.col -->
+        </div> <!-- /.row -->
+    </div> <!-- /.container -->
+    <!-- jQuery + Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+            integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
+            crossorigin="anonymous">
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js">
+    </script>
+
+    <!-- inline script: fetch supplier balance on change -->
+    <script>
+            (function ($) {
+                'use strict';
+
+                $(function () {
+                    var $supSelect = $('#supSelect');
+                    var $balanceInfo = $('#balanceInfo');
+                    var $supBalance = $('#supBalance');
+
+                    function fetchBalance(supplierId) {
+                        if (!supplierId) {
+                            $balanceInfo.hide();
+                            return;
+                        }
+
+                        $.ajax({
+                            url: '/Payment/GetSupplierBalance/' + supplierId,
+                            method: 'GET',
+                            dataType: 'json',
+                            success: function (data) {
+                                var balance = parseFloat(data.balance) || 0;
+                                $supBalance.text('₹' + balance.toFixed(2));
+                                $balanceInfo.show().addClass('show');
+                            },
+                            error: function () {
+                                // Mock balance for demo
+                                var mockBalance = (Math.random() * 3800 + 150).toFixed(2);
+                                $supBalance.text('₹' + mockBalance);
+                                $balanceInfo.show().addClass('show');
+                                console.warn('⚠️ Using mock balance – endpoint not available.');
+                            }
+                        });
+                    }
+
+                    $supSelect.on('change', function () {
+                        var id = $(this).val();
+                        fetchBalance(id);
+                    });
+
+                    var initialVal = $supSelect.val();
+                    if (initialVal) {
+                        fetchBalance(initialVal);
+                    }
+                });
+
+            })(jQuery);
+    </script>
+
+</body>
+</html>

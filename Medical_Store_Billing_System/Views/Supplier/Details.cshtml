@@ -1,0 +1,532 @@
+@* Views/Supplier/Details.cshtml *@
+@model MedicalStore.Business.ViewModels.SupplierVM
+
+@{
+    ViewData["Title"] = "Supplier Details";
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js">
+    </script>
+
+    <style>
+            /* ── Reset & Base ── */
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            body {
+                font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                background: linear-gradient(145deg, #f6f9fc 0%, #e9eef4 100%);
+                min-height: 100vh;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 1.5rem;
+                margin: 0;
+            }
+
+            /* ── Main Container ── */
+            .details-wrapper {
+                width: 100%;
+                max-width: 680px;
+                margin: 0 auto;
+                animation: fadeSlideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            }
+
+            @@keyframes fadeSlideUp {
+                0% {
+                    opacity: 0;
+                    transform: translateY(30px) scale(0.97);
+                }
+
+                100% {
+                    opacity: 1;
+                    transform: translateY(0) scale(1);
+                }
+            }
+
+            /* ── Card ── */
+            .card-custom {
+                background: #ffffff;
+                border: none;
+                border-radius: 28px;
+                box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08), 0 8px 28px rgba(0, 0, 0, 0.04), 0 0 0 1px rgba(0, 0, 0, 0.02);
+                transition: box-shadow 0.3s ease, transform 0.2s ease;
+                overflow: hidden;
+            }
+
+                .card-custom:hover {
+                    box-shadow: 0 32px 80px rgba(0, 0, 0, 0.12), 0 12px 36px rgba(0, 0, 0, 0.06), 0 0 0 1px rgba(0, 0, 0, 0.02);
+                    transform: translateY(-2px);
+                }
+
+            /* ── Card Header ── */
+            .card-header-custom {
+                background: #ffffff;
+                border-bottom: 1px solid #f0f3f9;
+                padding: 1.25rem 1.75rem;
+                display: flex;
+                flex-wrap: wrap;
+                align-items: center;
+                justify-content: space-between;
+                gap: 0.75rem;
+            }
+
+                .card-header-custom .header-title {
+                    font-weight: 700;
+                    font-size: 1.15rem;
+                    letter-spacing: -0.01em;
+                    color: #0b1a33;
+                    display: flex;
+                    align-items: center;
+                    gap: 0.6rem;
+                }
+
+                    .card-header-custom .header-title i {
+                        font-size: 1.4rem;
+                        color: #3d7eb9;
+                    }
+
+            /* ── Balance Badge in Header ── */
+            .balance-badge-header {
+                font-weight: 600;
+                font-size: 0.85rem;
+                padding: 0.4rem 1rem;
+                border-radius: 60px;
+                display: inline-flex;
+                align-items: center;
+                gap: 0.4rem;
+                white-space: nowrap;
+                border: 1px solid transparent;
+            }
+
+                .balance-badge-header.bg-success {
+                    background: #e3f5ec !important;
+                    color: #1e7a5a;
+                    border-color: #c5e3d4;
+                }
+
+                .balance-badge-header.bg-danger {
+                    background: #fde8e8 !important;
+                    color: #b33a3a;
+                    border-color: #f5d0d0;
+                }
+
+                .balance-badge-header i {
+                    font-size: 0.9rem;
+                }
+
+            /* ── Card Body ── */
+            .card-body-custom {
+                padding: 1.75rem 1.75rem 1.5rem;
+            }
+
+            /* ── Detail List ── */
+            .detail-list {
+                margin: 0;
+            }
+
+                .detail-list .row {
+                    padding: 0.6rem 0;
+                    border-bottom: 1px solid #f0f3f9;
+                    margin: 0;
+                }
+
+                    .detail-list .row:last-child {
+                        border-bottom: none;
+                    }
+
+                .detail-list dt {
+                    font-weight: 600;
+                    font-size: 0.8rem;
+                    text-transform: uppercase;
+                    letter-spacing: 0.04em;
+                    color: #5a6e8a;
+                    padding-right: 0.5rem;
+                }
+
+                .detail-list dd {
+                    font-weight: 500;
+                    font-size: 0.95rem;
+                    color: #0b1a33;
+                    margin-bottom: 0;
+                    word-break: break-word;
+                }
+
+                .detail-list .supp-name-value {
+                    font-weight: 700;
+                    font-size: 1.1rem;
+                    color: #0b1a33;
+                }
+
+                .detail-list .balance-value {
+                    font-weight: 700;
+                    font-size: 1.2rem;
+                }
+
+                    .detail-list .balance-value.positive {
+                        color: #2a9d8f;
+                    }
+
+                    .detail-list .balance-value.negative {
+                        color: #c62828;
+                    }
+
+                .detail-list .badge-status {
+                    font-weight: 600;
+                    font-size: 0.7rem;
+                    padding: 0.2rem 0.7rem;
+                    border-radius: 40px;
+                    margin-left: 0.5rem;
+                }
+
+                    .detail-list .badge-status.bg-success {
+                        background: #e3f5ec !important;
+                        color: #1e7a5a;
+                        border: 1px solid #c5e3d4;
+                    }
+
+                    .detail-list .badge-status.bg-danger {
+                        background: #fde8e8 !important;
+                        color: #b33a3a;
+                        border: 1px solid #f5d0d0;
+                    }
+
+            /* ── Contact Links ── */
+            .contact-link {
+                color: #3d5a80;
+                text-decoration: none;
+                transition: color 0.15s ease;
+            }
+
+                .contact-link:hover {
+                    color: #0d6efd;
+                    text-decoration: underline;
+                }
+
+                .contact-link i {
+                    margin-right: 0.25rem;
+                }
+
+            /* ── Card Footer ── */
+            .card-footer-custom {
+                background: #fafcff;
+                border-top: 1px solid #eef1f7;
+                padding: 1rem 1.75rem;
+                display: flex;
+                flex-wrap: wrap;
+                align-items: center;
+                gap: 0.6rem;
+            }
+
+            .btn-action-footer {
+                border-radius: 60px;
+                padding: 0.5rem 1.2rem;
+                font-weight: 600;
+                font-size: 0.85rem;
+                display: inline-flex;
+                align-items: center;
+                gap: 0.5rem;
+                transition: all 0.25s ease;
+                text-decoration: none;
+            }
+
+            .btn-edit {
+                background: #3d7eb9;
+                border: none;
+                color: #fff;
+                box-shadow: 0 4px 12px rgba(61, 126, 185, 0.25);
+            }
+
+                .btn-edit:hover {
+                    background: #3269a0;
+                    transform: translateY(-2px);
+                    box-shadow: 0 8px 20px rgba(61, 126, 185, 0.30);
+                    color: #fff;
+                }
+
+            .btn-payment {
+                background: #f59f00;
+                border: none;
+                color: #fff;
+                box-shadow: 0 4px 12px rgba(245, 159, 0, 0.25);
+            }
+
+                .btn-payment:hover {
+                    background: #e67700;
+                    transform: translateY(-2px);
+                    box-shadow: 0 8px 20px rgba(245, 159, 0, 0.30);
+                    color: #fff;
+                }
+
+            .btn-delete {
+                background: transparent;
+                border: 1.5px solid #f1e0e0;
+                color: #b34a4a;
+            }
+
+                .btn-delete:hover {
+                    background: #fef0f0;
+                    border-color: #e8c4c4;
+                    color: #9e2d2d;
+                    transform: translateY(-2px);
+                }
+
+            .btn-back {
+                background: transparent;
+                border: 1.5px solid #dce3ef;
+                color: #4a5d7a;
+                margin-left: auto;
+            }
+
+                .btn-back:hover {
+                    background: #f4f7fd;
+                    border-color: #b6c8e0;
+                    color: #1f3a5f;
+                    transform: translateY(-2px);
+                }
+
+            /* ── Responsive ── */
+            @@media (max-width: 576px) {
+                body {
+                    padding: 1rem;
+                    align-items: flex-start;
+                    padding-top: 2rem;
+                }
+
+                .card-header-custom {
+                    padding: 1rem 1.25rem;
+                    flex-direction: column;
+                    align-items: stretch;
+                    gap: 0.5rem;
+                }
+
+                    .card-header-custom .header-title {
+                        font-size: 1rem;
+                        justify-content: center;
+                    }
+
+                        .card-header-custom .header-title i {
+                            font-size: 1.2rem;
+                        }
+
+                .balance-badge-header {
+                    font-size: 0.75rem;
+                    padding: 0.3rem 0.8rem;
+                    justify-content: center;
+                }
+
+                .card-body-custom {
+                    padding: 1.25rem 1.25rem 1rem;
+                }
+
+                .detail-list dt {
+                    font-size: 0.7rem;
+                }
+
+                .detail-list dd {
+                    font-size: 0.88rem;
+                }
+
+                .detail-list .supp-name-value {
+                    font-size: 1rem;
+                }
+
+                .detail-list .balance-value {
+                    font-size: 1.05rem;
+                }
+
+                .detail-list .row {
+                    padding: 0.5rem 0;
+                }
+
+                .card-footer-custom {
+                    padding: 0.75rem 1.25rem;
+                    flex-direction: column;
+                    align-items: stretch;
+                }
+
+                .btn-action-footer {
+                    justify-content: center;
+                    padding: 0.5rem 1rem;
+                    font-size: 0.8rem;
+                }
+
+                .btn-back {
+                    margin-left: 0;
+                }
+            }
+
+            @@media (max-width: 400px) {
+                .card-custom {
+                    border-radius: 20px;
+                }
+
+                .card-header-custom {
+                    padding: 0.85rem 1rem;
+                }
+
+                .card-body-custom {
+                    padding: 1rem 1rem 0.75rem;
+                }
+
+                .card-footer-custom {
+                    padding: 0.5rem 1rem;
+                }
+
+                .detail-list dt {
+                    font-size: 0.65rem;
+                }
+
+                .detail-list dd {
+                    font-size: 0.82rem;
+                }
+            }
+
+            /* ── Reduced Motion ── */
+            @@media (prefers-reduced-motion: reduce) {
+                *,
+                *::before,
+                *::after {
+                    animation-duration: 0.01ms !important;
+                    animation-iteration-count: 1 !important;
+                    transition-duration: 0.01ms !important;
+                }
+            }
+    </style>
+</head>
+
+<body>
+
+    <div class="details-wrapper">
+
+        <div class="card-custom">
+
+            <!-- Card Header -->
+            <div class="card-header-custom">
+                <span class="header-title">
+                    <i class="bi bi-truck"></i>
+                    Supplier Details
+                </span>
+                <span class="balance-badge-header @(Model.SuppBal > 0 ? "bg-danger" : "bg-success")">
+                    <i class="bi @(Model.SuppBal > 0 ? "bi-exclamation-triangle" : "bi-check-circle")"></i>
+                    Balance: ₹@Model.SuppBal.ToString("N2")
+                </span>
+            </div>
+
+            <!-- Card Body -->
+            <div class="card-body-custom">
+
+                <dl class="detail-list">
+
+                    <!-- Supplier ID -->
+                    <div class="row">
+                        <dt class="col-sm-4">Supplier ID</dt>
+                        <dd class="col-sm-8">#@Model.SuppId</dd>
+                    </div>
+
+                    <!-- Name -->
+                    <div class="row">
+                        <dt class="col-sm-4">Name</dt>
+                        <dd class="col-sm-8 supp-name-value">@Model.SuppName</dd>
+                    </div>
+
+                    <!-- Phone -->
+                    <div class="row">
+                        <dt class="col-sm-4">Phone</dt>
+                        <dd class="col-sm-8">
+                            @if (!string.IsNullOrEmpty(Model.SuppPhone))
+                            {
+                                <a href="tel:@Model.SuppPhone" class="contact-link">
+                                    <i class="bi bi-telephone"></i> @Model.SuppPhone
+                                </a>
+                            }
+                            else
+                            {
+                                <span class="text-muted">—</span>
+                            }
+                        </dd>
+                    </div>
+
+                    <!-- Email -->
+                    <div class="row">
+                        <dt class="col-sm-4">Email</dt>
+                        <dd class="col-sm-8">
+                            @if (!string.IsNullOrEmpty(Model.SuppEmail))
+                            {
+                                <a href="mailto:@Model.SuppEmail" class="contact-link">
+                                    <i class="bi bi-envelope"></i> @Model.SuppEmail
+                                </a>
+                            }
+                            else
+                            {
+                                <span class="text-muted">—</span>
+                            }
+                        </dd>
+                    </div>
+
+                    <!-- Address -->
+                    <div class="row">
+                        <dt class="col-sm-4">Address</dt>
+                        <dd class="col-sm-8">@(string.IsNullOrEmpty(Model.SuppAddress) ? "—" : Model.SuppAddress)</dd>
+                    </div>
+
+                    <!-- GST -->
+                    <div class="row">
+                        <dt class="col-sm-4">GST No.</dt>
+                        <dd class="col-sm-8">@(string.IsNullOrEmpty(Model.GstNo) ? "—" : Model.GstNo)</dd>
+                    </div>
+
+                    <!-- Outstanding Payable (with status badge) -->
+                    <div class="row">
+                        <dt class="col-sm-4">Outstanding Payable</dt>
+                        <dd class="col-sm-8">
+                            <span class="balance-value @(Model.SuppBal > 0 ? "negative" : "positive")">
+                                ₹@Model.SuppBal.ToString("N2")
+                            </span>
+                            @if (Model.SuppBal > 0)
+                            {
+                                <span class="badge-status bg-danger">Payment Due</span>
+                            }
+                            else
+                            {
+                                <span class="badge-status bg-success">Clear</span>
+                            }
+                        </dd>
+                    </div>
+
+                </dl>
+
+            </div>
+            <!-- /card-body -->
+            <!-- Card Footer -->
+            <div class="card-footer-custom">
+               
+                <a asp-controller="Payment" asp-action="Create" class="btn-action-footer btn-payment">
+                    <i class="bi bi-cash-coin"></i> Make Payment
+                </a>
+              
+                <a asp-action="Index" class="btn-action-footer btn-back">
+                    <i class="bi bi-arrow-left"></i> Back
+                </a>
+            </div>
+
+        </div>
+        <!-- /card-custom -->
+
+    </div>
+    <!-- /details-wrapper -->
+
+</body>
+</html>
