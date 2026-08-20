@@ -5,516 +5,1052 @@
     Layout = null;
     var allSalesData = ViewBag.AllSales as IEnumerable<MedicalStore.Business.ViewModels.SaleMasterVM> ?? Model;
 }
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"]</title>
+    <title>@ViewData["Title"] - Medical Store</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800;14..32,900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
     <style>
-        /* ── Reset & Base ── */
-        * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-        }
-
-        body {
-        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-        background: linear-gradient(145deg, #f0f5fc 0%, #e3eaf5 100%);
-        min-height: 100vh;
-        padding: 1.5rem;
-        margin: 0;
-        }
-
-        /* ── Main Container ── */
-        .page-wrapper {
-        max-width: 1440px;
-        margin: 0 auto;
-        animation: fadeSlideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        @@keyframes fadeSlideUp {
-        0% {
-        opacity: 0;
-        transform: translateY(30px) scale(0.97);
-        }
-
-        100% {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-        }
-        }
-
-        /* ── Cards & Shadows ── */
-        .card-modern {
-        background: #ffffff;
-        border: none;
-        border-radius: 24px;
-        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.06), 0 8px 28px rgba(0, 0, 0, 0.03), 0 0 0 1px rgba(0, 0, 0, 0.02);
-        transition: box-shadow 0.3s ease, transform 0.2s ease;
-        overflow: hidden;
-        }
-
-        .card-modern:hover {
-        box-shadow: 0 32px 80px rgba(0, 0, 0, 0.08), 0 12px 36px rgba(0, 0, 0, 0.04), 0 0 0 1px rgba(0, 0, 0, 0.02);
-        transform: translateY(-2px);
-        }
-
-        .card-body-custom {
-        padding: 0;
-        }
-
-        /* ── Toolbar with Search ── */
-        .toolbar {
-        background: #ffffff;
-        border-radius: 16px;
-        padding: 0.75rem 1.25rem;
-        margin-bottom: 1.25rem;
-        display: flex;
-        flex-wrap: wrap;
-        align-items: center;
-        gap: 0.75rem;
-        border: 1px solid #eef1f7;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
-        }
-
-        .search-wrap {
-        flex: 1 1 250px;
-        position: relative;
-        min-width: 150px;
-        }
-
-        .search-wrap .bi-search {
-        position: absolute;
-        left: 12px;
-        top: 50%;
-        transform: translateY(-50%);
-        color: #a0b8cc;
-        font-size: 0.9rem;
-        pointer-events: none;
-        }
-
-        .search-wrap input {
-        width: 100%;
-        padding: 0.5rem 2.5rem 0.5rem 2.5rem;
-        border: 1.5px solid #e2e8f0;
-        border-radius: 40px;
-        font-size: 0.9rem;
-        background: #f8fafc;
-        transition: all 0.25s ease;
-        outline: none;
-        font-family: 'Inter', sans-serif;
-        }
-
-        .search-wrap input:focus {
-        border-color: #2e7d32;
-        background: #fff;
-        box-shadow: 0 0 0 4px rgba(46, 125, 50, 0.08);
-        }
-
-        .search-wrap input::placeholder {
-        color: #a5b9cd;
-        }
-
-        .clear-search {
-        position: absolute;
-        right: 10px;
-        top: 50%;
-        transform: translateY(-50%);
-        border: none;
-        background: transparent;
-        color: #9aa8b5;
-        cursor: pointer;
-        display: none;
-        font-size: 16px;
-        padding: 2px 4px;
-        transition: color 0.2s;
-        border-radius: 50%;
-        line-height: 1;
-        }
-
-        .clear-search:hover {
-        color: #dc3545;
-        }
-
-        .clear-search.show {
-        display: block;
-        }
-
-        .result-badge {
-        font-size: 0.85rem;
-        color: #5a738a;
-        background: #f0f4f9;
-        padding: 0.25rem 1rem;
-        border-radius: 40px;
-        font-weight: 500;
-        white-space: nowrap;
-        }
-
-        /* ── Table ── */
-        .table-wrapper {
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-        }
-
-        #salesTable {
-        width: 100%;
-        min-width: 1000px;
-        font-size: 0.9rem;
-        border-collapse: separate;
-        border-spacing: 0;
-        margin-bottom: 0;
-        }
-
-        #salesTable thead th {
-        background: #f8faff;
-        border-bottom: 2px solid #e2e8f0;
-        font-weight: 600;
-        font-size: 0.75rem;
-        text-transform: uppercase;
-        letter-spacing: 0.04em;
-        color: #4a5d7a;
-        padding: 0.75rem 0.6rem;
-        white-space: nowrap;
-        position: sticky;
-        top: 0;
-        z-index: 5;
-        }
-
-        #salesTable thead th:first-child {
-        border-radius: 0 0 0 0;
-        }
-
-        #salesTable tbody td {
-        padding: 0.6rem 0.6rem;
-        vertical-align: middle;
-        border-bottom: 1px solid #f0f3f9;
-        }
-
-        #salesTable tbody tr {
-        background: #ffffff;
-        transition: background 0.15s;
-        }
-
-        #salesTable tbody tr:hover {
-        background: #f8fbff;
-        }
-
-        /* ── Rowspan grouping separator ── */
-        #salesTable tbody tr.sale-group-start td {
-        border-top: 2px solid #dce3ef !important;
-        }
-
-        #salesTable td[rowspan] {
-        vertical-align: middle;
-        }
-
-        /* ── Empty state ── */
-        .empty-state {
-        color: #9aabbe;
-        padding: 2.5rem 0;
-        }
-
-        .empty-state i {
-        font-size: 3rem;
-        display: block;
-        margin-bottom: 0.5rem;
-        opacity: 0.6;
-        }
-
-        /* ── Header & Buttons ── */
-        .header-icon {
-        background: #e8f5e9;
-        padding: 0.6rem;
-        border-radius: 14px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        }
-
-        .header-icon i {
-        font-size: 1.6rem;
-        color: #2e7d32;
-        }
-
-        .btn-success-custom {
-        background: #2e7d32;
-        border: none;
-        border-radius: 60px;
-        padding: 0.5rem 1.5rem;
-        font-weight: 600;
-        font-size: 0.9rem;
-        color: #fff;
-        transition: all 0.25s ease;
-        box-shadow: 0 4px 12px rgba(46, 125, 50, 0.25);
-        display: inline-flex;
-        align-items: center;
-        gap: 0.4rem;
-        text-decoration: none;
-        }
-
-        .btn-success-custom:hover {
-        background: #1b5e20;
-        transform: translateY(-2px);
-        box-shadow: 0 8px 20px rgba(46, 125, 50, 0.30);
-        color: #fff;
-        }
-
-        .btn-outline-custom {
-        border: 1.5px solid #dce3ef;
-        border-radius: 60px;
-        padding: 0.25rem 0.9rem;
-        font-weight: 600;
-        font-size: 0.8rem;
-        color: #4a5d7a;
-        transition: all 0.2s ease;
-        background: transparent;
-        text-decoration: none;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 0.3rem;
-        }
-
-        .btn-outline-custom:hover {
-        background: #f4f7fd;
-        border-color: #b6c8e0;
-        color: #1f3a5f;
-        }
-
-        /* ── Alert styling ── */
-        .alert-custom {
-        border-radius: 16px;
-        border: none;
-        padding: 0.7rem 1rem;
-        font-size: 0.9rem;
-        font-weight: 500;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        }
-
-        /* ── Pagination ── */
-        .pagination-container {
-        padding: 0.9rem 1.5rem;
-        background: #fafcff;
-        border-top: 1px solid #eef1f7;
-        }
-
-        .pagination .page-link {
-        color: #1a4a6b;
-        border-radius: 8px;
-        margin: 0 3px;
-        border: 1px solid #e9edf4;
-        padding: 0.4rem 0.85rem;
-        font-size: 0.85rem;
-        font-family: 'Inter', sans-serif;
-        }
-
-        .pagination .page-link:hover {
-        background: #f0f4f9;
-        border-color: #2e7d32;
-        color: #2e7d32;
-        }
-
-        .pagination .page-item.active .page-link {
-        background: #2e7d32;
-        border-color: #2e7d32;
-        color: #fff;
-        }
-
-        .pagination .page-item.disabled .page-link {
-        color: #a0b8cc;
-        cursor: not-allowed;
-        }
-
-        /* ── Table Footer ── */
-        .table-footer {
-        background: #fafcfe;
-        padding: 0.7rem 1.5rem;
-        border-top: 1px solid #eef1f7;
-        font-size: 0.8rem;
-        color: #6b7a93;
-        display: flex;
-        flex-wrap: wrap;
-        align-items: center;
-        justify-content: space-between;
-        gap: 0.5rem;
-        }
-
-        .table-footer .total-badge {
-        background: #e9edf4;
-        padding: 0.15rem 0.7rem;
-        border-radius: 40px;
-        font-weight: 600;
-        color: #1d2b44;
-        font-size: 0.75rem;
-        }
-
-        /* ── Responsive tweaks ── */
-        @@media (max-width: 768px) {
-        body {
-        padding: 1rem;
-        }
-
-        .toolbar {
-        padding: 0.6rem 0.75rem;
-        flex-direction: column;
-        align-items: stretch;
-        gap: 0.5rem;
-        }
-
-        .search-wrap {
-        min-width: 0;
-        }
-
-        .result-badge {
-        text-align: center;
-        }
-
-        #salesTable {
-        min-width: 800px;
-        font-size: 0.8rem;
-        }
-
-        #salesTable thead th {
-        font-size: 0.65rem;
-        padding: 0.5rem 0.4rem;
-        }
-
-        #salesTable tbody td {
-        padding: 0.4rem 0.4rem;
-        }
-
-        .btn-success-custom {
-        font-size: 0.8rem;
-        padding: 0.4rem 1.2rem;
-        }
-
-        .btn-outline-custom {
-        font-size: 0.7rem;
-        padding: 0.2rem 0.6rem;
-        }
-
-        .pagination-container {
-        padding: 0.6rem 0.75rem;
-        }
-
-        .pagination .page-link {
-        padding: 0.3rem 0.6rem;
-        font-size: 0.75rem;
-        }
-
-        .table-footer {
-        font-size: 0.7rem;
-        padding: 0.5rem 0.75rem;
-        flex-direction: column;
-        align-items: flex-start;
-        }
-        }
-
-        @@media (max-width: 576px) {
-        .header-icon i {
-        font-size: 1.2rem;
-        }
-
-        h5 {
-        font-size: 1.1rem;
-        }
-
-        .d-flex.justify-content-between {
-        flex-wrap: wrap;
-        gap: 0.5rem;
-        }
-
-        #salesTable {
-        min-width: 700px;
-        font-size: 0.7rem;
-        }
-
-        #salesTable thead th {
-        padding: 0.3rem 0.2rem;
-        }
-
-        #salesTable tbody td {
-        padding: 0.3rem 0.2rem;
-        }
-
-        .btn-outline-custom {
-        padding: 0.15rem 0.5rem;
-        font-size: 0.65rem;
-        }
-
-        .btn-outline-custom i {
-        font-size: 0.8rem;
-        }
-        }
-
-        /* ── Reduced Motion ── */
-        @@media (prefers-reduced-motion: reduce) {
-        * {
-        animation-duration: 0.01ms !important;
-        transition-duration: 0.01ms !important;
-        }
-        }
-
-        /* ── Fade Animation for Rows ── */
-        .fade-in {
-        animation: fadeIn 0.3s ease forwards;
-        opacity: 0;
-        }
-
-        @@keyframes fadeIn {
-        to {
-        opacity: 1;
-        }
-        }
-
-        .fade-in:nth-child(1) {
-        animation-delay: 0.02s;
-        }
-
-        .fade-in:nth-child(2) {
-        animation-delay: 0.04s;
-        }
-
-        .fade-in:nth-child(3) {
-        animation-delay: 0.06s;
-        }
-
-        .fade-in:nth-child(4) {
-        animation-delay: 0.08s;
-        }
-
-        .fade-in:nth-child(5) {
-        animation-delay: 0.10s;
-        }
-
-        .fade-in:nth-child(6) {
-        animation-delay: 0.12s;
-        }
-
-        .fade-in:nth-child(7) {
-        animation-delay: 0.14s;
-        }
-
-        .fade-in:nth-child(8) {
-        animation-delay: 0.16s;
-        }
-
-        .fade-in:nth-child(9) {
-        animation-delay: 0.18s;
-        }
-
-        .fade-in:nth-child(10) {
-        animation-delay: 0.20s;
-        }
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+                font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            }
+
+            body {
+                background: linear-gradient(135deg, #f0f5fc 0%, #e3eaf5 100%);
+                min-height: 100vh;
+                padding: 30px;
+                position: relative;
+            }
+
+                body::before {
+                    content: '';
+                    position: fixed;
+                    top: -50%;
+                    left: -50%;
+                    width: 200%;
+                    height: 200%;
+                    background: radial-gradient(circle at 20% 30%, rgba(46, 125, 50, 0.03) 0%, transparent 50%), radial-gradient(circle at 80% 70%, rgba(46, 125, 50, 0.03) 0%, transparent 50%);
+                    pointer-events: none;
+                    z-index: 0;
+                }
+
+            .page-wrapper {
+                max-width: 1450px;
+                margin: 0 auto;
+                position: relative;
+                z-index: 1;
+                animation: fadeSlideUp 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+            }
+
+            @@keyframes fadeSlideUp {
+                0% {
+                    opacity: 0;
+                    transform: translateY(40px) scale(0.95);
+                }
+
+                100% {
+                    opacity: 1;
+                    transform: translateY(0) scale(1);
+                }
+            }
+
+            /* ── Enhanced Header ── */
+            .page-header {
+                background: linear-gradient(135deg, #0a2e1a 0%, #2e7d32 50%, #1b5e20 100%);
+                border-radius: 28px;
+                padding: 28px 36px;
+                margin-bottom: 28px;
+                display: flex;
+                flex-wrap: wrap;
+                align-items: center;
+                justify-content: space-between;
+                gap: 20px;
+                position: relative;
+                overflow: hidden;
+                box-shadow: 0 15px 50px rgba(0, 0, 0, .18), 0 25px 70px rgba(46, 125, 50, .2);
+                transition: all 0.3s ease;
+                border: 1px solid rgba(255, 255, 255, 0.1);
+            }
+
+                .page-header:hover {
+                    transform: translateY(-2px);
+                    box-shadow: 0 20px 60px rgba(0, 0, 0, .22), 0 30px 80px rgba(46, 125, 50, .25);
+                }
+
+                .page-header::before {
+                    content: '';
+                    position: absolute;
+                    top: -60%;
+                    right: -10%;
+                    width: 500px;
+                    height: 500px;
+                    background: radial-gradient(circle, rgba(255, 255, 255, 0.08) 0%, transparent 70%);
+                    pointer-events: none;
+                    animation: floatShapes 8s ease-in-out infinite;
+                }
+
+                .page-header::after {
+                    content: '';
+                    position: absolute;
+                    bottom: -40%;
+                    left: 5%;
+                    width: 300px;
+                    height: 300px;
+                    background: radial-gradient(circle, rgba(255, 255, 255, 0.05) 0%, transparent 70%);
+                    pointer-events: none;
+                    animation: floatShapes 10s ease-in-out infinite reverse;
+                }
+
+            @@keyframes floatShapes {
+                0%, 100% {
+                    transform: translate(0, 0) scale(1);
+                }
+
+                50% {
+                    transform: translate(20px, -20px) scale(1.1);
+                }
+            }
+
+            .page-header .header-left {
+                display: flex;
+                align-items: center;
+                gap: 16px;
+                position: relative;
+                z-index: 1;
+            }
+
+            .page-header .header-icon {
+                width: 64px;
+                height: 64px;
+                background: rgba(255, 255, 255, 0.15);
+                backdrop-filter: blur(8px);
+                border-radius: 18px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 30px;
+                color: #fff;
+                flex-shrink: 0;
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+                transition: all 0.3s ease;
+            }
+
+            .page-header:hover .header-icon {
+                transform: rotate(-8deg) scale(1.05);
+                background: rgba(255, 255, 255, 0.25);
+            }
+
+            .page-header .header-title h5 {
+                font-weight: 800;
+                margin: 0;
+                color: #fff;
+                font-size: 1.8rem;
+                letter-spacing: -0.03em;
+                text-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            }
+
+                .page-header .header-title h5 .badge-count {
+                    background: rgba(255, 255, 255, 0.15);
+                    backdrop-filter: blur(8px);
+                    padding: 6px 18px;
+                    border-radius: 50px;
+                    font-size: 0.8rem;
+                    font-weight: 600;
+                    color: #fff;
+                    border: 1px solid rgba(255, 255, 255, 0.1);
+                    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+                    transition: all 0.3s ease;
+                }
+
+            .page-header:hover .badge-count {
+                background: rgba(255, 255, 255, 0.25);
+                transform: scale(1.02);
+            }
+
+            .page-header .header-title small {
+                color: rgba(255, 255, 255, 0.8);
+                font-size: 0.95rem;
+                display: block;
+                margin-top: 2px;
+            }
+
+            .btn-new {
+                background: linear-gradient(135deg, #ffffff, #f0f5fa);
+                border: none;
+                padding: 12px 32px;
+                border-radius: 50px;
+                font-weight: 700;
+                font-size: 0.95rem;
+                color: #0a2e1a;
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                display: inline-flex;
+                align-items: center;
+                gap: 10px;
+                box-shadow: 0 6px 24px rgba(0, 0, 0, 0.2);
+                text-decoration: none;
+                position: relative;
+                z-index: 1;
+                letter-spacing: 0.3px;
+            }
+
+                .btn-new:hover {
+                    transform: translateY(-3px) scale(1.03);
+                    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+                    color: #0a2e1a;
+                    background: linear-gradient(135deg, #ffffff, #e8eff6);
+                }
+
+                .btn-new:active {
+                    transform: translateY(0) scale(0.98);
+                }
+
+            /* ── Enhanced Stats Row ── */
+            .stats-row {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                gap: 16px;
+                margin-bottom: 28px;
+            }
+
+            .stat-card {
+                background: rgba(255, 255, 255, 0.85);
+                backdrop-filter: blur(12px);
+                border-radius: 20px;
+                padding: 18px 22px;
+                display: flex;
+                align-items: center;
+                gap: 16px;
+                border: 1px solid rgba(255, 255, 255, 0.5);
+                transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+                box-shadow: 0 8px 32px rgba(0, 0, 0, .06), 0 4px 12px rgba(0, 0, 0, .03);
+                cursor: default;
+            }
+
+                .stat-card:hover {
+                    transform: translateY(-4px) scale(1.02);
+                    box-shadow: 0 15px 50px rgba(0, 0, 0, .10), 0 6px 18px rgba(0, 0, 0, .05);
+                    background: rgba(255, 255, 255, 0.95);
+                }
+
+            .stat-icon {
+                width: 52px;
+                height: 52px;
+                border-radius: 16px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 24px;
+                flex-shrink: 0;
+                transition: all 0.3s ease;
+            }
+
+            .stat-card:hover .stat-icon {
+                transform: scale(1.1) rotate(-5deg);
+            }
+
+            .stat-icon.blue {
+                background: linear-gradient(135deg, #e8f4fd, #d0e8f8);
+                color: #0d6efd;
+            }
+
+            .stat-icon.green {
+                background: linear-gradient(135deg, #e6f7ed, #c8f0d8);
+                color: #2e7d32;
+            }
+
+            .stat-icon.orange {
+                background: linear-gradient(135deg, #fef3e8, #fde5d0);
+                color: #e97c07;
+            }
+
+            .stat-icon.purple {
+                background: linear-gradient(135deg, #f0ebff, #e0d8f5);
+                color: #7c3aed;
+            }
+
+            .stat-number {
+                font-weight: 800;
+                font-size: 1.4rem;
+                line-height: 1.2;
+                color: #0a2e1a;
+                letter-spacing: -0.02em;
+            }
+
+            .stat-label {
+                display: block;
+                font-size: 0.78rem;
+                font-weight: 600;
+                text-transform: uppercase;
+                letter-spacing: 0.8px;
+                color: #6c7e96;
+            }
+
+            /* ── Alert Styling ── */
+            .alert-custom {
+                border-radius: 18px;
+                border: none;
+                padding: 16px 24px;
+                font-weight: 500;
+                font-size: 0.95rem;
+                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06);
+                margin-bottom: 24px;
+                backdrop-filter: blur(8px);
+                position: relative;
+                overflow: hidden;
+            }
+
+                .alert-custom::before {
+                    content: '';
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    width: 5px;
+                    height: 100%;
+                }
+
+                .alert-custom.alert-success {
+                    background: rgba(227, 245, 236, 0.95);
+                    color: #1e7a5a;
+                    border: 1px solid rgba(46, 125, 50, 0.2);
+                }
+
+                    .alert-custom.alert-success::before {
+                        background: linear-gradient(180deg, #2e7d32, #1b5e20);
+                    }
+
+                .alert-custom.alert-danger {
+                    background: rgba(253, 232, 232, 0.95);
+                    color: #b33a3a;
+                    border: 1px solid rgba(198, 40, 40, 0.2);
+                }
+
+                    .alert-custom.alert-danger::before {
+                        background: linear-gradient(180deg, #c62828, #8e1a1a);
+                    }
+
+                .alert-custom .btn-close {
+                    filter: brightness(0.5);
+                    opacity: 0.6;
+                    transition: opacity 0.2s ease;
+                }
+
+                    .alert-custom .btn-close:hover {
+                        opacity: 1;
+                    }
+
+            /* ── Enhanced Toolbar ── */
+            .toolbar {
+                background: rgba(255, 255, 255, 0.85);
+                backdrop-filter: blur(16px);
+                border-radius: 24px;
+                padding: 18px 24px;
+                margin-bottom: 28px;
+                display: flex;
+                flex-wrap: wrap;
+                align-items: center;
+                gap: 16px;
+                border: 1px solid rgba(255, 255, 255, 0.5);
+                box-shadow: 0 10px 40px rgba(0, 0, 0, .06), 0 4px 12px rgba(0, 0, 0, .03);
+                transition: all 0.3s ease;
+            }
+
+                .toolbar:hover {
+                    box-shadow: 0 15px 50px rgba(0, 0, 0, .08), 0 6px 16px rgba(0, 0, 0, .04);
+                    background: rgba(255, 255, 255, 0.92);
+                }
+
+            .search-wrap {
+                flex: 1;
+                min-width: 280px;
+                position: relative;
+            }
+
+                .search-wrap .bi-search {
+                    position: absolute;
+                    left: 18px;
+                    top: 50%;
+                    transform: translateY(-50%);
+                    color: #8aadc9;
+                    font-size: 1.1rem;
+                    pointer-events: none;
+                    transition: color 0.3s ease;
+                }
+
+                .search-wrap input {
+                    width: 100%;
+                    padding: 13px 50px 13px 50px;
+                    border: 2px solid #e9edf2;
+                    border-radius: 50px;
+                    font-size: 1rem;
+                    background: rgba(255, 255, 255, 0.9);
+                    transition: all 0.3s ease;
+                    outline: none;
+                    font-weight: 500;
+                    color: #0a2e1a;
+                }
+
+                    .search-wrap input:focus {
+                        border-color: #2e7d32;
+                        background: #ffffff;
+                        box-shadow: 0 0 0 5px rgba(46, 125, 50, 0.08), 0 8px 24px rgba(0, 0, 0, 0.04);
+                        transform: scale(1.01);
+                    }
+
+                        .search-wrap input:focus + .bi-search {
+                            color: #2e7d32;
+                        }
+
+                    .search-wrap input::placeholder {
+                        color: #a5b9cd;
+                        font-weight: 400;
+                    }
+
+            .clear-search {
+                position: absolute;
+                right: 16px;
+                top: 50%;
+                transform: translateY(-50%);
+                border: none;
+                background: transparent;
+                color: #9aa8b5;
+                cursor: pointer;
+                display: none;
+                font-size: 18px;
+                padding: 4px 8px;
+                transition: all 0.3s ease;
+                border-radius: 50%;
+                line-height: 1;
+            }
+
+                .clear-search:hover {
+                    color: #dc3545;
+                    transform: translateY(-50%) scale(1.2);
+                }
+
+                .clear-search.show {
+                    display: block;
+                }
+
+            .result-badge {
+                font-size: 0.9rem;
+                font-weight: 600;
+                color: #5a738a;
+                background: #eef2f7;
+                padding: 8px 24px;
+                border-radius: 50px;
+                white-space: nowrap;
+                transition: all 0.3s ease;
+                border: 1px solid #e5e9ef;
+            }
+
+                .result-badge:hover {
+                    background: #dce4ed;
+                    transform: scale(1.02);
+                }
+
+            /* ── Enhanced Table Card ── */
+            .card-modern {
+                background: rgba(255, 255, 255, 0.92);
+                backdrop-filter: blur(12px);
+                border-radius: 24px;
+                overflow: hidden;
+                border: 1px solid rgba(255, 255, 255, 0.5);
+                transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+                box-shadow: 0 15px 50px rgba(0, 0, 0, .06), 0 6px 18px rgba(0, 0, 0, .03);
+            }
+
+                .card-modern:hover {
+                    box-shadow: 0 25px 70px rgba(0, 0, 0, .10), 0 8px 24px rgba(0, 0, 0, .05);
+                    transform: translateY(-2px);
+                }
+
+            .card-body-custom {
+                padding: 0;
+            }
+
+            /* ── Enhanced Table ── */
+            .table-wrapper {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                padding: 0;
+            }
+
+            #salesTable {
+                width: 100%;
+                min-width: 1100px;
+                font-size: 0.92rem;
+                border-collapse: separate;
+                border-spacing: 0;
+                margin-bottom: 0;
+            }
+
+                #salesTable thead th {
+                    background: linear-gradient(135deg, #f8faff, #eef2f7);
+                    border-bottom: 2px solid #e5e9ef;
+                    font-weight: 700;
+                    font-size: 0.82rem;
+                    text-transform: uppercase;
+                    letter-spacing: 0.08em;
+                    color: #4a5d7a;
+                    padding: 16px 14px;
+                    white-space: nowrap;
+                    position: sticky;
+                    top: 0;
+                    z-index: 10;
+                    border: none;
+                }
+
+                    #salesTable thead th:first-child {
+                        padding-left: 24px;
+                    }
+
+                    #salesTable thead th:last-child {
+                        padding-right: 24px;
+                    }
+
+                #salesTable tbody td {
+                    padding: 12px 14px;
+                    vertical-align: middle;
+                    border-bottom: 1px solid #f0f3f9;
+                    background: transparent;
+                    transition: all 0.2s ease;
+                }
+
+                #salesTable tbody tr {
+                    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                    cursor: default;
+                }
+
+                    #salesTable tbody tr:hover td {
+                        background: rgba(46, 125, 50, 0.04);
+                        transform: scale(1.003);
+                    }
+
+                    #salesTable tbody tr:last-child td {
+                        border-bottom: none;
+                    }
+
+                    #salesTable tbody tr.sale-group-start td {
+                        border-top: 2px solid #dce3ef !important;
+                    }
+
+                #salesTable tbody td:first-child {
+                    padding-left: 24px;
+                }
+
+                #salesTable tbody td:last-child {
+                    padding-right: 24px;
+                }
+
+            /* ── Sale ID Badge ── */
+            .sale-id-badge {
+                display: inline-block;
+                background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
+                color: #2e7d32;
+                border: 1px solid #a5d6a7;
+                padding: 4px 14px;
+                border-radius: 50px;
+                font-weight: 700;
+                font-size: 0.85rem;
+                transition: all 0.3s ease;
+            }
+
+            #salesTable tbody tr:hover .sale-id-badge {
+                transform: scale(1.02);
+                box-shadow: 0 2px 12px rgba(46, 125, 50, 0.15);
+            }
+
+            .customer-name {
+                font-weight: 700;
+                color: #0a2e1a;
+                font-size: 0.95rem;
+            }
+
+            .medicine-name {
+                font-weight: 600;
+                color: #1a3a5a;
+            }
+
+            .amount-highlight {
+                font-weight: 700;
+                color: #1f5a8a;
+            }
+
+            .grand-total {
+                font-weight: 800;
+                color: #2e7d32;
+                font-size: 1.05rem;
+                letter-spacing: -0.3px;
+            }
+
+            /* ── Enhanced Action Buttons ── */
+            .action-group {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 6px;
+                flex-wrap: nowrap;
+            }
+
+            .btn-outline-custom {
+                border: 1.5px solid #dce3ef;
+                border-radius: 12px;
+                padding: 6px 12px;
+                font-weight: 600;
+                font-size: 0.8rem;
+                color: #4a5d7a;
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                background: transparent;
+                text-decoration: none;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                gap: 4px;
+                cursor: pointer;
+                min-width: 34px;
+                height: 34px;
+            }
+
+                .btn-outline-custom:hover {
+                    background: #f4f7fd;
+                    border-color: #b6c8e0;
+                    color: #1f3a5f;
+                    transform: translateY(-2px) scale(1.05);
+                    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+                }
+
+                .btn-outline-custom i {
+                    font-size: 0.95rem;
+                }
+
+                .btn-outline-custom.view:hover {
+                    background: #e8f4fd;
+                    border-color: #0d6efd;
+                    color: #0d6efd;
+                    box-shadow: 0 4px 16px rgba(13, 110, 253, 0.15);
+                }
+
+                .btn-outline-custom.invoice:hover {
+                    background: #fef3e8;
+                    border-color: #e97c07;
+                    color: #e97c07;
+                    box-shadow: 0 4px 16px rgba(233, 124, 7, 0.15);
+                }
+
+                .btn-outline-custom.delete:hover {
+                    background: #fde8e8;
+                    border-color: #d93025;
+                    color: #d93025;
+                    box-shadow: 0 4px 16px rgba(217, 48, 37, 0.15);
+                }
+
+                .btn-outline-custom:active {
+                    transform: scale(0.95);
+                }
+
+            /* ── Empty State ── */
+            .empty-state {
+                padding: 70px 20px;
+                text-align: center;
+                color: #8a99b0;
+            }
+
+                .empty-state i {
+                    font-size: 72px;
+                    color: #c5d5e5;
+                    display: block;
+                    margin-bottom: 20px;
+                    animation: float 4s ease-in-out infinite;
+                }
+
+            @@keyframes float {
+                0%, 100% {
+                    transform: translateY(0px) rotate(0deg);
+                }
+
+                50% {
+                    transform: translateY(-12px) rotate(2deg);
+                }
+            }
+
+            .empty-state div {
+                font-size: 1.1rem;
+                font-weight: 600;
+                color: #1a3a5a;
+                margin-bottom: 6px;
+            }
+
+            .empty-state .sub-text {
+                font-size: 0.95rem;
+                font-weight: 400;
+                color: #7a93ab;
+                margin-top: 4px;
+            }
+
+            .empty-state .btn-link {
+                color: #2e7d32;
+                font-weight: 600;
+                padding: 0;
+            }
+
+                .empty-state .btn-link:hover {
+                    color: #1b5e20;
+                    text-decoration: underline;
+                }
+
+            /* ── Pagination ── */
+            .pagination-container {
+                padding: 18px 24px;
+                background: rgba(248, 250, 252, 0.9);
+                border-top: 1px solid #e5e9ef;
+            }
+
+            .pagination .page-link {
+                color: #2e7d32;
+                border-radius: 12px;
+                margin: 0 5px;
+                border: 2px solid #e5e9ef;
+                padding: 12px 20px;
+                font-weight: 600;
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                background: transparent;
+                font-family: 'Inter', sans-serif;
+            }
+
+                .pagination .page-link:hover {
+                    background: #f0f4f9;
+                    border-color: #2e7d32;
+                    transform: translateY(-3px);
+                    box-shadow: 0 6px 20px rgba(46, 125, 50, 0.12);
+                }
+
+            .pagination .page-item.active .page-link {
+                background: linear-gradient(135deg, #2e7d32, #1b5e20);
+                border-color: #2e7d32;
+                color: #fff;
+                box-shadow: 0 6px 24px rgba(46, 125, 50, 0.25);
+            }
+
+            .pagination .page-item.disabled .page-link {
+                color: #b0c8dd;
+                cursor: not-allowed;
+                opacity: 0.5;
+            }
+
+            /* ── Table Footer ── */
+            .table-footer {
+                background: rgba(248, 250, 252, 0.9);
+                padding: 16px 24px;
+                border-top: 1px solid #e5e9ef;
+                font-size: 0.9rem;
+                color: #5a7a9a;
+                display: flex;
+                flex-wrap: wrap;
+                align-items: center;
+                justify-content: space-between;
+                gap: 10px;
+            }
+
+                .table-footer .total-badge {
+                    background: #eef2f7;
+                    padding: 6px 20px;
+                    border-radius: 50px;
+                    font-weight: 600;
+                    font-size: 0.85rem;
+                    color: #2a5a7a;
+                    transition: all 0.3s ease;
+                }
+
+                    .table-footer .total-badge:hover {
+                        background: #dce4ed;
+                        transform: scale(1.02);
+                    }
+
+            /* ── Animations ── */
+            .fade-in {
+                animation: fadeInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+                opacity: 0;
+            }
+
+            @@keyframes fadeInUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(30px) scale(0.98);
+                }
+
+                to {
+                    opacity: 1;
+                    transform: translateY(0) scale(1);
+                }
+            }
+
+            .fade-in:nth-child(1) {
+                animation-delay: 0.03s;
+            }
+
+            .fade-in:nth-child(2) {
+                animation-delay: 0.06s;
+            }
+
+            .fade-in:nth-child(3) {
+                animation-delay: 0.09s;
+            }
+
+            .fade-in:nth-child(4) {
+                animation-delay: 0.12s;
+            }
+
+            .fade-in:nth-child(5) {
+                animation-delay: 0.15s;
+            }
+
+            .fade-in:nth-child(6) {
+                animation-delay: 0.18s;
+            }
+
+            .fade-in:nth-child(7) {
+                animation-delay: 0.21s;
+            }
+
+            .fade-in:nth-child(8) {
+                animation-delay: 0.24s;
+            }
+
+            .fade-in:nth-child(9) {
+                animation-delay: 0.27s;
+            }
+
+            .fade-in:nth-child(10) {
+                animation-delay: 0.30s;
+            }
+
+            /* ── Toast Notification ── */
+            .toast-container {
+                position: fixed;
+                bottom: 30px;
+                right: 30px;
+                z-index: 9999;
+            }
+
+            .toast-message {
+                background: rgba(10, 46, 26, 0.95);
+                backdrop-filter: blur(12px);
+                color: white;
+                padding: 16px 28px;
+                border-radius: 16px;
+                box-shadow: 0 15px 50px rgba(0, 0, 0, 0.2);
+                font-weight: 500;
+                transform: translateY(100px);
+                opacity: 0;
+                transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+                border: 1px solid rgba(255, 255, 255, 0.1);
+            }
+
+                .toast-message.show {
+                    transform: translateY(0);
+                    opacity: 1;
+                }
+
+            /* ── Responsive ── */
+            @@media (max-width: 992px) {
+                body {
+                    padding: 20px;
+                }
+
+                .page-header {
+                    padding: 24px 28px;
+                }
+
+                    .page-header .header-title h5 {
+                        font-size: 1.5rem;
+                    }
+            }
+
+            @@media (max-width: 768px) {
+                body {
+                    padding: 16px;
+                }
+
+                .page-header {
+                    padding: 20px 18px;
+                    border-radius: 20px;
+                    flex-direction: column;
+                    align-items: stretch;
+                    gap: 16px;
+                }
+
+                    .page-header .header-left {
+                        flex-wrap: wrap;
+                    }
+
+                    .page-header .header-icon {
+                        width: 56px;
+                        height: 56px;
+                        font-size: 26px;
+                    }
+
+                    .page-header .header-title h5 {
+                        font-size: 1.3rem;
+                    }
+
+                .btn-new {
+                    justify-content: center;
+                    width: 100%;
+                }
+
+                .stats-row {
+                    grid-template-columns: repeat(2, 1fr);
+                    gap: 12px;
+                }
+
+                .stat-card {
+                    padding: 14px 16px;
+                }
+
+                .stat-icon {
+                    width: 44px;
+                    height: 44px;
+                    font-size: 20px;
+                }
+
+                .stat-number {
+                    font-size: 1.2rem;
+                }
+
+                .toolbar {
+                    padding: 16px 18px;
+                    flex-direction: column;
+                    align-items: stretch;
+                    gap: 12px;
+                }
+
+                .search-wrap {
+                    min-width: 100%;
+                }
+
+                .result-badge {
+                    text-align: center;
+                }
+
+                #salesTable {
+                    min-width: 900px;
+                    font-size: 0.82rem;
+                }
+
+                    #salesTable thead th,
+                    #salesTable tbody td {
+                        padding: 10px 10px;
+                    }
+
+                        #salesTable thead th:first-child,
+                        #salesTable tbody td:first-child {
+                            padding-left: 16px;
+                        }
+
+                        #salesTable thead th:last-child,
+                        #salesTable tbody td:last-child {
+                            padding-right: 16px;
+                        }
+
+                .btn-outline-custom {
+                    padding: 4px 8px;
+                    font-size: 0.7rem;
+                    min-width: 30px;
+                    height: 30px;
+                }
+
+                    .btn-outline-custom i {
+                        font-size: 0.8rem;
+                    }
+
+                .pagination-container {
+                    padding: 14px 16px;
+                }
+
+                .pagination .page-link {
+                    padding: 10px 14px;
+                    font-size: 0.85rem;
+                }
+
+                .table-footer {
+                    flex-direction: column;
+                    text-align: center;
+                    padding: 14px 18px;
+                    gap: 6px;
+                }
+
+                .empty-state {
+                    padding: 44px 16px;
+                }
+
+                    .empty-state i {
+                        font-size: 52px;
+                    }
+            }
+
+            @@media (max-width: 480px) {
+                .stats-row {
+                    grid-template-columns: 1fr;
+                }
+
+                .page-header .header-title h5 {
+                    font-size: 1.1rem;
+                }
+
+                #salesTable {
+                    min-width: 750px;
+                    font-size: 0.75rem;
+                }
+
+                    #salesTable thead th,
+                    #salesTable tbody td {
+                        padding: 6px 6px;
+                    }
+            }
+
+            /* ── Scrollbar Styling ── */
+            ::-webkit-scrollbar {
+                width: 8px;
+                height: 8px;
+            }
+
+            ::-webkit-scrollbar-track {
+                background: #eef2f7;
+                border-radius: 10px;
+            }
+
+            ::-webkit-scrollbar-thumb {
+                background: #c5d5e5;
+                border-radius: 10px;
+                transition: background 0.3s ease;
+            }
+
+                ::-webkit-scrollbar-thumb:hover {
+                    background: #8aadc9;
+                }
+
+            /* ── Reduced Motion ── */
+            @@media (prefers-reduced-motion: reduce) {
+                *,
+                *::before,
+                *::after {
+                    animation-duration: 0.01ms !important;
+                    animation-iteration-count: 1 !important;
+                    transition-duration: 0.01ms !important;
+                }
+            }
     </style>
 </head>
 
@@ -522,44 +1058,77 @@
 
     <div class="page-wrapper">
 
-        <!-- ── Header ── -->
-        <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
-            <div class="d-flex align-items-center gap-3">
+        <!-- ─── HEADER ─── -->
+        <div class="page-header">
+            <div class="header-left">
                 <div class="header-icon">
-                    <i class="bi bi-cart-check"></i>
+                    <i class="bi bi-cart-check-fill"></i>
                 </div>
-                <div>
-                    <h5 class="mb-0 fw-bold">
+                <div class="header-title">
+                    <h5>
                         Sales
-                        <span class="badge bg-success ms-2" style="font-size:0.7rem;">
-                            <i class="bi bi-database me-1"></i>@ViewBag.TotalRecords total
+                        <span class="badge-count">
+                            <i class="bi bi-database me-1"></i>
+                            @ViewBag.TotalRecords total
                         </span>
                     </h5>
-                    <small class="text-muted">Manage all sales transactions</small>
+                    <small><i class="bi bi-clock-history me-1"></i> Manage all sales transactions</small>
                 </div>
             </div>
-            <a asp-action="Create" class="btn btn-success-custom">
+            <a asp-action="Create" class="btn-new">
                 <i class="bi bi-plus-lg"></i> New Sale
             </a>
         </div>
 
-        <!-- ── Alerts ── -->
+        <!-- ─── STATS ROW ─── -->
+        <div class="stats-row">
+            <div class="stat-card">
+                <div class="stat-icon blue"><i class="bi bi-cart-check"></i></div>
+                <div>
+                    <span class="stat-number">@ViewBag.TotalRecords</span>
+                    <span class="stat-label">Total Sales</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon green"><i class="bi bi-currency-rupee"></i></div>
+                <div>
+                    <span class="stat-number">₹@ViewBag.TotalAmount?.ToString("N2")</span>
+                    <span class="stat-label">Total Revenue</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon orange"><i class="bi bi-tag"></i></div>
+                <div>
+                    <span class="stat-number">₹@ViewBag.TotalDiscount?.ToString("N2")</span>
+                    <span class="stat-label">Total Discount</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon purple"><i class="bi bi-people"></i></div>
+                <div>
+                    <span class="stat-number">@ViewBag.UniqueCustomers</span>
+                    <span class="stat-label">Unique Customers</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ─── ALERTS ─── -->
         @if (TempData["Success"] != null)
         {
-            <div class="alert alert-success alert-dismissible fade show alert-custom" role="alert">
-                <i class="bi bi-check-circle"></i>@TempData["Success"]
+            <div class="alert alert-custom alert-success alert-dismissible fade show" role="alert">
+                <i class="bi bi-check-circle-fill me-2"></i> @TempData["Success"]
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
         }
         @if (TempData["Error"] != null)
         {
-            <div class="alert alert-danger alert-dismissible fade show alert-custom" role="alert">
-                <i class="bi bi-exclamation-circle"></i>@TempData["Error"]
+            <div class="alert alert-custom alert-danger alert-dismissible fade show" role="alert">
+                <i class="bi bi-exclamation-circle-fill me-2"></i> @TempData["Error"]
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
         }
 
-        <!-- ── TOOLBAR WITH SEARCH ── -->
+        <!-- ─── TOOLBAR ─── -->
         <div class="toolbar">
             <div class="search-wrap">
                 <i class="bi bi-search"></i>
@@ -572,48 +1141,50 @@
                 </button>
             </div>
             <span class="result-badge" id="resultCount">
+                <i class="bi bi-funnel me-1"></i>
                 @ViewBag.TotalRecords results
             </span>
         </div>
 
-        <!-- ── Table Card ── -->
+        <!-- ─── TABLE CARD ─── -->
         <div class="card-modern">
             <div class="card-body-custom">
                 <div class="table-wrapper">
                     <table class="table" id="salesTable">
                         <thead>
                             <tr>
-                                <th class="ps-3">#</th>
-                                <th>Date</th>
-                                <th>Customer</th>
-                                <th>Medicine</th>
-                                <th class="text-end">Rate (₹)</th>
-                                <th class="text-end">Qty</th>
-                                <th class="text-end">Amount (₹)</th>
-                                <th class="text-end">GST (₹)</th>
-                                <th class="text-end">Line Total (₹)</th>
-                                <th class="text-end">Grand Total (₹)</th>
-                                <th class="text-center">Actions</th>
+                                <th class="ps-3" style="width:80px;">#</th>
+                                <th style="min-width:110px;">Date</th>
+                                <th style="min-width:140px;">Customer</th>
+                                <th style="min-width:150px;">Medicine</th>
+                                <th class="text-end" style="width:90px;">Rate (₹)</th>
+                                <th class="text-end" style="width:70px;">Qty</th>
+                                <th class="text-end" style="width:100px;">Amount (₹)</th>
+                                <th class="text-end" style="width:100px;">GST (₹)</th>
+                                <th class="text-end" style="width:110px;">Line Total (₹)</th>
+                                <th class="text-end" style="width:120px;">Grand Total (₹)</th>
+                                <th class="text-center" style="width:140px;">Actions</th>
                             </tr>
                         </thead>
                         <tbody id="salesTableBody">
                             @if (!Model.Any())
                             {
                                 <tr>
-                                    <td colspan="11" class="text-center empty-state">
+                                    <td colspan="11" class="empty-state">
                                         @if (!string.IsNullOrEmpty(ViewBag.CurrentSearch))
                                         {
                                             <i class="bi bi-search"></i>
                                             <div>No sales found matching "<strong>@ViewBag.CurrentSearch</strong>"</div>
-                                            <div style="margin-top:0.25rem; font-size:0.9rem;">
-                                                Try adjusting your search or <a asp-action="Index" class="text-decoration-none">clear the filter</a>.
+                                            <div class="sub-text">
+                                                Try adjusting your search or
+                                                <a asp-action="Index" class="btn-link">clear the filter</a>.
                                             </div>
                                         }
                                         else
                                         {
                                             <i class="bi bi-inbox"></i>
                                             <div>No sales found.</div>
-                                            <div style="margin-top:0.25rem; font-size:0.9rem;">
+                                            <div class="sub-text">
                                                 Click <strong>New Sale</strong> to get started.
                                             </div>
                                         }
@@ -633,30 +1204,38 @@
                                     {
                                         <!-- ── Sale with NO detail lines ── -->
                                         <tr class="fade-in sale-group-start" data-search="@sale.SaleId @sale.CustomerName @sale.SaleDate.ToString("dd-MM-yyyy")">
-                                            <td class="ps-3 fw-semibold text-muted">@sale.SaleId</td>
-                                            <td>@sale.SaleDate.ToString("dd-MM-yyyy")</td>
-                                            <td class="fw-semibold">@sale.CustomerName</td>
-                                            <td colspan="6" class="text-muted fst-italic">No items</td>
-                                            <td class="text-end fw-bold text-success">
-                                                ₹@sale.GrandTotal.ToString("N2")
+                                            <td class="ps-3">
+                                                <span class="sale-id-badge">@sale.SaleId</span>
                                             </td>
+                                            <td>
+                                                <i class="bi bi-calendar3 me-1" style="font-size:0.8rem; opacity:0.6;"></i>
+                                                @sale.SaleDate.ToString("dd-MM-yyyy")
+                                            </td>
+                                            <td class="customer-name">
+                                                <i class="bi bi-person me-1" style="font-size:0.8rem; opacity:0.6;"></i>
+                                                @sale.CustomerName
+                                            </td>
+                                            <td colspan="6" class="text-muted fst-italic">No items</td>
+                                            <td class="text-end grand-total">₹@sale.GrandTotal.ToString("N2")</td>
                                             <td class="text-center">
-                                                <a asp-action="Details" asp-route-id="@sale.SaleId"
-                                                   class="btn btn-outline-custom me-1" title="View">
-                                                    <i class="bi bi-eye"></i>
-                                                </a>
-                                                <a asp-action="Invoice" asp-route-id="@sale.SaleId"
-                                                   class="btn btn-outline-custom me-1" title="Invoice">
-                                                    <i class="bi bi-receipt"></i>
-                                                </a>
-                                                <form asp-action="Delete" asp-route-id="@sale.SaleId"
-                                                      method="post" class="d-inline"
-                                                      onsubmit="return confirm('Delete Sale #@sale.SaleId?')">
-                                                    @Html.AntiForgeryToken()
-                                                    <button type="submit" class="btn btn-outline-custom" title="Delete">
-                                                        <i class="bi bi-trash"></i>
-                                                    </button>
-                                                </form>
+                                                <div class="action-group">
+                                                    <a asp-action="Details" asp-route-id="@sale.SaleId"
+                                                       class="btn-outline-custom view" title="View Details">
+                                                        <i class="bi bi-eye"></i>
+                                                    </a>
+                                                    <a asp-action="Invoice" asp-route-id="@sale.SaleId"
+                                                       class="btn-outline-custom invoice" title="Invoice">
+                                                        <i class="bi bi-receipt"></i>
+                                                    </a>
+                                                    <form asp-action="Delete" asp-route-id="@sale.SaleId"
+                                                          method="post" class="d-inline"
+                                                          onsubmit="return confirm('Delete Sale #@sale.SaleId? This cannot be undone.')">
+                                                        @Html.AntiForgeryToken()
+                                                        <button type="submit" class="btn-outline-custom delete" title="Delete">
+                                                            <i class="bi bi-trash"></i>
+                                                        </button>
+                                                    </form>
+                                                </div>
                                             </td>
                                         </tr>
                                     }
@@ -671,48 +1250,59 @@
                                                 @if (isFirst)
                                                 {
                                                     <!-- Sale header cells — span all detail rows -->
-                                                    <td class="ps-3 fw-semibold" rowspan="@rowCount">
-                                                        @sale.SaleId
+                                                    <td class="ps-3" rowspan="@rowCount">
+                                                        <span class="sale-id-badge">@sale.SaleId</span>
                                                     </td>
                                                     <td rowspan="@rowCount">
+                                                        <i class="bi bi-calendar3 me-1" style="font-size:0.8rem; opacity:0.6;"></i>
                                                         @sale.SaleDate.ToString("dd-MM-yyyy")
                                                     </td>
-                                                    <td rowspan="@rowCount" class="fw-semibold">
+                                                    <td rowspan="@rowCount" class="customer-name">
+                                                        <i class="bi bi-person me-1" style="font-size:0.8rem; opacity:0.6;"></i>
                                                         @sale.CustomerName
                                                     </td>
                                                 }
 
                                                 <!-- Detail columns -->
-                                                <td>@detail.MedicineName</td>
+                                                <td class="medicine-name">
+                                                    <i class="bi bi-capsule me-1" style="font-size:0.8rem; opacity:0.5;"></i>
+                                                    @detail.MedicineName
+                                                </td>
                                                 <td class="text-end">@detail.Rate.ToString("N2")</td>
-                                                <td class="text-end">@detail.Qty.ToString("N0")</td>
-                                                <td class="text-end">@detail.Amt.ToString("N2")</td>
-                                                <td class="text-end">@detail.GstAmt.ToString("N2")</td>
-                                                <td class="text-end fw-semibold">@detail.Total.ToString("N2")</td>
+                                                <td class="text-end">
+                                                    <span class="badge" style="background:#eef2f7; color:#3d5a7a; font-weight:600; padding:2px 12px; border-radius:50px;">
+                                                        @detail.Qty.ToString("N0")
+                                                    </span>
+                                                </td>
+                                                <td class="text-end amount-highlight">@detail.Amt.ToString("N2")</td>
+                                                <td class="text-end" style="color:#6b7a93;">@detail.GstAmt.ToString("N2")</td>
+                                                <td class="text-end fw-semibold" style="color:#0a2e4a;">@detail.Total.ToString("N2")</td>
 
                                                 @if (isFirst)
                                                 {
                                                     <!-- Grand total + action buttons — span all detail rows -->
-                                                    <td class="text-end fw-bold text-success" rowspan="@rowCount">
+                                                    <td class="text-end grand-total" rowspan="@rowCount">
                                                         ₹@sale.GrandTotal.ToString("N2")
                                                     </td>
                                                     <td class="text-center" rowspan="@rowCount">
-                                                        <a asp-action="Details" asp-route-id="@sale.SaleId"
-                                                           class="btn btn-outline-custom me-1" title="View Details">
-                                                            <i class="bi bi-eye"></i>
-                                                        </a>
-                                                        <a asp-action="Invoice" asp-route-id="@sale.SaleId"
-                                                           class="btn btn-outline-custom me-1" title="Invoice">
-                                                            <i class="bi bi-receipt"></i>
-                                                        </a>
-                                                        <form asp-action="Delete" asp-route-id="@sale.SaleId"
-                                                              method="post" class="d-inline"
-                                                              onsubmit="return confirm('Delete Sale #@sale.SaleId? This cannot be undone.')">
-                                                            @Html.AntiForgeryToken()
-                                                            <button type="submit" class="btn btn-outline-custom" title="Delete">
-                                                                <i class="bi bi-trash"></i>
-                                                            </button>
-                                                        </form>
+                                                        <div class="action-group">
+                                                            <a asp-action="Details" asp-route-id="@sale.SaleId"
+                                                               class="btn-outline-custom view" title="View Details">
+                                                                <i class="bi bi-eye"></i>
+                                                            </a>
+                                                            <a asp-action="Invoice" asp-route-id="@sale.SaleId"
+                                                               class="btn-outline-custom invoice" title="Invoice">
+                                                                <i class="bi bi-receipt"></i>
+                                                            </a>
+                                                            <form asp-action="Delete" asp-route-id="@sale.SaleId"
+                                                                  method="post" class="d-inline"
+                                                                  onsubmit="return confirm('Delete Sale #@sale.SaleId? This cannot be undone.')">
+                                                                @Html.AntiForgeryToken()
+                                                                <button type="submit" class="btn-outline-custom delete" title="Delete">
+                                                                    <i class="bi bi-trash"></i>
+                                                                </button>
+                                                            </form>
+                                                        </div>
                                                     </td>
                                                 }
 
@@ -778,229 +1368,291 @@
     </div>
 
     <script>
-        (function() {
-        'use strict';
+            (function() {
+                'use strict';
 
-        // Store ALL sales for searching across all pages
-        const allSales = @Html.Raw(Json.Serialize(allSalesData));
-        const searchInput = document.getElementById('saleSearch');
-        const clearButton = document.getElementById('clearSearch');
-        const tbody = document.getElementById('salesTableBody');
-        const visibleCount = document.getElementById('visibleCount');
-        const totalCount = document.getElementById('totalCount');
-        const resultCount = document.getElementById('resultCount');
-        const paginationContainer = document.getElementById('paginationContainer');
-        const currentPage = @ViewBag.CurrentPage;
+                const allSales = @Html.Raw(Json.Serialize(allSalesData));
+                const searchInput = document.getElementById('saleSearch');
+                const clearButton = document.getElementById('clearSearch');
+                const tbody = document.getElementById('salesTableBody');
+                const visibleCount = document.getElementById('visibleCount');
+                const totalCount = document.getElementById('totalCount');
+                const resultCount = document.getElementById('resultCount');
+                const paginationContainer = document.getElementById('paginationContainer');
+                const currentPage = @ViewBag.CurrentPage;
 
-        // ── Escape HTML to prevent XSS ──
-        function escapeHtml(text) {
-        if (!text) return '';
-        const div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
-        }
+                let searchTimeout;
 
-        // ── Toggle clear button visibility ──
-        function toggleClearButton() {
-        if (searchInput.value.trim().length > 0) {
-        clearButton.classList.add('show');
-        } else {
-        clearButton.classList.remove('show');
-        }
-        }
+                function escapeHtml(text) {
+                    if (!text) return '';
+                    const div = document.createElement('div');
+                    div.textContent = text;
+                    return div.innerHTML;
+                }
 
-        // ── Format date ──
-        function formatDate(dateString) {
-        if (!dateString) return '';
-        const date = new Date(dateString);
-        const day = String(date.getDate()).padStart(2, '0');
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const year = date.getFullYear();
-        return `${day}-${month}-${year}`;
-        }
+                function toggleClearButton() {
+                    if (searchInput.value.trim().length > 0) {
+                        clearButton.classList.add('show');
+                    } else {
+                        clearButton.classList.remove('show');
+                    }
+                }
 
-        // ── Render filtered sales (client-side search across ALL records) ──
-        function renderFilteredSales(searchTerm) {
-        const trimmedTerm = searchTerm.trim();
+                function showToast(message, type) {
+                    const existingToast = document.querySelector('.toast-container');
+                    if (existingToast) {
+                        existingToast.remove();
+                    }
 
-        // If search is empty, reload the page to show server-side pagination
-        if (trimmedTerm === "") {
-        window.location.href = '@Url.Action("Index", new { page = -1 })'.replace('-1', currentPage);
-        return;
-        }
+                    const container = document.createElement('div');
+                    container.className = 'toast-container';
+                    const toast = document.createElement('div');
+                    toast.className = 'toast-message';
+                    const icon = type === 'success' ? 'check-circle' : type === 'warning' ? 'exclamation-triangle' : 'info-circle';
+                    toast.innerHTML = `<i class="bi bi-${icon} me-2"></i> ${message}`;
+                    container.appendChild(toast);
+                    document.body.appendChild(container);
 
-        const lowerSearch = trimmedTerm.toLowerCase();
+                    setTimeout(() => toast.classList.add('show'), 10);
 
-        // Filter sales from ALL data
-        const filtered = allSales.filter(s =>
-        (s.saleId && s.saleId.toString().includes(lowerSearch)) ||
-        (s.customerName && s.customerName.toLowerCase().includes(lowerSearch)) ||
-        (s.purchaseDate && formatDate(s.purchaseDate).includes(lowerSearch)) ||
-        (s.saleDetails && s.saleDetails.some(d =>
-        d.medicineName && d.medicineName.toLowerCase().includes(lowerSearch)
-        ))
-        );
+                    setTimeout(() => {
+                        toast.classList.remove('show');
+                        setTimeout(() => container.remove(), 500);
+                    }, 3000);
+                }
 
-        // Update counts
-        const total = allSales.length;
-        const shown = filtered.length;
+                function formatDate(dateString) {
+                    if (!dateString) return '';
+                    const date = new Date(dateString);
+                    const day = String(date.getDate()).padStart(2, '0');
+                    const month = String(date.getMonth() + 1).padStart(2, '0');
+                    const year = date.getFullYear();
+                    return `${day}-${month}-${year}`;
+                }
 
-        if (visibleCount) visibleCount.textContent = shown;
-        if (totalCount) totalCount.textContent = total;
-        if (resultCount) {
-        resultCount.textContent = shown + ' result' + (shown !== 1 ? 's' : '');
-        }
+                function renderFilteredSales(searchTerm) {
+                    const trimmedTerm = searchTerm.trim();
 
-        // Hide pagination when searching
-        if (paginationContainer) {
-        paginationContainer.style.display = 'none';
-        }
+                    if (trimmedTerm === "") {
+                        window.location.href = '@Url.Action("Index", new { page = -1 })'.replace('-1', currentPage);
+                        return;
+                    }
 
-        // Show clear button
-        toggleClearButton();
+                    const lowerSearch = trimmedTerm.toLowerCase();
 
-        // Show "no results" message
-        if (filtered.length === 0) {
-        tbody.innerHTML = `
-        <tr>
-        <td colspan="11" class="text-center empty-state">
-        <i class="bi bi-search"></i>
-        <div>No sales found matching "<strong>${escapeHtml(trimmedTerm)}</strong>"</div>
-        <div style="margin-top:0.25rem; font-size:0.9rem;">
-        Try adjusting your search or
-        <button type="button" id="clearSearchFromMsg"
-        class="btn btn-link btn-sm text-decoration-none p-0"
-        style="color:#2e7d32;">
-        clear the filter
-        </button>.
-        </div>
-        </td>
-        </tr>
-        `;
-        const clearBtnMsg = document.getElementById('clearSearchFromMsg');
-        if (clearBtnMsg) {
-        clearBtnMsg.addEventListener('click', function() {
-        clearButton.click();
-        });
-        }
-        return;
-        }
+                    const filtered = allSales.filter(s =>
+                        (s.saleId && s.saleId.toString().includes(lowerSearch)) ||
+                        (s.customerName && s.customerName.toLowerCase().includes(lowerSearch)) ||
+                        (s.saleDate && formatDate(s.saleDate).includes(lowerSearch)) ||
+                        (s.saleDetails && s.saleDetails.some(d =>
+                            d.medicineName && d.medicineName.toLowerCase().includes(lowerSearch)
+                        ))
+                    );
 
-        // Build results HTML
-        let html = '';
-        filtered.forEach(function(s) {
-        const details = s.saleDetails || [];
-        const rowCount = details.length > 0 ? details.length : 1;
-        let isFirst = true;
+                    const total = allSales.length;
+                    const shown = filtered.length;
 
-        if (details.length === 0) {
-        html += `
-        <tr class="fade-in sale-group-start">
-        <td class="ps-3 fw-semibold text-muted">${s.saleId}</td>
-        <td>${formatDate(s.purchaseDate)}</td>
-        <td class="fw-semibold">${escapeHtml(s.customerName)}</td>
-        <td colspan="6" class="text-muted fst-italic">No items</td>
-        <td class="text-end fw-bold text-success">₹${parseFloat(s.grandTotal).toFixed(2)}</td>
-        <td class="text-center">
-        <a href="/Sale/Details/${s.saleId}" class="btn btn-outline-custom me-1" title="View">
-        <i class="bi bi-eye"></i>
-        </a>
-        <a href="/Sale/Invoice/${s.saleId}" class="btn btn-outline-custom me-1" title="Invoice">
-        <i class="bi bi-receipt"></i>
-        </a>
-        <form action="/Sale/Delete/${s.saleId}" method="post" class="d-inline"
-        onsubmit="return confirm('Delete Sale #${s.saleId}?')">
-        <button type="submit" class="btn btn-outline-custom" title="Delete">
-        <i class="bi bi-trash"></i>
-        </button>
-        </form>
-        </td>
-        </tr>
-        `;
-        } else {
-        details.forEach(function(d) {
-        html += `
-        <tr class="fade-in ${isFirst ? 'sale-group-start' : ''}">
-        ${isFirst ? `
-        <td class="ps-3 fw-semibold" rowspan="${rowCount}">${s.saleId}</td>
-        <td rowspan="${rowCount}">${formatDate(s.purchaseDate)}</td>
-        <td rowspan="${rowCount}" class="fw-semibold">${escapeHtml(s.customerName)}</td>
-        ` : ''}
-        <td>${escapeHtml(d.medicineName)}</td>
-        <td class="text-end">${parseFloat(d.rate).toFixed(2)}</td>
-        <td class="text-end">${parseInt(d.qty).toFixed(0)}</td>
-        <td class="text-end">${parseFloat(d.amt).toFixed(2)}</td>
-        <td class="text-end">${parseFloat(d.gstAmt).toFixed(2)}</td>
-        <td class="text-end fw-semibold">${parseFloat(d.total).toFixed(2)}</td>
-        ${isFirst ? `
-        <td class="text-end fw-bold text-success" rowspan="${rowCount}">
-        ₹${parseFloat(s.grandTotal).toFixed(2)}
-        </td>
-        <td class="text-center" rowspan="${rowCount}">
-        <a href="/Sale/Details/${s.saleId}" class="btn btn-outline-custom me-1" title="View Details">
-        <i class="bi bi-eye"></i>
-        </a>
-        <a href="/Sale/Invoice/${s.saleId}" class="btn btn-outline-custom me-1" title="Invoice">
-        <i class="bi bi-receipt"></i>
-        </a>
-        <form action="/Sale/Delete/${s.saleId}" method="post" class="d-inline"
-        onsubmit="return confirm('Delete Sale #${s.saleId}? This cannot be undone.')">
-        <button type="submit" class="btn btn-outline-custom" title="Delete">
-        <i class="bi bi-trash"></i>
-        </button>
-        </form>
-        </td>
-        ` : ''}
-        </tr>
-        `;
-        isFirst = false;
-        });
-        }
-        });
+                    if (visibleCount) visibleCount.textContent = shown;
+                    if (totalCount) totalCount.textContent = total;
+                    if (resultCount) {
+                        resultCount.innerHTML = `<i class="bi bi-funnel me-1"></i> ${shown} result${shown !== 1 ? 's' : ''}`;
+                    }
 
-        tbody.innerHTML = html;
-        }
+                    if (paginationContainer) {
+                        paginationContainer.style.display = 'none';
+                    }
 
-        // ── Debounce search ──
-        let debounceTimer;
-        searchInput.addEventListener('input', function() {
-        clearTimeout(debounceTimer);
-        debounceTimer = setTimeout(function() {
-        renderFilteredSales(searchInput.value);
-        }, 300);
-        });
+                    toggleClearButton();
 
-        // ── Clear button click ──
-        clearButton.addEventListener('click', function() {
-        searchInput.value = '';
-        clearButton.classList.remove('show');
-        window.location.href = '@Url.Action("Index", new { page = -1 })'.replace('-1', currentPage);
-        });
+                    if (filtered.length === 0) {
+                        tbody.innerHTML = `
+                                    <tr>
+                                        <td colspan="11" class="empty-state">
+                                            <i class="bi bi-search"></i>
+                                            <div>No sales found matching "<strong>${escapeHtml(trimmedTerm)}</strong>"</div>
+                                            <div class="sub-text">
+                                                Try adjusting your search or
+                                                <button type="button" id="clearSearchFromMsg"
+                                                        class="btn btn-link btn-sm text-decoration-none p-0"
+                                                        style="color:#2e7d32; font-weight:600;">
+                                                    clear the filter
+                                                </button>.
+                                            </div>
+                                        </td>
+                                    </tr>
+                                `;
 
-        // ── Enter key to search ──
-        searchInput.addEventListener('keydown', function(e) {
-        if (e.key === 'Enter') {
-        e.preventDefault();
-        renderFilteredSales(searchInput.value);
-        }
-        if (e.key === 'Escape') {
-        clearButton.click();
-        }
-        });
+                        const clearBtnMsg = document.getElementById('clearSearchFromMsg');
+                        if (clearBtnMsg) {
+                            clearBtnMsg.addEventListener('click', function() {
+                                clearButton.click();
+                            });
+                        }
 
-        // ── Initial state ──
-        toggleClearButton();
+                        showToast('No sales found matching your search', 'warning');
+                        return;
+                    }
 
-        // If there's a search term from server, trigger client-side filter
-        const currentSearchTerm = '@ViewBag.CurrentSearch';
-        if (currentSearchTerm && currentSearchTerm.trim() !== '') {
-        searchInput.value = currentSearchTerm;
-        setTimeout(function() {
-        renderFilteredSales(currentSearchTerm);
-        }, 100);
-        }
+                    let html = '';
+                    filtered.forEach(function(s, index) {
+                        const details = s.saleDetails || [];
+                        const rowCount = details.length > 0 ? details.length : 1;
+                        let isFirst = true;
+                        const delay = Math.min(index * 0.03, 0.3);
 
-        })();
+                        if (details.length === 0) {
+                            html += `
+                                        <tr class="fade-in sale-group-start" style="animation-delay: ${delay}s">
+                                            <td class="ps-3">
+                                                <span class="sale-id-badge">${s.saleId}</span>
+                                            </td>
+                                            <td>
+                                                <i class="bi bi-calendar3 me-1" style="font-size:0.8rem; opacity:0.6;"></i>
+                                                ${formatDate(s.saleDate)}
+                                            </td>
+                                            <td class="customer-name">
+                                                <i class="bi bi-person me-1" style="font-size:0.8rem; opacity:0.6;"></i>
+                                                ${escapeHtml(s.customerName)}
+                                            </td>
+                                            <td colspan="6" class="text-muted fst-italic">No items</td>
+                                            <td class="text-end grand-total">₹${parseFloat(s.grandTotal).toFixed(2)}</td>
+                                            <td class="text-center">
+                                                <div class="action-group">
+                                                    <a href="/Sale/Details/${s.saleId}" class="btn-outline-custom view" title="View Details">
+                                                        <i class="bi bi-eye"></i>
+                                                    </a>
+                                                    <a href="/Sale/Invoice/${s.saleId}" class="btn-outline-custom invoice" title="Invoice">
+                                                        <i class="bi bi-receipt"></i>
+                                                    </a>
+                                                    <form action="/Sale/Delete/${s.saleId}" method="post" class="d-inline"
+                                                          onsubmit="return confirm('Delete Sale #${s.saleId}? This cannot be undone.')">
+                                                        <button type="submit" class="btn-outline-custom delete" title="Delete">
+                                                            <i class="bi bi-trash"></i>
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    `;
+                        } else {
+                            details.forEach(function(d) {
+                                html += `
+                                            <tr class="fade-in ${isFirst ? 'sale-group-start' : ''}" style="animation-delay: ${delay}s">
+                                                ${isFirst ? `
+                                                    <td class="ps-3" rowspan="${rowCount}">
+                                                        <span class="sale-id-badge">${s.saleId}</span>
+                                                    </td>
+                                                    <td rowspan="${rowCount}">
+                                                        <i class="bi bi-calendar3 me-1" style="font-size:0.8rem; opacity:0.6;"></i>
+                                                        ${formatDate(s.saleDate)}
+                                                    </td>
+                                                    <td rowspan="${rowCount}" class="customer-name">
+                                                        <i class="bi bi-person me-1" style="font-size:0.8rem; opacity:0.6;"></i>
+                                                        ${escapeHtml(s.customerName)}
+                                                    </td>
+                                                ` : ''}
+                                                <td class="medicine-name">
+                                                    <i class="bi bi-capsule me-1" style="font-size:0.8rem; opacity:0.5;"></i>
+                                                    ${escapeHtml(d.medicineName)}
+                                                </td>
+                                                <td class="text-end">${parseFloat(d.rate).toFixed(2)}</td>
+                                                <td class="text-end">
+                                                    <span class="badge" style="background:#eef2f7; color:#3d5a7a; font-weight:600; padding:2px 12px; border-radius:50px;">
+                                                        ${parseInt(d.qty).toFixed(0)}
+                                                    </span>
+                                                </td>
+                                                <td class="text-end amount-highlight">${parseFloat(d.amt).toFixed(2)}</td>
+                                                <td class="text-end" style="color:#6b7a93;">${parseFloat(d.gstAmt).toFixed(2)}</td>
+                                                <td class="text-end fw-semibold" style="color:#0a2e4a;">${parseFloat(d.total).toFixed(2)}</td>
+                                                ${isFirst ? `
+                                                    <td class="text-end grand-total" rowspan="${rowCount}">
+                                                        ₹${parseFloat(s.grandTotal).toFixed(2)}
+                                                    </td>
+                                                    <td class="text-center" rowspan="${rowCount}">
+                                                        <div class="action-group">
+                                                            <a href="/Sale/Details/${s.saleId}" class="btn-outline-custom view" title="View Details">
+                                                                <i class="bi bi-eye"></i>
+                                                            </a>
+                                                            <a href="/Sale/Invoice/${s.saleId}" class="btn-outline-custom invoice" title="Invoice">
+                                                                <i class="bi bi-receipt"></i>
+                                                            </a>
+                                                            <form action="/Sale/Delete/${s.saleId}" method="post" class="d-inline"
+                                                                  onsubmit="return confirm('Delete Sale #${s.saleId}? This cannot be undone.')">
+                                                                <button type="submit" class="btn-outline-custom delete" title="Delete">
+                                                                    <i class="bi bi-trash"></i>
+                                                                </button>
+                                                            </form>
+                                                        </div>
+                                                    </td>
+                                                ` : ''}
+                                            </tr>
+                                        `;
+                                isFirst = false;
+                            });
+                        }
+                    });
+
+                    tbody.innerHTML = html;
+
+                    if (shown > 0) {
+                        showToast(`Found ${shown} sale${shown > 1 ? 's' : ''} matching your search`, 'success');
+                    }
+                }
+
+                // ── Event Listeners ──
+
+                searchInput.addEventListener('input', function() {
+                    clearTimeout(searchTimeout);
+                    searchTimeout = setTimeout(() => {
+                        renderFilteredSales(this.value);
+                    }, 300);
+                });
+
+                clearButton.addEventListener('click', function() {
+                    searchInput.value = '';
+                    clearButton.classList.remove('show');
+                    window.location.href = '@Url.Action("Index", new { page = -1 })'.replace('-1', currentPage);
+                });
+
+                searchInput.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        clearTimeout(searchTimeout);
+                        renderFilteredSales(this.value);
+                    }
+                    if (e.key === 'Escape') {
+                        clearButton.click();
+                    }
+                });
+
+                // ── Initial state ──
+                toggleClearButton();
+
+                const currentSearchTerm = '@ViewBag.CurrentSearch';
+                if (currentSearchTerm && currentSearchTerm.trim() !== '') {
+                    searchInput.value = currentSearchTerm;
+                    setTimeout(function() {
+                        renderFilteredSales(currentSearchTerm);
+                    }, 150);
+                }
+
+                // ── Keyboard shortcuts ──
+                document.addEventListener('keydown', function(e) {
+                    if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
+                        e.preventDefault();
+                        searchInput.focus();
+                        searchInput.select();
+                    }
+                    if (e.key === 'Escape' && document.activeElement === searchInput) {
+                        if (searchInput.value.trim() !== '') {
+                            clearButton.click();
+                        }
+                    }
+                });
+
+                console.log('🛒 Sales Management System loaded successfully!');
+                console.log(`📊 Total sales: ${allSales.length}`);
+            })();
     </script>
 
 </body>

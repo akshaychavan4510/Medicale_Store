@@ -3,379 +3,690 @@
     ViewData["Title"] = "New Sale";
     Layout = null;
 }
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"]</title>
+    <title>@ViewData["Title"] - Medical Store</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800;14..32,900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
     <style>
-        /* ── Reset & Base ── */
-        * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-        }
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+                font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            }
 
-        body {
-        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-        background: linear-gradient(145deg, #f0f5fc 0%, #e3eaf5 100%);
-        min-height: 100vh;
-        padding: 1.5rem;
-        margin: 0;
-        }
+            body {
+                background: linear-gradient(135deg, #f0f5fc 0%, #e3eaf5 100%);
+                min-height: 100vh;
+                padding: 30px;
+                position: relative;
+            }
 
-        /* ── Main Container ── */
-        .page-wrapper {
-        max-width: 1280px;
-        margin: 0 auto;
-        animation: fadeSlideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-        }
+                body::before {
+                    content: '';
+                    position: fixed;
+                    top: -50%;
+                    left: -50%;
+                    width: 200%;
+                    height: 200%;
+                    background: radial-gradient(circle at 30% 20%, rgba(46, 125, 50, 0.04) 0%, transparent 50%), radial-gradient(circle at 70% 80%, rgba(46, 125, 50, 0.04) 0%, transparent 50%);
+                    pointer-events: none;
+                    z-index: 0;
+                }
 
-        @@keyframes fadeSlideUp {
-        0% {
-        opacity: 0;
-        transform: translateY(30px) scale(0.97);
-        }
+            .page-wrapper {
+                max-width: 1300px;
+                margin: 0 auto;
+                position: relative;
+                z-index: 1;
+                animation: fadeSlideUp 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+            }
 
-        100% {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-        }
-        }
+            @@keyframes fadeSlideUp {
+                0% {
+                    opacity: 0;
+                    transform: translateY(40px) scale(0.95);
+                }
 
-        /* ── Cards & Shadows ── */
-        .card-modern {
-        background: #ffffff;
-        border: none;
-        border-radius: 24px;
-        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.06), 0 8px 28px rgba(0, 0, 0, 0.03), 0 0 0 1px rgba(0, 0, 0, 0.02);
-        transition: box-shadow 0.3s ease, transform 0.2s ease;
-        overflow: hidden;
-        }
+                100% {
+                    opacity: 1;
+                    transform: translateY(0) scale(1);
+                }
+            }
 
-        .card-modern:hover {
-        box-shadow: 0 32px 80px rgba(0, 0, 0, 0.08), 0 12px 36px rgba(0, 0, 0, 0.04), 0 0 0 1px rgba(0, 0, 0, 0.02);
-        transform: translateY(-2px);
-        }
+            /* ── Enhanced Header ── */
+            .page-header {
+                background: linear-gradient(135deg, #0a2e1a 0%, #2e7d32 50%, #1b5e20 100%);
+                border-radius: 28px;
+                padding: 28px 36px;
+                margin-bottom: 28px;
+                display: flex;
+                flex-wrap: wrap;
+                align-items: center;
+                gap: 20px;
+                position: relative;
+                overflow: hidden;
+                box-shadow: 0 15px 50px rgba(0, 0, 0, .18), 0 25px 70px rgba(46, 125, 50, .2);
+                transition: all 0.3s ease;
+                border: 1px solid rgba(255, 255, 255, 0.1);
+            }
 
-        .card-header-custom {
-        background: transparent;
-        border-bottom: 1px solid #f0f3f9;
-        padding: 1rem 1.5rem;
-        font-weight: 600;
-        font-size: 1rem;
-        color: #1f3a5f;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        }
+                .page-header:hover {
+                    transform: translateY(-2px);
+                    box-shadow: 0 20px 60px rgba(0, 0, 0, .22), 0 30px 80px rgba(46, 125, 50, .25);
+                }
 
-        .card-body-custom {
-        padding: 1.5rem;
-        }
+                .page-header::before {
+                    content: '';
+                    position: absolute;
+                    top: -60%;
+                    right: -10%;
+                    width: 500px;
+                    height: 500px;
+                    background: radial-gradient(circle, rgba(255, 255, 255, 0.08) 0%, transparent 70%);
+                    pointer-events: none;
+                    animation: floatShapes 8s ease-in-out infinite;
+                }
 
-        /* ── Form Controls ── */
-        .form-control, .form-select {
-        border: 1.5px solid #e2e8f0;
-        border-radius: 14px;
-        padding: 0.6rem 1rem;
-        font-size: 0.9rem;
-        font-weight: 500;
-        color: #0b1a33;
-        background: #fafcff;
-        transition: all 0.2s ease;
-        box-shadow: inset 0 1px 3px rgba(0,0,0,0.02);
-        }
+                .page-header::after {
+                    content: '';
+                    position: absolute;
+                    bottom: -40%;
+                    left: 5%;
+                    width: 300px;
+                    height: 300px;
+                    background: radial-gradient(circle, rgba(255, 255, 255, 0.05) 0%, transparent 70%);
+                    pointer-events: none;
+                    animation: floatShapes 10s ease-in-out infinite reverse;
+                }
 
-        .form-control:focus, .form-select:focus {
-        border-color: #2e7d32;
-        background: #ffffff;
-        box-shadow: 0 0 0 4px rgba(46, 125, 50, 0.12), inset 0 1px 3px rgba(0,0,0,0.02);
-        outline: none;
-        }
+            @@keyframes floatShapes {
+                0%, 100% {
+                    transform: translate(0, 0) scale(1);
+                }
 
-        .form-control[readonly], .form-control.bg-light {
-        background: #f4f7fc;
-        color: #2d405b;
-        }
+                50% {
+                    transform: translate(20px, -20px) scale(1.1);
+                }
+            }
 
-        .form-label-custom {
-        font-weight: 600;
-        font-size: 0.75rem;
-        text-transform: uppercase;
-        letter-spacing: 0.04em;
-        color: #4a5d7a;
-        margin-bottom: 0.25rem;
-        }
+            .header-icon {
+                width: 64px;
+                height: 64px;
+                background: rgba(255, 255, 255, 0.15);
+                backdrop-filter: blur(8px);
+                border-radius: 18px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 30px;
+                color: #fff;
+                flex-shrink: 0;
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+                transition: all 0.3s ease;
+                position: relative;
+                z-index: 1;
+            }
 
-        .form-label-custom .required-star {
-        color: #c62828;
-        margin-left: 0.15rem;
-        }
+            .page-header:hover .header-icon {
+                transform: rotate(-8deg) scale(1.05);
+                background: rgba(255, 255, 255, 0.25);
+            }
 
-        /* ── Table ── */
-        .table-wrapper {
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-        margin: 0 -0.5rem;
-        }
+            .header-title h5 {
+                font-weight: 800;
+                margin: 0;
+                color: #fff;
+                font-size: 1.8rem;
+                letter-spacing: -0.03em;
+                text-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+                position: relative;
+                z-index: 1;
+            }
 
-        #detailsTable {
-        min-width: 700px;
-        font-size: 0.9rem;
-        border-collapse: separate;
-        border-spacing: 0 4px;
-        margin-bottom: 0;
-        }
+            .header-title small {
+                color: rgba(255, 255, 255, 0.8);
+                font-size: 0.95rem;
+                display: block;
+                margin-top: 2px;
+            }
 
-        #detailsTable thead th {
-        background: #f8faff;
-        border: none;
-        font-weight: 600;
-        font-size: 0.75rem;
-        text-transform: uppercase;
-        letter-spacing: 0.04em;
-        color: #4a5d7a;
-        padding: 0.6rem 0.5rem;
-        white-space: nowrap;
-        border-bottom: 2px solid #e2e8f0;
-        }
+            .btn-back {
+                background: rgba(255, 255, 255, 0.12);
+                backdrop-filter: blur(8px);
+                border: 1px solid rgba(255, 255, 255, 0.15);
+                border-radius: 50px;
+                padding: 10px 24px;
+                font-weight: 600;
+                font-size: 0.9rem;
+                color: #fff;
+                transition: all 0.3s ease;
+                text-decoration: none;
+                display: inline-flex;
+                align-items: center;
+                gap: 8px;
+                position: relative;
+                z-index: 1;
+                margin-left: auto;
+            }
 
-        #detailsTable tbody tr {
-        background: #ffffff;
-        transition: background 0.15s;
-        box-shadow: 0 1px 4px rgba(0,0,0,0.02);
-        }
+                .btn-back:hover {
+                    background: rgba(255, 255, 255, 0.25);
+                    color: #fff;
+                    transform: translateY(-2px);
+                    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.15);
+                }
 
-        #detailsTable tbody tr:hover {
-        background: #f8fbff;
-        }
+            /* ── Enhanced Card ── */
+            .card-modern {
+                background: rgba(255, 255, 255, 0.95);
+                backdrop-filter: blur(16px);
+                border: none;
+                border-radius: 28px;
+                box-shadow: 0 25px 80px rgba(0, 0, 0, 0.08), 0 10px 32px rgba(0, 0, 0, 0.04), 0 0 0 1px rgba(255, 255, 255, 0.5);
+                transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+                overflow: hidden;
+            }
 
-        #detailsTable tbody td {
-        padding: 0.4rem 0.5rem;
-        vertical-align: middle;
-        border: none;
-        border-bottom: 1px solid #f0f3f9;
-        }
+                .card-modern:hover {
+                    box-shadow: 0 35px 90px rgba(0, 0, 0, 0.12), 0 15px 40px rgba(0, 0, 0, 0.06), 0 0 0 1px rgba(255, 255, 255, 0.8);
+                    transform: translateY(-3px);
+                }
 
-        #detailsTable tbody tr:last-child td {
-        border-bottom: none;
-        }
+            .card-header-custom {
+                background: linear-gradient(135deg, #f8faff, #eef2f7);
+                border-bottom: 2px solid #e5e9ef;
+                padding: 16px 24px;
+                font-weight: 700;
+                font-size: 1rem;
+                color: #0a2e1a;
+                display: flex;
+                align-items: center;
+                gap: 12px;
+            }
 
-        #detailsTable tfoot td {
-        padding: 0.6rem 0.5rem;
-        border: none;
-        border-top: 2px solid #e2e8f0;
-        font-weight: 600;
-        }
+                .card-header-custom i {
+                    font-size: 1.2rem;
+                    color: #2e7d32;
+                }
 
-        .table-purchase .form-control-sm {
-        border-radius: 10px;
-        padding: 0.35rem 0.6rem;
-        font-size: 0.85rem;
-        }
+            .card-body-custom {
+                padding: 28px;
+            }
 
-        .table-purchase .form-select-sm {
-        border-radius: 10px;
-        padding: 0.35rem 0.6rem;
-        font-size: 0.85rem;
-        }
+            /* ── Enhanced Form Controls ── */
+            .form-label-custom {
+                font-weight: 700;
+                font-size: 0.8rem;
+                text-transform: uppercase;
+                letter-spacing: 0.06em;
+                color: #4a5d7a;
+                margin-bottom: 6px;
+                display: block;
+            }
 
-        /* ── Buttons ── */
-        .btn-success-custom {
-        background: #2e7d32;
-        border: none;
-        border-radius: 60px;
-        padding: 0.6rem 1.8rem;
-        font-weight: 600;
-        font-size: 0.9rem;
-        color: #fff;
-        transition: all 0.25s ease;
-        box-shadow: 0 6px 18px rgba(46, 125, 50, 0.30);
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 0.4rem;
-        }
+                .form-label-custom .required-star {
+                    color: #dc3545;
+                    margin-left: 2px;
+                }
 
-        .btn-success-custom:hover {
-        background: #1b5e20;
-        transform: translateY(-2px);
-        box-shadow: 0 10px 28px rgba(46, 125, 50, 0.35);
-        color: #fff;
-        }
+            .form-control, .form-select {
+                border: 2px solid #e9edf2;
+                border-radius: 14px;
+                padding: 12px 16px;
+                font-size: 0.95rem;
+                font-weight: 500;
+                color: #0a2e1a;
+                background: rgba(255, 255, 255, 0.9);
+                transition: all 0.3s ease;
+                box-shadow: none;
+                height: auto;
+            }
 
-        .btn-success-custom:active {
-        transform: translateY(0px);
-        box-shadow: 0 4px 12px rgba(46, 125, 50, 0.25);
-        }
+                .form-control:focus, .form-select:focus {
+                    border-color: #2e7d32;
+                    background: #ffffff;
+                    box-shadow: 0 0 0 4px rgba(46, 125, 50, 0.08);
+                    outline: none;
+                }
 
-        .btn-outline-custom {
-        border: 1.5px solid #dce3ef;
-        border-radius: 60px;
-        padding: 0.6rem 1.8rem;
-        font-weight: 600;
-        font-size: 0.9rem;
-        color: #4a5d7a;
-        transition: all 0.2s ease;
-        background: transparent;
-        text-decoration: none;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 0.4rem;
-        }
+                .form-control[readonly], .form-control.bg-light {
+                    background: #f4f7fc;
+                    color: #2d405b;
+                    cursor: not-allowed;
+                }
 
-        .btn-outline-custom:hover {
-        background: #f4f7fd;
-        border-color: #b6c8e0;
-        color: #1f3a5f;
-        text-decoration: none;
-        }
+            .form-control-sm {
+                padding: 8px 12px;
+                font-size: 0.85rem;
+                border-radius: 10px;
+            }
 
-        .btn-add {
-        border-radius: 60px;
-        padding: 0.4rem 1.2rem;
-        font-weight: 600;
-        font-size: 0.8rem;
-        background: #e8f5e9;
-        color: #1b5e20;
-        border: 1px solid #c8e6c9;
-        transition: all 0.2s ease;
-        }
+            .form-select-sm {
+                padding: 8px 12px;
+                font-size: 0.85rem;
+                border-radius: 10px;
+            }
 
-        .btn-add:hover {
-        background: #c8e6c9;
-        border-color: #81c784;
-        color: #0a3d0e;
-        }
+            /* ── Enhanced Table ── */
+            .table-wrapper {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                border-radius: 16px;
+                border: 1px solid #eef3f9;
+                background: #fafcff;
+                margin: 0;
+            }
 
-        .btn-remove {
-        color: #b0bccd;
-        transition: color 0.2s ease;
-        border: none;
-        background: transparent;
-        }
+            #detailsTable {
+                width: 100%;
+                min-width: 750px;
+                font-size: 0.92rem;
+                border-collapse: separate;
+                border-spacing: 0;
+                margin-bottom: 0;
+            }
 
-        .btn-remove:hover {
-        color: #c62828;
-        }
+                #detailsTable thead th {
+                    background: linear-gradient(135deg, #f8faff, #eef2f7);
+                    border: none;
+                    font-weight: 700;
+                    font-size: 0.8rem;
+                    text-transform: uppercase;
+                    letter-spacing: 0.06em;
+                    color: #4a5d7a;
+                    padding: 14px 12px;
+                    white-space: nowrap;
+                    border-bottom: 2px solid #e5e9ef;
+                    position: sticky;
+                    top: 0;
+                    z-index: 5;
+                }
 
-        /* ── Header icon ── */
-        .header-icon {
-        background: #e8f5e9;
-        padding: 0.6rem;
-        border-radius: 14px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        }
+                    #detailsTable thead th:first-child {
+                        padding-left: 16px;
+                    }
 
-        .header-icon i {
-        font-size: 1.6rem;
-        color: #2e7d32;
-        }
+                    #detailsTable thead th:last-child {
+                        padding-right: 16px;
+                    }
 
-        /* ── Responsive ── */
-        @@media (max-width: 768px) {
-        body {
-        padding: 1rem;
-        }
+                #detailsTable tbody tr {
+                    background: #ffffff;
+                    transition: all 0.2s ease;
+                    border-bottom: 1px solid #f0f3f9;
+                }
 
-        .card-body-custom {
-        padding: 1rem;
-        }
+                    #detailsTable tbody tr:hover {
+                        background: rgba(46, 125, 50, 0.03);
+                    }
 
-        .page-wrapper {
-        max-width: 100%;
-        }
+                    #detailsTable tbody tr:last-child {
+                        border-bottom: none;
+                    }
 
-        #detailsTable {
-        min-width: 600px;
-        font-size: 0.8rem;
-        }
+                #detailsTable tbody td {
+                    padding: 8px 12px;
+                    vertical-align: middle;
+                    border: none;
+                    border-bottom: 1px solid #f0f3f9;
+                }
 
-        #detailsTable thead th {
-        font-size: 0.65rem;
-        padding: 0.4rem 0.3rem;
-        }
+                #detailsTable tbody tr:last-child td {
+                    border-bottom: none;
+                }
 
-        #detailsTable tbody td {
-        padding: 0.3rem 0.3rem;
-        }
+                #detailsTable tbody td:first-child {
+                    padding-left: 16px;
+                }
 
-        .form-control-sm, .form-select-sm {
-        font-size: 0.8rem;
-        padding: 0.3rem 0.5rem;
-        }
+                #detailsTable tbody td:last-child {
+                    padding-right: 16px;
+                }
 
-        .btn-success-custom, .btn-outline-custom {
-        width: 100%;
-        justify-content: center;
-        }
+                #detailsTable tfoot td {
+                    padding: 14px 12px;
+                    border: none;
+                    border-top: 2px solid #e2e8f0;
+                    font-weight: 600;
+                    background: #f8faff;
+                }
 
-        .d-flex.gap-2 {
-        flex-direction: column;
-        gap: 0.5rem;
-        }
+                    #detailsTable tfoot td:first-child {
+                        padding-left: 16px;
+                    }
 
-        .btn-add {
-        width: 100%;
-        }
-        }
+                    #detailsTable tfoot td:last-child {
+                        padding-right: 16px;
+                    }
 
-        @@media (max-width: 576px) {
-        .row.g-3 > [class*="col-"] {
-        padding-left: 0;
-        padding-right: 0;
-        }
+            .stock-display {
+                font-size: 0.7rem;
+                color: #6b7a93;
+                display: block;
+                margin-top: 4px;
+                font-weight: 500;
+            }
 
-        .row.g-3 {
-        --bs-gutter-x: 0.5rem;
-        }
+                .stock-display.low {
+                    color: #e97c07;
+                }
 
-        .form-label-custom {
-        font-size: 0.7rem;
-        }
-        }
+                .stock-display.out {
+                    color: #dc3545;
+                }
 
-        /* ── Reduced Motion ── */
-        @@media (prefers-reduced-motion: reduce) {
-        * {
-        animation-duration: 0.01ms !important;
-        transition-duration: 0.01ms !important;
-        }
-        }
+            /* ── Enhanced Buttons ── */
+            .btn-success-custom {
+                background: linear-gradient(135deg, #2e7d32, #1b5e20);
+                border: none;
+                border-radius: 60px;
+                padding: 12px 32px;
+                font-weight: 700;
+                font-size: 0.95rem;
+                color: #fff;
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                box-shadow: 0 6px 24px rgba(46, 125, 50, 0.30);
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                gap: 10px;
+                cursor: pointer;
+            }
 
-        /* ── Misc ── */
-        .text-accent {
-        color: #2e7d32;
-        }
+                .btn-success-custom:hover {
+                    background: linear-gradient(135deg, #1b5e20, #0a3a10);
+                    transform: translateY(-3px) scale(1.02);
+                    box-shadow: 0 10px 32px rgba(46, 125, 50, 0.40);
+                    color: #fff;
+                }
 
-        .bg-soft-success {
-        background: #e8f5e9;
-        }
+                .btn-success-custom:active {
+                    transform: scale(0.96);
+                }
 
-        .fw-500 {
-        font-weight: 500;
-        }
+            .btn-outline-custom {
+                border: 2px solid #dce3ef;
+                border-radius: 60px;
+                padding: 12px 32px;
+                font-weight: 700;
+                font-size: 0.95rem;
+                color: #4a5d7a;
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                background: transparent;
+                text-decoration: none;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                gap: 10px;
+                cursor: pointer;
+            }
 
-        .gap-2 {
-        gap: 0.5rem;
-        }
+                .btn-outline-custom:hover {
+                    background: #f4f7fd;
+                    border-color: #b6c8e0;
+                    color: #1f3a5f;
+                    transform: translateY(-2px);
+                    text-decoration: none;
+                }
 
-        .stock-display {
-        font-size: 0.7rem;
-        color: #6b7a93;
-        display: block;
-        margin-top: 0.15rem;
-        }
+                .btn-outline-custom:active {
+                    transform: scale(0.96);
+                }
+
+            .btn-add {
+                border-radius: 60px;
+                padding: 10px 24px;
+                font-weight: 700;
+                font-size: 0.85rem;
+                background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
+                color: #1b5e20;
+                border: 2px solid #a5d6a7;
+                transition: all 0.3s ease;
+                cursor: pointer;
+                display: inline-flex;
+                align-items: center;
+                gap: 8px;
+            }
+
+                .btn-add:hover {
+                    background: linear-gradient(135deg, #c8e6c9, #81c784);
+                    border-color: #66bb6a;
+                    color: #0a3d0e;
+                    transform: translateY(-2px);
+                    box-shadow: 0 4px 16px rgba(46, 125, 50, 0.15);
+                }
+
+                .btn-add:active {
+                    transform: scale(0.96);
+                }
+
+            .btn-remove {
+                color: #b0bccd;
+                transition: all 0.3s ease;
+                border: none;
+                background: transparent;
+                padding: 4px 8px;
+                border-radius: 8px;
+                cursor: pointer;
+                font-size: 1.1rem;
+            }
+
+                .btn-remove:hover {
+                    color: #dc3545;
+                    background: #fde8e8;
+                    transform: scale(1.1);
+                }
+
+                .btn-remove:active {
+                    transform: scale(0.9);
+                }
+
+            /* ── Grand Total Display ── */
+            .grand-total-display {
+                font-weight: 800;
+                color: #1b5e20;
+                font-size: 1.4rem;
+                letter-spacing: -0.02em;
+            }
+
+            .grand-total-label {
+                font-weight: 700;
+                color: #4a5d7a;
+                font-size: 0.95rem;
+                text-transform: uppercase;
+                letter-spacing: 0.04em;
+            }
+
+            /* ── Responsive ── */
+            @@media (max-width: 992px) {
+                body {
+                    padding: 20px;
+                }
+
+                .page-header {
+                    padding: 24px 28px;
+                }
+
+                .header-title h5 {
+                    font-size: 1.5rem;
+                }
+
+                .card-body-custom {
+                    padding: 20px;
+                }
+            }
+
+            @@media (max-width: 768px) {
+                body {
+                    padding: 16px;
+                }
+
+                .page-header {
+                    padding: 20px 18px;
+                    flex-direction: column;
+                    align-items: stretch;
+                    gap: 16px;
+                }
+
+                .header-icon {
+                    width: 56px;
+                    height: 56px;
+                    font-size: 26px;
+                }
+
+                .header-title h5 {
+                    font-size: 1.3rem;
+                }
+
+                .btn-back {
+                    margin-left: 0;
+                    justify-content: center;
+                }
+
+                .card-body-custom {
+                    padding: 16px;
+                }
+
+                .card-header-custom {
+                    padding: 12px 16px;
+                    font-size: 0.9rem;
+                }
+
+                #detailsTable {
+                    min-width: 600px;
+                    font-size: 0.8rem;
+                }
+
+                    #detailsTable thead th,
+                    #detailsTable tbody td,
+                    #detailsTable tfoot td {
+                        padding: 6px 8px;
+                    }
+
+                        #detailsTable thead th:first-child,
+                        #detailsTable tbody td:first-child,
+                        #detailsTable tfoot td:first-child {
+                            padding-left: 10px;
+                        }
+
+                        #detailsTable thead th:last-child,
+                        #detailsTable tbody td:last-child,
+                        #detailsTable tfoot td:last-child {
+                            padding-right: 10px;
+                        }
+
+                .form-control, .form-select {
+                    padding: 8px 12px;
+                    font-size: 0.85rem;
+                }
+
+                .form-control-sm, .form-select-sm {
+                    padding: 4px 8px;
+                    font-size: 0.75rem;
+                }
+
+                .btn-success-custom, .btn-outline-custom {
+                    width: 100%;
+                    justify-content: center;
+                    padding: 10px 20px;
+                    font-size: 0.85rem;
+                }
+
+                .btn-add {
+                    width: 100%;
+                    justify-content: center;
+                    padding: 8px 16px;
+                }
+
+                .d-flex.gap-2 {
+                    flex-direction: column;
+                    gap: 8px;
+                }
+
+                .grand-total-display {
+                    font-size: 1.2rem;
+                }
+            }
+
+            @@media (max-width: 480px) {
+                .header-title h5 {
+                    font-size: 1.1rem;
+                }
+
+                #detailsTable {
+                    min-width: 500px;
+                    font-size: 0.7rem;
+                }
+
+                    #detailsTable thead th,
+                    #detailsTable tbody td,
+                    #detailsTable tfoot td {
+                        padding: 4px 6px;
+                    }
+
+                .form-control-sm, .form-select-sm {
+                    font-size: 0.7rem;
+                    padding: 3px 6px;
+                }
+            }
+
+            /* ── Scrollbar ── */
+            ::-webkit-scrollbar {
+                width: 6px;
+                height: 6px;
+            }
+
+            ::-webkit-scrollbar-track {
+                background: #eef2f7;
+                border-radius: 10px;
+            }
+
+            ::-webkit-scrollbar-thumb {
+                background: #c5d5e5;
+                border-radius: 10px;
+                transition: background 0.3s ease;
+            }
+
+                ::-webkit-scrollbar-thumb:hover {
+                    background: #8aadc9;
+                }
+
+            /* ── Reduced Motion ── */
+            @@media (prefers-reduced-motion: reduce) {
+                *,
+                *::before,
+                *::after {
+                    animation-duration: 0.01ms !important;
+                    animation-iteration-count: 1 !important;
+                    transition-duration: 0.01ms !important;
+                }
+            }
+
+            /* ── Validation ── */
+            .text-danger.small {
+                font-size: 0.75rem;
+                font-weight: 500;
+                margin-top: 4px;
+            }
+
+            .alert-danger {
+                border-radius: 14px;
+                border: none;
+                background: rgba(253, 232, 232, 0.95);
+                color: #b33a3a;
+                border-left: 4px solid #c62828;
+            }
     </style>
 </head>
 
@@ -383,61 +694,83 @@
 
     <div class="page-wrapper">
 
-        <!-- ── Header ── -->
-        <div class="d-flex flex-wrap align-items-center gap-3 mb-4">
+        <!-- ─── HEADER ─── -->
+        <div class="page-header">
             <div class="header-icon">
-                <i class="bi bi-cart-check"></i>
+                <i class="bi bi-cart-check-fill"></i>
             </div>
-            <div class="flex-grow-1">
-                <h5 class="mb-0 fw-bold">New Sale Entry</h5>
-                <small class="text-muted">Record a new sales transaction</small>
+            <div class="header-title">
+                <h5>
+                    <i class="bi bi-plus-circle me-2" style="font-size:1.2rem;"></i>
+                    New Sale Entry
+                </h5>
+                <small><i class="bi bi-pencil-square me-1"></i> Record a new sales transaction</small>
             </div>
-            <a asp-action="Index" class="btn btn-outline-custom btn-sm ms-auto">
-                <i class="bi bi-arrow-left me-1"></i>Back to List
+            <a asp-action="Index" class="btn-back">
+                <i class="bi bi-arrow-left"></i> Back to Sales
             </a>
         </div>
 
-        <!-- ── Main Card ── -->
+        <!-- ─── Main Card ─── -->
         <div class="card-modern">
             <div class="card-header-custom">
-                <i class="bi bi-pencil-square text-success"></i>
+                <i class="bi bi-pencil-square"></i>
                 Sale Details
+                <span class="badge" style="background: #e8f5e9; color: #2e7d32; font-weight: 600; margin-left: auto;">
+                    <i class="bi bi-info-circle me-1"></i> Fill all required fields
+                </span>
             </div>
             <div class="card-body-custom">
 
-                <form asp-action="Create" method="post" id="saleForm">
+                <form asp-action="Create" method="post" id="saleForm" novalidate>
                     @Html.AntiForgeryToken()
 
-                    <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2 small"></div>
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2 small" style="display:none;"></div>
 
-                    <!-- ── Master Fields ── -->
-                    <div class="row g-3 mb-4">
-                        <div class="col-md-4">
-                            <label asp-for="SaleDate" class="form-label-custom">Sale Date</label>
-                            <input asp-for="SaleDate" type="date" class="form-control"
-                                   value="@DateTime.Now.ToString("yyyy-MM-dd")" />
-                            <span asp-validation-for="SaleDate" class="text-danger small"></span>
-                        </div>
+                    <!-- ─── Master Fields ─── -->
+                    <div class="row g-4 mb-4">
                         <div class="col-md-5">
-                            <label asp-for="CustId" class="form-label-custom">Customer <span class="required-star">*</span></label>
-                            <select asp-for="CustId" asp-items="ViewBag.Customers" class="form-select">
+                            <label asp-for="CustId" class="form-label-custom">
+                                <i class="bi bi-person me-1"></i> Customer <span class="required-star">*</span>
+                            </label>
+                            <select asp-for="CustId" asp-items="ViewBag.Customers" class="form-select" id="customerSelect">
                                 <option value="">-- Select Customer --</option>
                             </select>
                             <span asp-validation-for="CustId" class="text-danger small"></span>
                         </div>
+                        <div class="col-md-4">
+                            <label asp-for="SaleDate" class="form-label-custom">
+                                <i class="bi bi-calendar3 me-1"></i> Sale Date
+                            </label>
+                            <input asp-for="SaleDate" type="date" class="form-control"
+                                   value="@DateTime.Now.ToString("yyyy-MM-dd")" />
+                            <span asp-validation-for="SaleDate" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label-custom">
+                                <i class="bi bi-receipt me-1"></i> Status
+                            </label>
+                            <div class="form-control" style="background: #e8f5e9; color: #2e7d32; font-weight: 700; border-color: #a5d6a7;">
+                                <i class="bi bi-check-circle me-1"></i> New
+                            </div>
+                        </div>
                     </div>
 
-                    <!-- ── Detail Lines Table ── -->
+                    <!-- ─── Detail Lines Table ─── -->
                     <div class="table-wrapper mb-3">
                         <table class="table" id="detailsTable">
                             <thead>
                                 <tr>
-                                    <th style="min-width:200px;">Medicine</th>
-                                    <th style="min-width:90px;">Rate (₹)</th>
-                                    <th style="min-width:70px;">Qty</th>
-                                    <th style="min-width:90px;">Amount</th>
-                                    <th style="min-width:90px;">GST (5%)</th>
-                                    <th style="min-width:90px;">Total</th>
+                                    <th style="min-width:200px;">
+                                        <i class="bi bi-capsule me-1"></i> Medicine
+                                    </th>
+                                    <th style="min-width:90px;" class="text-end">
+                                        <i class="bi bi-currency-rupee me-1"></i> Rate
+                                    </th>
+                                    <th style="min-width:70px;" class="text-center">Qty</th>
+                                    <th style="min-width:90px;" class="text-end">Amount</th>
+                                    <th style="min-width:90px;" class="text-end">GST (5%)</th>
+                                    <th style="min-width:90px;" class="text-end">Total</th>
                                     <th style="width:50px;"></th>
                                 </tr>
                             </thead>
@@ -446,8 +779,10 @@
                             </tbody>
                             <tfoot>
                                 <tr>
-                                    <td colspan="5" class="text-end fw-semibold">Grand Total</td>
-                                    <td class="fw-bold text-success fs-5">
+                                    <td colspan="5" class="text-end grand-total-label">
+                                        <i class="bi bi-currency-rupee me-1"></i> Grand Total
+                                    </td>
+                                    <td class="text-end grand-total-display">
                                         ₹<span id="grandTotalDisplay">0.00</span>
                                     </td>
                                     <td></td>
@@ -456,18 +791,20 @@
                         </table>
                     </div>
 
-                    <!-- Hidden grand total sent to server -->
+                    <!-- Hidden fields -->
                     <input type="hidden" name="GrandTotal" id="grandTotalHidden" value="0" />
 
-                    <!-- ── Buttons ── -->
-                    <div class="d-flex flex-wrap gap-2">
-                        <button type="button" class="btn btn-add" id="addRowBtn">
-                            <i class="bi bi-plus-circle me-1"></i>Add Medicine
+                    <!-- ─── Buttons ─── -->
+                    <div class="d-flex flex-wrap gap-2 mt-3">
+                        <button type="button" class="btn-add" id="addRowBtn">
+                            <i class="bi bi-plus-circle"></i> Add Medicine
                         </button>
-                        <button type="submit" class="btn btn-success-custom px-4">
-                            <i class="bi bi-check-lg me-1"></i>Save Sale
+                        <button type="submit" class="btn-success-custom">
+                            <i class="bi bi-check-lg"></i> Save Sale
                         </button>
-                        <a asp-action="Index" class="btn btn-outline-custom">Cancel</a>
+                        <a asp-action="Index" class="btn-outline-custom">
+                            <i class="bi bi-x-lg"></i> Cancel
+                        </a>
                     </div>
 
                 </form>
@@ -477,15 +814,14 @@
 
     </div>
 
-    <!-- ── Row Template ── -->
+    <!-- ─── Row Template ─── -->
     <template id="rowTemplate">
         <tr>
             <td>
                 <select name="SaleDetails[__IDX__].MedId"
                         class="form-select form-select-sm med-select" required>
                     <option value="">-- Select Medicine --</option>
-                    @foreach (var m in (ViewBag.Medicines as IEnumerable<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>
-                                       ?? new List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>()))
+                    @foreach (var m in (ViewBag.Medicines as IEnumerable<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem> ?? new List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>()))
                     {
                         <option value="@m.Value">@m.Text</option>
                     }
@@ -495,25 +831,25 @@
             <td>
                 <input type="number"
                        name="SaleDetails[__IDX__].Rate"
-                       class="form-control form-control-sm rate-input"
+                       class="form-control form-control-sm rate-input text-end"
                        step="0.01" min="0" value="0" readonly />
             </td>
             <td>
                 <input type="number"
                        name="SaleDetails[__IDX__].Qty"
-                       class="form-control form-control-sm qty-input"
+                       class="form-control form-control-sm qty-input text-center"
                        min="1" step="1" value="1" required />
             </td>
             <td>
                 <input type="number"
                        name="SaleDetails[__IDX__].Amt"
-                       class="form-control form-control-sm amt-input"
+                       class="form-control form-control-sm amt-input text-end"
                        step="0.01" value="0" readonly />
             </td>
             <td>
                 <input type="number"
                        name="SaleDetails[__IDX__].GstAmt"
-                       class="form-control form-control-sm gst-input"
+                       class="form-control form-control-sm gst-input text-end"
                        step="0.01" value="0" readonly />
                 <input type="hidden"
                        name="SaleDetails[__IDX__].GstPct"
@@ -523,161 +859,231 @@
             <td>
                 <input type="number"
                        name="SaleDetails[__IDX__].Total"
-                       class="form-control form-control-sm total-input"
+                       class="form-control form-control-sm total-input text-end"
                        step="0.01" value="0" readonly />
             </td>
-            <td>
-                <button type="button" class="btn btn-sm btn-remove" title="Remove">
+            <td class="text-center">
+                <button type="button" class="btn-remove" title="Remove">
                     <i class="bi bi-x-lg"></i>
                 </button>
             </td>
         </tr>
     </template>
 
-    <!-- ── Script ── -->
+    <!-- ─── Script ─── -->
     <script>
-        (function () {
-        "use strict";
+            (function() {
+                "use strict";
 
-        const GST_PCT = 5;
-        let rowIndex = 0;
+                const GST_PCT = 5;
+                let rowIndex = 0;
 
-        function round2(n) { return Math.round(n * 100) / 100; }
+                function round2(n) { return Math.round(n * 100) / 100; }
 
-        function recalcRow(row) {
-        const rate = parseFloat(row.querySelector(".rate-input").value) || 0;
-        const qty = parseFloat(row.querySelector(".qty-input").value) || 0;
+                function recalcRow(row) {
+                    const rate = parseFloat(row.querySelector(".rate-input").value) || 0;
+                    const qty = parseFloat(row.querySelector(".qty-input").value) || 0;
 
-        const amt = round2(rate * qty);
-        const gstAmt = round2(amt * GST_PCT / 100);
-        const total = round2(amt + gstAmt);
+                    const amt = round2(rate * qty);
+                    const gstAmt = round2(amt * GST_PCT / 100);
+                    const total = round2(amt + gstAmt);
 
-        row.querySelector(".amt-input").value = amt.toFixed(2);
-        row.querySelector(".gst-input").value = gstAmt.toFixed(2);
-        row.querySelector(".total-input").value = total.toFixed(2);
+                    row.querySelector(".amt-input").value = amt.toFixed(2);
+                    row.querySelector(".gst-input").value = gstAmt.toFixed(2);
+                    row.querySelector(".total-input").value = total.toFixed(2);
 
-        const gstPctInput = row.querySelector(".gstpct-input");
-        if (gstPctInput) gstPctInput.value = GST_PCT;
+                    const gstPctInput = row.querySelector(".gstpct-input");
+                    if (gstPctInput) gstPctInput.value = GST_PCT;
 
-        recalcGrandTotal();
-        }
+                    recalcGrandTotal();
+                }
 
-        function recalcGrandTotal() {
-        let grand = 0;
-        document.querySelectorAll("#detailsBody .total-input").forEach(function (el) {
-        grand += parseFloat(el.value) || 0;
-        });
-        grand = round2(grand);
-        document.getElementById("grandTotalDisplay").textContent = grand.toFixed(2);
-        document.getElementById("grandTotalHidden").value = grand.toFixed(2);
-        }
+                function recalcGrandTotal() {
+                    let grand = 0;
+                    document.querySelectorAll("#detailsBody .total-input").forEach(function(el) {
+                        grand += parseFloat(el.value) || 0;
+                    });
+                    grand = round2(grand);
+                    document.getElementById("grandTotalDisplay").textContent = grand.toFixed(2);
+                    document.getElementById("grandTotalHidden").value = grand.toFixed(2);
+                }
 
-        function reindexRows() {
-        document.querySelectorAll("#detailsBody tr").forEach(function (row, i) {
-        row.querySelectorAll("[name]").forEach(function (el) {
-        el.name = el.name.replace(/SaleDetails\[\d+\]/, "SaleDetails[" + i + "]");
-        });
-        });
-        rowIndex = document.querySelectorAll("#detailsBody tr").length;
-        }
+                function reindexRows() {
+                    document.querySelectorAll("#detailsBody tr").forEach(function(row, i) {
+                        row.querySelectorAll("[name]").forEach(function(el) {
+                            el.name = el.name.replace(/SaleDetails\[\d+\]/, "SaleDetails[" + i + "]");
+                        });
+                    });
+                    rowIndex = document.querySelectorAll("#detailsBody tr").length;
+                }
 
-        function buildRow(idx) {
-        const template = document.getElementById("rowTemplate");
-        const html = template.innerHTML.replace(/__IDX__/g, idx);
-        const wrapper = document.createElement("tbody");
-        wrapper.innerHTML = html;
-        const row = wrapper.firstElementChild;
+                function updateStockDisplay(row, stock) {
+                    const stockEl = row.querySelector(".stock-display");
+                    if (!stockEl) return;
 
-        // ── medicine select change ──
-        row.querySelector(".med-select").addEventListener("change", async function () {
-        const medId = this.value;
-        if (!medId) {
-        row.querySelector(".rate-input").value = "";
-        const stockEl = row.querySelector(".stock-display");
-        if (stockEl) stockEl.textContent = "";
-        recalcRow(row);
-        return;
-        }
+                    stockEl.textContent = "Stock: " + stock;
+                    stockEl.className = "stock-display";
+                    if (stock === 0) {
+                        stockEl.classList.add("out");
+                    } else if (stock <= 5) {
+                        stockEl.classList.add("low");
+                    }
+                }
 
-        try {
-        const resp = await fetch("/Sale/GetMedicineInfo?id=" + medId);
-        if (!resp.ok) throw new Error("Not found");
-        const data = await resp.json();
+                function buildRow(idx) {
+                    const template = document.getElementById("rowTemplate");
+                    const html = template.innerHTML.replace(/__IDX__/g, idx);
+                    const wrapper = document.createElement("tbody");
+                    wrapper.innerHTML = html;
+                    const row = wrapper.firstElementChild;
 
-        row.querySelector(".rate-input").value = parseFloat(data.rate).toFixed(2);
-        row.dataset.stock = data.stock;
+                    // ── Medicine select change ──
+                    row.querySelector(".med-select").addEventListener("change", async function() {
+                        const medId = this.value;
+                        if (!medId) {
+                            row.querySelector(".rate-input").value = "";
+                            updateStockDisplay(row, 0);
+                            recalcRow(row);
+                            return;
+                        }
 
-        const stockEl = row.querySelector(".stock-display");
-        if (stockEl) stockEl.textContent = "Stock: " + data.stock;
+                        try {
+                            const resp = await fetch("/Sale/GetMedicineInfo?id=" + medId);
+                            if (!resp.ok) throw new Error("Not found");
+                            const data = await resp.json();
 
-        } catch (e) {
-        alert("Could not fetch medicine info. Please try again.");
-        }
+                            row.querySelector(".rate-input").value = parseFloat(data.rate).toFixed(2);
+                            row.dataset.stock = data.stock;
+                            updateStockDisplay(row, data.stock);
 
-        recalcRow(row);
-        });
+                        } catch (e) {
+                            console.error(e);
+                            alert("Could not fetch medicine info. Please try again.");
+                        }
 
-        // ── qty / rate change ──
-        row.querySelector(".qty-input").addEventListener("input", function () { recalcRow(row); });
-        row.querySelector(".rate-input").addEventListener("input", function () { recalcRow(row); });
+                        recalcRow(row);
+                    });
 
-        // ── remove row (FIXED: using .btn-remove, not .remove-row) ──
-        row.querySelector(".btn-remove").addEventListener("click", function () {
-        row.remove();
-        reindexRows();
-        recalcGrandTotal();
-        });
+                    // ── Qty change ──
+                    row.querySelector(".qty-input").addEventListener("input", function() {
+                        const stock = parseFloat(row.dataset.stock || 0);
+                        const qty = parseFloat(this.value) || 0;
 
-        return row;
-        }
+                        if (qty > stock && stock > 0) {
+                            this.style.borderColor = "#dc3545";
+                            this.style.backgroundColor = "#fde8e8";
+                        } else {
+                            this.style.borderColor = "";
+                            this.style.backgroundColor = "";
+                        }
 
-        // ── Add row ──
-        document.getElementById("addRowBtn").addEventListener("click", function () {
-        const row = buildRow(rowIndex++);
-        document.getElementById("detailsBody").appendChild(row);
-        });
+                        recalcRow(row);
+                    });
 
-        // ── Form submit validation ──
-        document.getElementById("saleForm").addEventListener("submit", function (e) {
-        const rows = document.querySelectorAll("#detailsBody tr");
+                    // ── Rate change ──
+                    row.querySelector(".rate-input").addEventListener("input", function() {
+                        recalcRow(row);
+                    });
 
-        if (rows.length === 0) {
-        e.preventDefault();
-        alert("Please add at least one medicine row before saving.");
-        return;
-        }
+                    // ── Remove row ──
+                    row.querySelector(".btn-remove").addEventListener("click", function() {
+                        if (confirm("Remove this medicine from the sale?")) {
+                            row.remove();
+                            reindexRows();
+                            recalcGrandTotal();
+                        }
+                    });
 
-        let valid = true;
-        rows.forEach(function (row) {
-        const medSel = row.querySelector(".med-select");
-        const qtyInput = row.querySelector(".qty-input");
-        const stock = parseFloat(row.dataset.stock || "99999");
-        const qty = parseFloat(qtyInput.value) || 0;
+                    // ── Trigger initial stock display ──
+                    const initialSelect = row.querySelector(".med-select");
+                    if (initialSelect.value) {
+                        initialSelect.dispatchEvent(new Event("change"));
+                    }
 
-        if (!medSel.value) {
-        alert("Please select a medicine in every row.");
-        valid = false;
-        return;
-        }
-        if (qty <= 0) {
-        alert("Quantity must be greater than zero.");
-        valid = false;
-        return;
-        }
-        if (qty > stock) {
-        alert("Quantity (" + qty + ") exceeds available stock (" + stock + ") for " +
-        medSel.options[medSel.selectedIndex].text + ".");
-        valid = false;
-        return;
-        }
-        });
+                    return row;
+                }
 
-        if (!valid) { e.preventDefault(); return; }
+                // ── Add row ──
+                document.getElementById("addRowBtn").addEventListener("click", function() {
+                    const row = buildRow(rowIndex++);
+                    document.getElementById("detailsBody").appendChild(row);
 
-        recalcGrandTotal();
-        });
+                    // Focus the new select
+                    const select = row.querySelector(".med-select");
+                    if (select) {
+                        setTimeout(function() {
+                            select.focus();
+                        }, 100);
+                    }
+                });
 
-        })();
+                // ── Add initial row ──
+                document.addEventListener("DOMContentLoaded", function() {
+                    const row = buildRow(rowIndex++);
+                    document.getElementById("detailsBody").appendChild(row);
+                });
+
+                // ── Form submit validation ──
+                document.getElementById("saleForm").addEventListener("submit", function(e) {
+                    const rows = document.querySelectorAll("#detailsBody tr");
+
+                    if (rows.length === 0) {
+                        e.preventDefault();
+                        alert("Please add at least one medicine row before saving.");
+                        return;
+                    }
+
+                    let valid = true;
+                    let errorMessages = [];
+
+                    rows.forEach(function(row) {
+                        const medSel = row.querySelector(".med-select");
+                        const qtyInput = row.querySelector(".qty-input");
+                        const stock = parseFloat(row.dataset.stock || 0);
+                        const qty = parseFloat(qtyInput.value) || 0;
+
+                        if (!medSel.value) {
+                            errorMessages.push("Please select a medicine in every row.");
+                            valid = false;
+                            return;
+                        }
+                        if (qty <= 0) {
+                            errorMessages.push("Quantity must be greater than zero for " + medSel.options[medSel.selectedIndex].text);
+                            valid = false;
+                            return;
+                        }
+                        if (qty > stock && stock > 0) {
+                            errorMessages.push("Quantity (" + qty + ") exceeds available stock (" + stock + ") for " +
+                                medSel.options[medSel.selectedIndex].text);
+                            valid = false;
+                            return;
+                        }
+                    });
+
+                    if (!valid) {
+                        e.preventDefault();
+                        alert(errorMessages.join("\n\n"));
+                        return;
+                    }
+
+                    recalcGrandTotal();
+                });
+
+                // ── Customer select validation styling ──
+                const customerSelect = document.getElementById("customerSelect");
+                if (customerSelect) {
+                    customerSelect.addEventListener("change", function() {
+                        if (this.value) {
+                            this.style.borderColor = "#2e7d32";
+                        } else {
+                            this.style.borderColor = "";
+                        }
+                    });
+                }
+
+                console.log('🧾 New Sale Entry loaded successfully!');
+                console.log('📊 GST Rate: ' + GST_PCT + '%');
+            })();
     </script>
 
 </body>

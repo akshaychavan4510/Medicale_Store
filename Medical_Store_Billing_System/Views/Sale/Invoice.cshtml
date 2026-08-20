@@ -1,13 +1,19 @@
 ﻿@model MedicalStore.Business.ViewModels.SaleMasterVM
 @{
     Layout = null; // standalone print page
+    ViewData["Title"] = $"Invoice #{Model.SaleId}";
 }
+
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Invoice #@Model.SaleId</title>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Invoice #@Model.SaleId - Medical Store</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800;14..32,900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+
     <style>
             /* ── Base ── */
             * {
@@ -18,7 +24,7 @@
 
             body {
                 font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-                background: #f4f7fc;
+                background: linear-gradient(135deg, #f0f5fc 0%, #e3eaf5 100%);
                 padding: 30px;
                 font-size: 14px;
                 color: #1e293b;
@@ -26,22 +32,52 @@
                 justify-content: center;
                 align-items: center;
                 min-height: 100vh;
+                position: relative;
             }
+
+                body::before {
+                    content: '';
+                    position: fixed;
+                    top: -50%;
+                    left: -50%;
+                    width: 200%;
+                    height: 200%;
+                    background: radial-gradient(circle at 30% 20%, rgba(46, 125, 50, 0.04) 0%, transparent 50%), radial-gradient(circle at 70% 80%, rgba(46, 125, 50, 0.04) 0%, transparent 50%);
+                    pointer-events: none;
+                    z-index: 0;
+                }
 
             /* ── Invoice Wrapper ── */
             .invoice-wrapper {
-                max-width: 900px;
+                max-width: 1000px;
                 width: 100%;
-                background: #ffffff;
-                border-radius: 20px;
-                box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08), 0 8px 28px rgba(0, 0, 0, 0.04), 0 0 0 1px rgba(0, 0, 0, 0.02);
-                padding: 35px 40px 30px;
-                transition: box-shadow 0.3s;
+                background: rgba(255, 255, 255, 0.95);
+                backdrop-filter: blur(16px);
+                border-radius: 28px;
+                box-shadow: 0 25px 80px rgba(0, 0, 0, 0.08), 0 10px 32px rgba(0, 0, 0, 0.04), 0 0 0 1px rgba(255, 255, 255, 0.5);
+                padding: 40px 45px 35px;
+                transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+                position: relative;
+                z-index: 1;
+                animation: fadeSlideUp 0.7s cubic-bezier(0.16, 1, 0.3, 1);
             }
 
-                .invoice-wrapper:hover {
-                    box-shadow: 0 32px 80px rgba(0, 0, 0, 0.10), 0 12px 36px rgba(0, 0, 0, 0.05), 0 0 0 1px rgba(0, 0, 0, 0.02);
+            @@keyframes fadeSlideUp {
+                0% {
+                    opacity: 0;
+                    transform: translateY(40px) scale(0.95);
                 }
+
+                100% {
+                    opacity: 1;
+                    transform: translateY(0) scale(1);
+                }
+            }
+
+            .invoice-wrapper:hover {
+                box-shadow: 0 35px 90px rgba(0, 0, 0, 0.12), 0 15px 40px rgba(0, 0, 0, 0.06), 0 0 0 1px rgba(255, 255, 255, 0.8);
+                transform: translateY(-3px);
+            }
 
             /* ── Header ── */
             .invoice-header {
@@ -49,88 +85,127 @@
                 justify-content: space-between;
                 align-items: center;
                 border-bottom: 2px solid #e2e8f0;
-                padding-bottom: 20px;
-                margin-bottom: 25px;
+                padding-bottom: 24px;
+                margin-bottom: 28px;
+                flex-wrap: wrap;
+                gap: 16px;
             }
 
                 .invoice-header .brand {
                     display: flex;
                     align-items: center;
-                    gap: 12px;
+                    gap: 16px;
                 }
 
                 .invoice-header .brand-icon {
-                    width: 50px;
-                    height: 50px;
+                    width: 56px;
+                    height: 56px;
                     background: linear-gradient(135deg, #2e7d32, #43a047);
-                    border-radius: 50%;
+                    border-radius: 16px;
                     display: flex;
                     align-items: center;
                     justify-content: center;
                     color: #fff;
-                    font-size: 26px;
+                    font-size: 28px;
+                    box-shadow: 0 4px 16px rgba(46, 125, 50, 0.25);
+                    transition: all 0.3s ease;
                 }
 
-                .invoice-header .brand-text h2 {
-                    font-weight: 700;
-                    font-size: 24px;
+            .invoice-wrapper:hover .brand-icon {
+                transform: rotate(-8deg) scale(1.05);
+                box-shadow: 0 8px 24px rgba(46, 125, 50, 0.35);
+            }
+
+            .invoice-header .brand-text h2 {
+                font-weight: 800;
+                font-size: 26px;
+                letter-spacing: -0.5px;
+                color: #0a2e1a;
+                margin: 0;
+            }
+
+            .invoice-header .brand-text span {
+                font-size: 13px;
+                color: #64748b;
+                font-weight: 500;
+            }
+
+            .invoice-header .invoice-title {
+                text-align: right;
+            }
+
+                .invoice-header .invoice-title .label {
+                    font-size: 12px;
+                    text-transform: uppercase;
+                    letter-spacing: 0.08em;
+                    color: #94a3b8;
+                    font-weight: 600;
+                }
+
+                .invoice-header .invoice-title .number {
+                    font-size: 30px;
+                    font-weight: 800;
+                    color: #2e7d32;
                     letter-spacing: -0.5px;
-                    color: #0f2b3d;
-                    margin: 0;
+                    text-shadow: 0 2px 4px rgba(46, 125, 50, 0.1);
                 }
 
-                .invoice-header .brand-text span {
-                    font-size: 13px;
-                    color: #64748b;
-                    font-weight: 500;
+                .invoice-header .invoice-title .status-badge {
+                    display: inline-block;
+                    background: #e8f5e9;
+                    color: #2e7d32;
+                    padding: 4px 16px;
+                    border-radius: 50px;
+                    font-size: 12px;
+                    font-weight: 600;
+                    margin-top: 4px;
+                    border: 1px solid #a5d6a7;
                 }
-
-                .invoice-header .invoice-title {
-                    text-align: right;
-                }
-
-                    .invoice-header .invoice-title .label {
-                        font-size: 12px;
-                        text-transform: uppercase;
-                        letter-spacing: 0.08em;
-                        color: #94a3b8;
-                        font-weight: 600;
-                    }
-
-                    .invoice-header .invoice-title .number {
-                        font-size: 28px;
-                        font-weight: 700;
-                        color: #2e7d32;
-                        letter-spacing: -0.5px;
-                    }
 
             /* ── Info Row ── */
             .info-row {
-                display: flex;
-                flex-wrap: wrap;
-                justify-content: space-between;
-                background: #f8faff;
-                border-radius: 14px;
-                padding: 14px 20px;
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                gap: 12px;
+                background: rgba(248, 250, 255, 0.9);
+                backdrop-filter: blur(8px);
+                border-radius: 16px;
+                padding: 16px 20px;
                 margin-bottom: 30px;
-                border: 1px solid #eef3f9;
+                border: 1px solid rgba(238, 243, 249, 0.8);
+                transition: all 0.3s ease;
             }
+
+                .info-row:hover {
+                    background: rgba(240, 246, 254, 0.95);
+                    transform: translateY(-2px);
+                    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+                }
 
                 .info-row .info-item {
                     display: flex;
                     align-items: baseline;
-                    gap: 6px;
+                    gap: 8px;
                 }
 
                     .info-row .info-item .info-label {
                         font-weight: 600;
                         color: #475569;
                         font-size: 13px;
+                        text-transform: uppercase;
+                        letter-spacing: 0.04em;
                     }
 
+                        .info-row .info-item .info-label i {
+                            font-size: 14px;
+                            color: #2e7d32;
+                            margin-right: 4px;
+                        }
+
                     .info-row .info-item .info-value {
-                        font-weight: 600;
-                        color: #0f2b3d;
+                        font-weight: 700;
+                        color: #0a2e1a;
+                        font-size: 15px;
                     }
 
             /* ── Table ── */
@@ -143,66 +218,144 @@
             }
 
                 .table-invoice thead th {
-                    background: #f1f5f9;
+                    background: linear-gradient(135deg, #f1f5f9, #e8ecf4);
                     text-transform: uppercase;
                     font-size: 12px;
                     font-weight: 700;
-                    letter-spacing: 0.04em;
+                    letter-spacing: 0.06em;
                     color: #475569;
-                    padding: 10px 12px;
+                    padding: 12px 16px;
                     border: none;
-                    border-radius: 8px 8px 0 0;
+                    border-radius: 10px 10px 0 0;
+                    position: sticky;
+                    top: 0;
+                    z-index: 5;
                 }
 
                     .table-invoice thead th:first-child {
-                        border-radius: 8px 0 0 0;
+                        border-radius: 10px 0 0 0;
+                        padding-left: 20px;
                     }
 
                     .table-invoice thead th:last-child {
-                        border-radius: 0 8px 0 0;
+                        border-radius: 0 10px 0 0;
+                        padding-right: 20px;
                     }
 
                 .table-invoice tbody tr {
                     background: #ffffff;
                     box-shadow: 0 1px 4px rgba(0,0,0,0.02);
-                    transition: background 0.15s;
+                    transition: all 0.2s ease;
                 }
 
                     .table-invoice tbody tr:hover {
-                        background: #fafdff;
+                        background: rgba(46, 125, 50, 0.04);
+                        transform: scale(1.002);
                     }
 
                 .table-invoice tbody td {
-                    padding: 10px 12px;
+                    padding: 12px 16px;
                     border: none;
                     border-bottom: 1px solid #f0f3f9;
                     vertical-align: middle;
+                    color: #1a2a44;
                 }
 
                 .table-invoice tbody tr:last-child td {
                     border-bottom: none;
                 }
 
+                .table-invoice tbody td:first-child {
+                    padding-left: 20px;
+                }
+
+                .table-invoice tbody td:last-child {
+                    padding-right: 20px;
+                }
+
+                .table-invoice .medicine-name {
+                    font-weight: 600;
+                    color: #0a2e4a;
+                }
+
+                .table-invoice .qty-badge {
+                    display: inline-block;
+                    background: #eef2f7;
+                    padding: 2px 14px;
+                    border-radius: 50px;
+                    font-weight: 600;
+                    font-size: 13px;
+                    color: #3d5a7a;
+                }
+
+                .table-invoice .amount-highlight {
+                    font-weight: 700;
+                    color: #1f5a8a;
+                }
+
+                .table-invoice .total-amount {
+                    font-weight: 800;
+                    color: #0a2e4a;
+                    font-size: 15px;
+                }
+
+                /* ── Table Footer ── */
                 .table-invoice tfoot td {
-                    padding: 12px 12px;
+                    padding: 14px 16px;
                     border: none;
                     border-top: 2px solid #e2e8f0;
+                    background: #f8faff;
+                }
+
+                    .table-invoice tfoot td:first-child {
+                        padding-left: 20px;
+                    }
+
+                    .table-invoice tfoot td:last-child {
+                        padding-right: 20px;
+                    }
+
+                .table-invoice .subtotal-row td {
+                    padding-top: 12px;
+                    padding-bottom: 8px;
+                    background: #f8faff;
+                }
+
+                .table-invoice .discount-row td {
+                    padding-top: 4px;
+                    padding-bottom: 8px;
+                    background: #f8faff;
+                    color: #dc3545;
                 }
 
                 .table-invoice .grand-total-row td {
-                    border-top: 2px solid #2e7d32;
-                    background: #f0fdf4;
-                    font-weight: 700;
-                    border-radius: 0 0 8px 8px;
+                    border-top: 3px solid #2e7d32;
+                    background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
+                    font-weight: 800;
+                    color: #1b5e20;
+                    border-radius: 0 0 10px 10px;
+                    padding: 16px 16px;
+                    font-size: 16px;
                 }
 
                     .table-invoice .grand-total-row td:first-child {
-                        border-radius: 0 0 0 8px;
+                        border-radius: 0 0 0 10px;
                     }
 
                     .table-invoice .grand-total-row td:last-child {
-                        border-radius: 0 0 8px 0;
+                        border-radius: 0 0 10px 0;
                     }
+
+                .table-invoice .grand-total-row .total-label {
+                    font-size: 14px;
+                    text-transform: uppercase;
+                    letter-spacing: 0.06em;
+                    color: #1b5e20;
+                }
+
+                .table-invoice .grand-total-row .total-value {
+                    font-size: 20px;
+                }
 
             .text-end {
                 text-align: right;
@@ -219,77 +372,137 @@
             /* ── Footer ── */
             .invoice-footer {
                 margin-top: 30px;
-                padding-top: 20px;
-                border-top: 1px solid #e2e8f0;
+                padding-top: 24px;
+                border-top: 2px solid #e2e8f0;
                 display: flex;
                 justify-content: space-between;
+                align-items: center;
                 font-size: 13px;
                 color: #64748b;
+                flex-wrap: wrap;
+                gap: 12px;
             }
 
                 .invoice-footer .terms {
                     font-size: 12px;
                     color: #94a3b8;
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
                 }
+
+                    .invoice-footer .terms i {
+                        color: #2e7d32;
+                        font-size: 16px;
+                    }
+
+                .invoice-footer .generated {
+                    display: flex;
+                    align-items: center;
+                    gap: 6px;
+                }
+
+                    .invoice-footer .generated i {
+                        color: #2e7d32;
+                    }
+
+                .invoice-footer .signature {
+                    display: flex;
+                    flex-direction: column;
+                    align-items: flex-end;
+                }
+
+                    .invoice-footer .signature .line {
+                        width: 150px;
+                        border-bottom: 2px solid #2e7d32;
+                        margin-top: 4px;
+                    }
+
+                    .invoice-footer .signature .label {
+                        font-size: 11px;
+                        color: #94a3b8;
+                        text-transform: uppercase;
+                        letter-spacing: 0.04em;
+                    }
 
             /* ── Buttons (no-print) ── */
             .no-print {
-                margin-top: 25px;
+                margin-top: 28px;
                 display: flex;
-                gap: 12px;
+                gap: 14px;
                 justify-content: center;
+                flex-wrap: wrap;
             }
 
             .btn-print, .btn-back {
-                padding: 10px 28px;
+                padding: 12px 32px;
                 border: none;
                 border-radius: 60px;
-                font-weight: 600;
+                font-weight: 700;
                 font-size: 14px;
                 display: inline-flex;
                 align-items: center;
-                gap: 8px;
-                transition: all 0.25s ease;
+                gap: 10px;
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
                 text-decoration: none;
                 cursor: pointer;
+                letter-spacing: 0.3px;
             }
 
+                .btn-print:active, .btn-back:active {
+                    transform: scale(0.96);
+                }
+
             .btn-print {
-                background: #2e7d32;
+                background: linear-gradient(135deg, #2e7d32, #1b5e20);
                 color: #fff;
-                box-shadow: 0 6px 18px rgba(46,125,50,0.30);
+                box-shadow: 0 6px 24px rgba(46, 125, 50, 0.30);
             }
 
                 .btn-print:hover {
-                    background: #1b5e20;
-                    transform: translateY(-2px);
-                    box-shadow: 0 10px 28px rgba(46,125,50,0.35);
+                    background: linear-gradient(135deg, #1b5e20, #0a3a10);
+                    transform: translateY(-3px) scale(1.02);
+                    box-shadow: 0 10px 32px rgba(46, 125, 50, 0.40);
                 }
 
             .btn-back {
                 background: #f1f5f9;
                 color: #334155;
+                border: 2px solid #e2e8f0;
             }
 
                 .btn-back:hover {
                     background: #e2e8f0;
-                    transform: translateY(-2px);
+                    transform: translateY(-3px) scale(1.02);
+                    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
                 }
 
             /* ── Print Styles ── */
             @@media print {
                 body {
-                    background: #fff;
-                    padding: 15px;
-                    margin: 0;
+                    background: #fff !important;
+                    padding: 15px !important;
+                    margin: 0 !important;
                 }
 
+                    body::before {
+                        display: none !important;
+                    }
+
                 .invoice-wrapper {
-                    box-shadow: none;
-                    border: none;
-                    padding: 20px;
-                    border-radius: 0;
+                    box-shadow: none !important;
+                    border: none !important;
+                    padding: 20px !important;
+                    border-radius: 0 !important;
+                    backdrop-filter: none !important;
+                    background: #fff !important;
+                    transform: none !important;
+                    animation: none !important;
                 }
+
+                    .invoice-wrapper:hover {
+                        transform: none !important;
+                    }
 
                 .no-print {
                     display: none !important;
@@ -308,7 +521,7 @@
                 }
 
                 .table-invoice .grand-total-row td {
-                    background: #f0fdf4 !important;
+                    background: #e8f5e9 !important;
                     -webkit-print-color-adjust: exact !important;
                     print-color-adjust: exact !important;
                 }
@@ -319,23 +532,29 @@
                     print-color-adjust: exact !important;
                 }
 
-                .invoice-wrapper:hover {
-                    box-shadow: none;
+                    .info-row:hover {
+                        transform: none !important;
+                    }
+
+                .table-invoice tbody tr:hover {
+                    background: #ffffff !important;
+                    transform: none !important;
                 }
 
-                .btn-print, .btn-back {
-                    display: none;
+                .invoice-footer .signature .line {
+                    border-bottom-color: #000 !important;
                 }
             }
 
             /* ── Responsive ── */
-            @@media (max-width: 600px) {
+            @@media (max-width: 768px) {
                 body {
-                    padding: 15px;
+                    padding: 16px;
                 }
 
                 .invoice-wrapper {
-                    padding: 20px;
+                    padding: 24px 20px;
+                    border-radius: 20px;
                 }
 
                 .invoice-header {
@@ -350,39 +569,161 @@
                     }
 
                         .invoice-header .invoice-title .number {
-                            font-size: 22px;
+                            font-size: 24px;
                         }
 
+                    .invoice-header .brand-text h2 {
+                        font-size: 22px;
+                    }
+
+                    .invoice-header .brand-icon {
+                        width: 48px;
+                        height: 48px;
+                        font-size: 24px;
+                    }
+
                 .info-row {
-                    flex-direction: column;
-                    gap: 6px;
+                    grid-template-columns: 1fr;
+                    gap: 8px;
+                    padding: 14px 16px;
                 }
 
                 .table-invoice {
                     font-size: 12px;
                 }
 
-                    .table-invoice thead th, .table-invoice tbody td {
-                        padding: 6px 8px;
+                    .table-invoice thead th,
+                    .table-invoice tbody td,
+                    .table-invoice tfoot td {
+                        padding: 8px 10px;
                     }
+
+                        .table-invoice thead th:first-child,
+                        .table-invoice tbody td:first-child,
+                        .table-invoice tfoot td:first-child {
+                            padding-left: 12px;
+                        }
+
+                        .table-invoice thead th:last-child,
+                        .table-invoice tbody td:last-child,
+                        .table-invoice tfoot td:last-child {
+                            padding-right: 12px;
+                        }
+
+                    .table-invoice .grand-total-row td {
+                        padding: 12px 10px;
+                        font-size: 14px;
+                    }
+
+                    .table-invoice .grand-total-row .total-value {
+                        font-size: 17px;
+                    }
+
+                    .table-invoice .qty-badge {
+                        padding: 1px 10px;
+                        font-size: 11px;
+                    }
+
+                .invoice-footer {
+                    flex-direction: column;
+                    align-items: flex-start;
+                    gap: 8px;
+                }
+
+                    .invoice-footer .signature {
+                        align-items: flex-start;
+                        width: 100%;
+                    }
+
+                        .invoice-footer .signature .line {
+                            width: 100%;
+                        }
 
                 .no-print {
                     flex-direction: column;
                     align-items: stretch;
                 }
 
-                .invoice-footer {
-                    flex-direction: column;
-                    gap: 6px;
+                .btn-print, .btn-back {
+                    justify-content: center;
+                    padding: 10px 20px;
+                }
+            }
+
+            @@media (max-width: 480px) {
+                .invoice-wrapper {
+                    padding: 16px 12px;
+                }
+
+                .invoice-header .brand-text h2 {
+                    font-size: 18px;
+                }
+
+                .invoice-header .brand-icon {
+                    width: 40px;
+                    height: 40px;
+                    font-size: 20px;
+                }
+
+                .table-invoice {
+                    font-size: 11px;
+                }
+
+                    .table-invoice thead th,
+                    .table-invoice tbody td,
+                    .table-invoice tfoot td {
+                        padding: 6px 6px;
+                    }
+
+                    .table-invoice .grand-total-row td {
+                        padding: 10px 6px;
+                        font-size: 13px;
+                    }
+
+                    .table-invoice .grand-total-row .total-value {
+                        font-size: 15px;
+                    }
+            }
+
+            /* ── Scrollbar Styling ── */
+            ::-webkit-scrollbar {
+                width: 6px;
+                height: 6px;
+            }
+
+            ::-webkit-scrollbar-track {
+                background: #eef2f7;
+                border-radius: 10px;
+            }
+
+            ::-webkit-scrollbar-thumb {
+                background: #c5d5e5;
+                border-radius: 10px;
+                transition: background 0.3s ease;
+            }
+
+                ::-webkit-scrollbar-thumb:hover {
+                    background: #8aadc9;
+                }
+
+            /* ── Reduced Motion ── */
+            @@media (prefers-reduced-motion: reduce) {
+                *,
+                *::before,
+                *::after {
+                    animation-duration: 0.01ms !important;
+                    animation-iteration-count: 1 !important;
+                    transition-duration: 0.01ms !important;
                 }
             }
     </style>
 </head>
+
 <body>
 
     <div class="invoice-wrapper">
 
-        <!-- ── Header ── -->
+        <!-- ─── Header ─── -->
         <div class="invoice-header">
             <div class="brand">
                 <div class="brand-icon">
@@ -390,35 +731,44 @@
                 </div>
                 <div class="brand-text">
                     <h2>MediStore</h2>
-                    <span>Healthcare Solutions</span>
+                    <span><i class="bi bi-geo-alt me-1"></i> Healthcare Solutions</span>
                 </div>
             </div>
-            
+            <div class="invoice-title">
+                <div class="label">Invoice #</div>
+                <div class="number">@Model.SaleId.ToString("D4")</div>
+                <span class="status-badge">
+                    <i class="bi bi-check-circle me-1"></i> Paid
+                </span>
+            </div>
         </div>
 
-        <!-- ── Info Row ── -->
+        <!-- ─── Info Row ─── -->
         <div class="info-row">
             <div class="info-item">
-                <span class="info-label">Invoice Date:</span>
+                <span class="info-label"><i class="bi bi-calendar3"></i> Invoice Date:</span>
                 <span class="info-value">@Model.SaleDate.ToString("dd-MMM-yyyy")</span>
             </div>
             <div class="info-item">
-                <span class="info-label">Customer:</span>
+                <span class="info-label"><i class="bi bi-person"></i> Customer:</span>
                 <span class="info-value">@Model.CustomerName</span>
             </div>
-            
+            <div class="info-item">
+                <span class="info-label"><i class="bi bi-receipt"></i> Invoice No:</span>
+                <span class="info-value">#@Model.SaleId.ToString("D4")</span>
+            </div>
         </div>
 
-        <!-- ── Table ── -->
+        <!-- ─── Table ─── -->
         <table class="table-invoice">
             <thead>
                 <tr>
-                    <th>#</th>
-                    <th>Medicine</th>
-                    <th class="text-end">Rate (₹)</th>
-                    <th class="text-end">Qty</th>
-                    <th class="text-end">GST (%)</th>
-                    <th class="text-end">Total (₹)</th>
+                    <th style="width:50px;">#</th>
+                    <th style="min-width:180px;">Medicine</th>
+                    <th class="text-end" style="width:100px;">Rate (₹)</th>
+                    <th class="text-end" style="width:80px;">Qty</th>
+                    <th class="text-end" style="width:80px;">GST %</th>
+                    <th class="text-end" style="width:120px;">Total (₹)</th>
                 </tr>
             </thead>
             <tbody>
@@ -429,53 +779,70 @@
                 {
                     <tr>
                         <td>@sr</td>
-                        <td>@d.MedicineName</td>
-                        <td class="text-end">@d.Rate.ToString("N2")</td>
-                        <td class="text-end">@d.Qty</td>
-                        <td class="text-end">@d.Gst.ToString("N2")</td>
-                        <td class="text-end">@d.Total.ToString("N2")</td>
+                        <td class="medicine-name">
+                            <i class="bi bi-capsule me-1" style="font-size:0.8rem; opacity:0.5;"></i>
+                            @d.MedicineName
+                        </td>
+                        <td class="text-end amount-highlight">@d.Rate.ToString("N2")</td>
+                        <td class="text-end">
+                            <span class="qty-badge">@d.Qty</span>
+                        </td>
+                        <td class="text-end">@d.GstPct.ToString("N2")%</td>
+                        <td class="text-end total-amount">₹@d.Total.ToString("N2")</td>
                     </tr>
                     sr++;
                 }
             </tbody>
             <tfoot>
                 <tr class="grand-total-row">
-                    <td colspan="5" class="text-end fw-bold">Grand Total (₹)</td>
-                    <td class="text-end fw-bold">@Model.GrandTotal.ToString("N2")</td>
+                    <td colspan="5" class="text-end total-label">
+                        <i class="bi bi-currency-rupee me-1"></i> Grand Total
+                    </td>
+                    <td class="text-end total-value">₹@Model.GrandTotal.ToString("N2")</td>
                 </tr>
             </tfoot>
         </table>
 
-        <!-- ── Footer ── -->
+        <!-- ─── Footer ─── -->
         <div class="invoice-footer">
             <div class="terms">
-                <i class="bi bi-check-circle" style="color:#2e7d32;"></i> This is a computer‑generated invoice. No signature required.
+                <i class="bi bi-check-circle"></i>
+                This is a computer‑generated invoice. No signature required.
             </div>
-            <div>
-                <i class="bi bi-clock"></i> Generated on @DateTime.Now.ToString("dd-MMM-yyyy HH:mm")
+            <div class="generated">
+                <i class="bi bi-clock"></i>
+                Generated on @DateTime.Now.ToString("dd-MMM-yyyy HH:mm")
+            </div>
+            <div class="signature">
+                <span class="label">Authorized Signature</span>
+                <div class="line"></div>
             </div>
         </div>
 
-        <!-- ── Buttons (no-print) ── -->
+        <!-- ─── Buttons (no-print) ─── -->
         <div class="no-print">
             <button class="btn-print" onclick="window.print()">
                 <i class="bi bi-printer"></i> Print Invoice
             </button>
             <a href="/Sale/Index" class="btn-back">
-                <i class="bi bi-arrow-left"></i> Back
+                <i class="bi bi-arrow-left"></i> Back to Sales
             </a>
         </div>
 
     </div>
 
-    <!-- Bootstrap Icons (optional, for icons) -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
-
     <script>
-            // Automatically trigger print on load (like your original)
-            window.onload = function () {
-                window.print();
+            // ── Auto-trigger print on load ──
+            window.onload = function() {
+                // Small delay to ensure everything renders
+                setTimeout(function() {
+                    window.print();
+                }, 500);
             };
+
+            // ── Logging ──
+            console.log('🧾 Invoice loaded successfully!');
+            console.log(`📊 Sale ID: @Model.SaleId, Total: ₹@Model.GrandTotal.ToString("N2")`);
     </script>
 
 </body>
