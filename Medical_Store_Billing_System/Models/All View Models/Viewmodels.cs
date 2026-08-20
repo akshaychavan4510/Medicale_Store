@@ -250,7 +250,7 @@ namespace MedicalStore.Business.ViewModels
     // ── Purchase Detail Line ──────────────────────────────────────────
     public class PurchaseMasterVM
     {
-        public int PurId { get; set; } // maps to PurchaseId
+        public int PurId { get; set; }
 
         [Display(Name = "Purchase Date")]
         [DataType(DataType.Date)]
@@ -281,49 +281,94 @@ namespace MedicalStore.Business.ViewModels
     public class PurchaseDetailVM
     {
         public int MedId { get; set; }
+
         public decimal Qty { get; set; }
+
         public decimal Rate { get; set; }
+
         public decimal Amt { get; set; }
+
         public decimal GstPct { get; set; }
+
         public decimal GstAmt { get; set; }
+
         public decimal Total { get; set; }
+
         public string? MedicineName { get; set; }
     }
-
     // ── Receipt ───────────────────────────────────────────────────────
     public class ReceiptVM
     {
+        // ============================================================
+        // RECEIPT ID
+        // ============================================================
         public int ReceiptId { get; set; }
 
-        [Required]
+        // ============================================================
+        // RECEIPT DATE
+        // ============================================================
+        [Required(ErrorMessage = "Receipt date is required.")]
         [Display(Name = "Receipt Date")]
+        [DataType(DataType.Date)]
         public DateTime ReceiptDate { get; set; } = DateTime.Now;
 
-        [Required(ErrorMessage = "Customer is required.")]
+        // ============================================================
+        // CUSTOMER
+        // ============================================================
+        [Required(ErrorMessage = "Please select a customer.")]
         [Display(Name = "Customer")]
         public int CustId { get; set; }
 
+        // ============================================================
+        // CUSTOMER NAME
+        // Used for displaying customer name in Index/Details
+        // ============================================================
         [Display(Name = "Customer Name")]
         public string? CustomerName { get; set; }
 
-        [Required]
-        [Range(0.01, double.MaxValue, ErrorMessage = "Amount must be greater than 0.")]
+        // ============================================================
+        // AMOUNT
+        // ============================================================
+        [Required(ErrorMessage = "Amount is required.")]
+        [Range(
+            0.01,
+            double.MaxValue,
+            ErrorMessage = "Amount must be greater than 0."
+        )]
         [Display(Name = "Amount (₹)")]
         public decimal Amount { get; set; }
 
+        // ============================================================
+        // PAYMENT MODE
+        // ============================================================
         [Display(Name = "Payment Mode")]
         public string? PayMode { get; set; } = "Cash";
 
+        // ============================================================
+        // REFERENCE NUMBER
+        // ============================================================
         [Display(Name = "Reference No.")]
+        [MaxLength(100, ErrorMessage = "Reference number cannot exceed 100 characters.")]
         public string? RefNo { get; set; }
 
+        // ============================================================
+        // NOTE
+        // ============================================================
+        [Display(Name = "Note")]
         public string? Note { get; set; }
 
+        // ============================================================
+        // CREATED BY
+        // ============================================================
+        [Display(Name = "Created By")]
         public string? CreatedBy { get; set; }
 
-        public DateTime CreatedDate { get; set; }
+        // ============================================================
+        // CREATED DATE
+        // ============================================================
+        [Display(Name = "Created Date")]
+        public DateTime CreatedDate { get; set; } = DateTime.Now;
     }
-
     // ── Payment ───────────────────────────────────────────────────────
     public class PaymentVM
     {

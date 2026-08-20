@@ -23,233 +23,581 @@ namespace MedicalStore.Web.Controllers
             _medicineService = medicineService;
         }
 
-        // GET: Purchase/Index
-        public async Task<IActionResult> Index(string searchTerm = "", int page = 1)
+        // ================================================================
+        // INDEX
+        // GET: /Purchase
+        // GET: /Purchase/Index
+        // ================================================================
+        [HttpGet]
+        public async Task<IActionResult> Index(
+            string? searchTerm = "",
+            int page = 1)
         {
             const int pageSize = 10;
 
-            // Get ALL purchases from database
-            var allPurchases = await _purchaseService.GetAllAsync();
-
-            // Store all purchases for JavaScript search (client-side search across all pages)
-            ViewBag.AllPurchases = allPurchases;
-
-            // Apply server-side search filter
-            IEnumerable<PurchaseMasterVM> filteredPurchases = allPurchases;
-
-            if (!string.IsNullOrWhiteSpace(searchTerm))
+            if (page < 1)
             {
-                searchTerm = searchTerm.Trim();
-                filteredPurchases = filteredPurchases.Where(x =>
-                    x.PurId.ToString().Contains(searchTerm) ||
-                    (!string.IsNullOrEmpty(x.InvoiceNo) &&
-                     x.InvoiceNo.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)) ||
-                    (!string.IsNullOrEmpty(x.SupplierName) &&
-                     x.SupplierName.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)) ||
-                    x.PurchaseDate.ToString("dd-MM-yyyy").Contains(searchTerm)
-                );
+                page = 1;
             }
 
-            // Get total records for pagination
-            int totalRecords = filteredPurchases.Count();
+            try
+            {
+                // --------------------------------------------------------
+                // Get ALL purchases
+                // --------------------------------------------------------
+                var allPurchases =
+                    await _purchaseService.GetAllAsync()
+                    ?? Enumerable.Empty<PurchaseMasterVM>();
 
-            // Apply pagination
-            var paginatedData = filteredPurchases
-                .OrderByDescending(p => p.PurId)
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
-                .ToList();
+                // Materialize once
+                var purchaseList = allPurchases.ToList();
 
-            // Set ViewBag properties
-            ViewBag.CurrentPage = page;
-            ViewBag.TotalPages = (int)Math.Ceiling((double)totalRecords / pageSize);
-            ViewBag.TotalRecords = totalRecords;
-            ViewBag.CurrentSearch = searchTerm;
-            ViewBag.PageSize = pageSize;
+                // --------------------------------------------------------
+                // Keep ALL purchases for client-side JavaScript search
+                // --------------------------------------------------------
+                ViewBag.AllPurchases = purchaseList;
 
-            // Calculate stats for display
-            ViewBag.TotalAmount = allPurchases.Sum(p => p.GrandTotal);
+                // --------------------------------------------------------
+                // SEARCH
+                // --------------------------------------------------------
+                var filteredPurchases = purchaseList.AsEnumerable();
 
-            return View(paginatedData);
+                if (!string.IsNullOrWhiteSpace(searchTerm))
+                {
+                    searchTerm = searchTerm.Trim();
+
+                    filteredPurchases = filteredPurchases.Where(p =>
+                        p.PurId
+                            .ToString()
+                            .Contains(searchTerm, StringComparison.OrdinalIgnoreCase)
+
+                        ||
+
+                        (!string.IsNullOrWhiteSpace(p.InvoiceNo) &&
+                         p.InvoiceNo.Contains(
+                             searchTerm,
+                             StringComparison.OrdinalIgnoreCase))
+
+                        ||
+
+                        (!string.IsNullOrWhiteSpace(p.SupplierName) &&
+                         p.SupplierName.Contains(
+                             searchTerm,
+                             StringComparison.OrdinalIgnoreCase))
+
+                        ||
+
+                        p.PurchaseDate
+                            .ToString("dd-MM-yyyy")
+                            .Contains(
+                                searchTerm,
+                                StringComparison.OrdinalIgnoreCase)
+                    );
+                }
+
+                // --------------------------------------------------------
+                // TOTAL FILTERED RECORDS
+                // --------------------------------------------------------
+                var filteredList = filteredPurchases
+                    .OrderByDescending(p => p.PurId)
+                    .ToList();
+
+                int totalRecords = filteredList.Count;
+
+                // --------------------------------------------------------
+                // TOTAL PAGES
+                // --------------------------------------------------------
+                int totalPages =
+                    totalRecords == 0
+                        ? 1
+                        : (int)Math.Ceiling(
+                            totalRecords / (double)pageSize);
+
+                // --------------------------------------------------------
+                // Prevent invalid page number
+                // --------------------------------------------------------
+                if (page > totalPages)
+                {
+                    page = totalPages;
+                }
+
+                // --------------------------------------------------------
+                // PAGINATION
+                // --------------------------------------------------------
+                var paginatedData = filteredList
+                    .Skip((page - 1) * pageSize)
+                    .Take(pageSize)
+                    .ToList();
+
+                // --------------------------------------------------------
+                // VIEWBAG
+                // --------------------------------------------------------
+                ViewBag.CurrentPage = page;
+                ViewBag.TotalPages = totalPages;
+                ViewBag.TotalRecords = totalRecords;
+                ViewBag.CurrentSearch = searchTerm ?? string.Empty;
+                ViewBag.PageSize = pageSize;
+
+                // --------------------------------------------------------
+                // STATISTICS
+                // --------------------------------------------------------
+                ViewBag.TotalPurchaseAmount = purchaseList.Sum(
+                    p => p.GrandTotal);
+
+                ViewBag.TotalNetAmount = purchaseList.Sum(
+                    p => p.NetTotal);
+
+                ViewBag.TotalDiscount = purchaseList.Sum(
+                    p => p.Discount);
+
+                ViewBag.LatestPurchaseDate =
+                    purchaseList.Any()
+                        ? purchaseList.Max(p => p.PurchaseDate)
+                        : (DateTime?)null;
+
+                // --------------------------------------------------------
+                // IMPORTANT:
+                // This view receives List<PurchaseMasterVM>
+                // --------------------------------------------------------
+                return View(paginatedData);
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] =
+                    $"Unable to load purchases: {ex.Message}";
+
+                return View(new List<PurchaseMasterVM>());
+            }
         }
 
-        // GET: Purchase/Create
+        // ================================================================
+        // CREATE - GET
+        // GET: /Purchase/Create
+        // ================================================================
+        [HttpGet]
         public async Task<IActionResult> Create()
         {
-            await PopulateDropdownsAsync();
-
-            // Get next sequential ID and auto-generated invoice number
-            var (nextPurId, nextInvoiceNo) = await _purchaseService.GetNextPurchaseNumberAsync();
-
-            ViewBag.NextPurId = nextPurId;
-            ViewBag.NextInvoiceNo = nextInvoiceNo;
-
-            var vm = new PurchaseMasterVM
+            try
             {
-                PurchaseDate = DateTime.Now,
-                InvoiceNo = nextInvoiceNo   // pre-fills InvoiceNo in the VM too
-            };
+                await PopulateDropdownsAsync();
 
-            return View(vm);
+                var (
+                    nextPurId,
+                    nextInvoiceNo
+                ) = await _purchaseService
+                    .GetNextPurchaseNumberAsync();
+
+                ViewBag.NextPurId = nextPurId;
+                ViewBag.NextInvoiceNo = nextInvoiceNo;
+
+                var vm = new PurchaseMasterVM
+                {
+                    PurId = nextPurId,
+                    PurchaseDate = DateTime.Now,
+                    InvoiceNo = nextInvoiceNo,
+                    PurchaseDetails = new List<PurchaseDetailVM>()
+                };
+
+                return View(vm);
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] =
+                    $"Unable to open purchase form: {ex.Message}";
+
+                return RedirectToAction(nameof(Index));
+            }
         }
 
-        // POST: Purchase/Create
+        // ================================================================
+        // CREATE - POST
+        // POST: /Purchase/Create
+        // ================================================================
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(PurchaseMasterVM vm)
         {
-            if (vm.PurchaseDetails == null || !vm.PurchaseDetails.Any())
+            // ------------------------------------------------------------
+            // Ensure collection is never null
+            // ------------------------------------------------------------
+            vm.PurchaseDetails ??= new List<PurchaseDetailVM>();
+
+            // ------------------------------------------------------------
+            // At least one purchase detail is required
+            // ------------------------------------------------------------
+            if (!vm.PurchaseDetails.Any())
             {
-                ModelState.AddModelError("", "Please add at least one medicine line.");
-                await PopulateDropdownsAsync();
-                return View(vm);
+                ModelState.AddModelError(
+                    "PurchaseDetails",
+                    "Please add at least one medicine.");
             }
 
-            ModelState.Remove("GrandTotal");
-            ModelState.Remove("NetTotal");
-            foreach (var key in ModelState.Keys.Where(k =>
-                k.Contains("Amt") || k.Contains("Total") || k.Contains("Gst") ||
-                k.Contains("MedicineName") || k.Contains("SupplierName")).ToList())
-                ModelState.Remove(key);
+            // ------------------------------------------------------------
+            // Remove calculated/display-only fields
+            // ------------------------------------------------------------
+            RemoveCalculatedFieldsFromModelState();
 
             if (!ModelState.IsValid)
             {
                 await PopulateDropdownsAsync();
+
                 return View(vm);
             }
 
             try
             {
-                if (await _purchaseService.CreatePurchaseAsync(vm))
+                bool result =
+                    await _purchaseService.CreatePurchaseAsync(vm);
+
+                if (result)
                 {
-                    TempData["Success"] = $"Purchase PUR-{vm.PurId:D4} created successfully.";
+                    TempData["Success"] =
+                        $"Purchase PUR-{vm.PurId:D4} created successfully.";
+
                     return RedirectToAction(nameof(Index));
                 }
+
+                ModelState.AddModelError(
+                    "",
+                    "Purchase could not be created.");
             }
             catch (Exception ex)
             {
-                ModelState.AddModelError("", ex.Message);
+                ModelState.AddModelError(
+                    "",
+                    $"Error creating purchase: {ex.Message}");
             }
 
             await PopulateDropdownsAsync();
+
             return View(vm);
         }
 
-        // GET: Purchase/Details/5
+        // ================================================================
+        // DETAILS
+        // GET: /Purchase/Details/5
+        // ================================================================
+        [HttpGet]
         public async Task<IActionResult> Details(int id)
         {
-            var vm = await _purchaseService.GetByIdAsync(id);
-            if (vm == null) return NotFound();
-            return View(vm);
+            if (id <= 0)
+            {
+                return BadRequest();
+            }
+
+            try
+            {
+                var vm =
+                    await _purchaseService.GetByIdAsync(id);
+
+                if (vm == null)
+                {
+                    return NotFound();
+                }
+
+                return View(vm);
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] =
+                    $"Unable to load purchase details: {ex.Message}";
+
+                return RedirectToAction(nameof(Index));
+            }
         }
 
-        // ── EDIT ─────────────────────────────────────────────────────────────
-
-        // GET: Purchase/Edit/5
+        // ================================================================
+        // EDIT - GET
+        // GET: /Purchase/Edit/5
+        // ================================================================
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {
-            var vm = await _purchaseService.GetByIdAsync(id);
-            if (vm == null) return NotFound();
-            await PopulateDropdownsAsync();
-            return View(vm);
+            if (id <= 0)
+            {
+                return BadRequest();
+            }
+
+            try
+            {
+                var vm =
+                    await _purchaseService.GetByIdAsync(id);
+
+                if (vm == null)
+                {
+                    return NotFound();
+                }
+
+                vm.PurchaseDetails ??=
+                    new List<PurchaseDetailVM>();
+
+                await PopulateDropdownsAsync();
+
+                return View(vm);
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] =
+                    $"Unable to load purchase for editing: {ex.Message}";
+
+                return RedirectToAction(nameof(Index));
+            }
         }
 
-        // POST: Purchase/Edit
+        // ================================================================
+        // EDIT - POST
+        // POST: /Purchase/Edit
+        // ================================================================
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(PurchaseMasterVM vm)
         {
-            if (vm.PurchaseDetails == null || !vm.PurchaseDetails.Any())
+            vm.PurchaseDetails ??=
+                new List<PurchaseDetailVM>();
+
+            // ------------------------------------------------------------
+            // Validate details
+            // ------------------------------------------------------------
+            if (!vm.PurchaseDetails.Any())
             {
-                ModelState.AddModelError("", "Please add at least one medicine line.");
-                await PopulateDropdownsAsync();
-                return View(vm);
+                ModelState.AddModelError(
+                    "PurchaseDetails",
+                    "Please add at least one medicine.");
             }
 
-            // Remove server-calculated fields from validation
-            ModelState.Remove("GrandTotal");
-            ModelState.Remove("NetTotal");
-            foreach (var key in ModelState.Keys.Where(k =>
-                k.Contains("Amt") || k.Contains("Total") || k.Contains("Gst") ||
-                k.Contains("MedicineName") || k.Contains("SupplierName")).ToList())
-                ModelState.Remove(key);
+            // ------------------------------------------------------------
+            // Remove calculated/display-only fields
+            // ------------------------------------------------------------
+            RemoveCalculatedFieldsFromModelState();
 
             if (!ModelState.IsValid)
             {
                 await PopulateDropdownsAsync();
+
                 return View(vm);
             }
 
             try
             {
-                if (await _purchaseService.UpdatePurchaseAsync(vm))
+                bool result =
+                    await _purchaseService.UpdatePurchaseAsync(vm);
+
+                if (result)
                 {
-                    TempData["Success"] = $"Purchase PUR-{vm.PurId:D4} updated successfully.";
+                    TempData["Success"] =
+                        $"Purchase PUR-{vm.PurId:D4} updated successfully.";
+
                     return RedirectToAction(nameof(Index));
                 }
 
-                TempData["Error"] = "Purchase not found or could not be updated.";
+                TempData["Error"] =
+                    "Purchase not found or could not be updated.";
+
+                await PopulateDropdownsAsync();
+
+                return View(vm);
             }
             catch (Exception ex)
             {
-                ModelState.AddModelError("", ex.Message);
-            }
+                ModelState.AddModelError(
+                    "",
+                    $"Error updating purchase: {ex.Message}");
 
-            await PopulateDropdownsAsync();
-            return View(vm);
+                await PopulateDropdownsAsync();
+
+                return View(vm);
+            }
         }
 
-        // ── DELETE ────────────────────────────────────────────────────────────
-
-        // GET: Purchase/Delete/5
+        // ================================================================
+        // DELETE - GET
+        // GET: /Purchase/Delete/5
+        // ================================================================
         [HttpGet]
         public async Task<IActionResult> Delete(int id)
         {
-            var vm = await _purchaseService.GetByIdAsync(id);
-            if (vm == null) return NotFound();
-            return View(vm);
+            if (id <= 0)
+            {
+                return BadRequest();
+            }
+
+            try
+            {
+                var vm =
+                    await _purchaseService.GetByIdAsync(id);
+
+                if (vm == null)
+                {
+                    return NotFound();
+                }
+
+                return View(vm);
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] =
+                    $"Unable to load purchase: {ex.Message}";
+
+                return RedirectToAction(nameof(Index));
+            }
         }
 
-        // POST: Purchase/Delete  (ActionName keeps URL as /Purchase/Delete)
+        // ================================================================
+        // DELETE - POST
+        // POST: /Purchase/Delete
+        // ================================================================
         [HttpPost]
         [ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
+            if (id <= 0)
+            {
+                TempData["Error"] = "Invalid purchase ID.";
+
+                return RedirectToAction(nameof(Index));
+            }
+
             try
             {
-                if (await _purchaseService.DeleteAsync(id))
-                    TempData["Success"] = $"Purchase PUR-{id:D4} deleted successfully.";
+                bool result =
+                    await _purchaseService.DeleteAsync(id);
+
+                if (result)
+                {
+                    TempData["Success"] =
+                        $"Purchase PUR-{id:D4} deleted successfully.";
+                }
                 else
-                    TempData["Error"] = "Purchase not found or could not be deleted.";
+                {
+                    TempData["Error"] =
+                        "Purchase not found or could not be deleted.";
+                }
             }
             catch (Exception ex)
             {
-                TempData["Error"] = $"Error deleting purchase: {ex.Message}";
+                TempData["Error"] =
+                    $"Error deleting purchase: {ex.Message}";
             }
 
             return RedirectToAction(nameof(Index));
         }
 
-        // ── AJAX ──────────────────────────────────────────────────────────────
-
+        // ================================================================
+        // AJAX - MEDICINE INFORMATION
+        // GET: /Purchase/GetMedicineInfo/5
+        // ================================================================
         [HttpGet]
         public async Task<IActionResult> GetMedicineInfo(int id)
         {
-            var med = await _medicineService.GetByIdAsync(id);
-            if (med == null) return NotFound();
-            return Json(new { rate = med.SaleRate, stock = med.Stock, name = med.MedName });
+            if (id <= 0)
+            {
+                return BadRequest(
+                    new
+                    {
+                        success = false,
+                        message = "Invalid medicine ID."
+                    });
+            }
+
+            try
+            {
+                var medicine =
+                    await _medicineService.GetByIdAsync(id);
+
+                if (medicine == null)
+                {
+                    return NotFound(
+                        new
+                        {
+                            success = false,
+                            message = "Medicine not found."
+                        });
+                }
+
+                return Json(
+                    new
+                    {
+                        success = true,
+                        medId = medicine.MedId,
+                        name = medicine.MedName,
+                        rate = medicine.SaleRate,
+                        stock = medicine.Stock
+                    });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(
+                    StatusCodes.Status500InternalServerError,
+                    new
+                    {
+                        success = false,
+                        message = ex.Message
+                    });
+            }
         }
 
-        // ── HELPERS ───────────────────────────────────────────────────────────
-
+        // ================================================================
+        // HELPER - DROPDOWNS
+        // ================================================================
         private async Task PopulateDropdownsAsync()
         {
-            var suppliers = await _supplierService.GetAllAsync();
-            var medicines = await _medicineService.GetAllAsync();
-            ViewBag.Suppliers = new SelectList(suppliers, "SuppId", "SuppName");
-            ViewBag.Medicines = new SelectList(medicines, "MedId", "MedName");
+            var suppliers =
+                await _supplierService.GetAllAsync()
+                ?? Enumerable.Empty<SupplierVM>();
+
+            var medicines =
+                await _medicineService.GetAllAsync()
+                ?? Enumerable.Empty<MedicineMasterVM>();
+
+            ViewBag.Suppliers =
+                new SelectList(
+                    suppliers,
+                    "SuppId",
+                    "SuppName");
+
+            ViewBag.Medicines =
+                new SelectList(
+                    medicines,
+                    "MedId",
+                    "MedName");
+        }
+
+        // ================================================================
+        // HELPER - MODELSTATE
+        // ================================================================
+        private void RemoveCalculatedFieldsFromModelState()
+        {
+            // Master calculated fields
+            ModelState.Remove(nameof(PurchaseMasterVM.GrandTotal));
+            ModelState.Remove(nameof(PurchaseMasterVM.NetTotal));
+
+            // Display-only master field
+            ModelState.Remove(nameof(PurchaseMasterVM.SupplierName));
+
+            // ------------------------------------------------------------
+            // Remove calculated/display-only detail fields
+            // ------------------------------------------------------------
+            var keysToRemove = ModelState.Keys
+                .Where(key =>
+                    key.EndsWith(".Amt",
+                        StringComparison.OrdinalIgnoreCase)
+                    ||
+                    key.EndsWith(".Total",
+                        StringComparison.OrdinalIgnoreCase)
+                    ||
+                    key.EndsWith(".GstAmt",
+                        StringComparison.OrdinalIgnoreCase)
+                    ||
+                    key.EndsWith(".MedicineName",
+                        StringComparison.OrdinalIgnoreCase)
+                )
+                .ToList();
+
+            foreach (var key in keysToRemove)
+            {
+                ModelState.Remove(key);
+            }
         }
     }
 }

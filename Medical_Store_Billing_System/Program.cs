@@ -15,17 +15,31 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// ============================================================
+// MVC
+// ============================================================
 builder.Services.AddControllersWithViews();
+
 builder.Services.AddHttpContextAccessor();
 
+// ============================================================
+// DATABASE
+// ============================================================
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(
         builder.Configuration.GetConnectionString("DefaultConnection")));
 
-builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
+// ============================================================
+// IDENTITY
+// ============================================================
+builder.Services
+    .AddIdentity<ApplicationUser, IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
 
+// ============================================================
+// COOKIE CONFIGURATION
+// ============================================================
 builder.Services.ConfigureApplicationCookie(options =>
 {
     options.LoginPath = "/Account/Login";
@@ -33,6 +47,9 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.AccessDeniedPath = "/Account/AccessDenied";
 });
 
+// ============================================================
+// SESSION
+// ============================================================
 builder.Services.AddDistributedMemoryCache();
 
 builder.Services.AddSession(options =>
@@ -42,10 +59,25 @@ builder.Services.AddSession(options =>
     options.Cookie.IsEssential = true;
 });
 
+// ============================================================
+// AUTOMAPPER
+// ============================================================
+// MappingProfile is located in:
+// MedicalStore.Business.Mappings
+//
+// AutoMapper scans the assembly containing MappingProfile
+// and registers all Profile classes found there.
+// ============================================================
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 
+// ============================================================
+// UNIT OF WORK
+// ============================================================
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
+// ============================================================
+// REPOSITORIES
+// ============================================================
 builder.Services.AddScoped<IMedicineCategoryRepository, MedicineCategoryRepository>();
 builder.Services.AddScoped<IBrandRepository, BrandRepository>();
 builder.Services.AddScoped<IMedicineMasterRepository, MedicineMasterRepository>();
@@ -58,6 +90,9 @@ builder.Services.AddScoped<IPurchaseDetailsRepository, PurchaseDetailsRepository
 builder.Services.AddScoped<IReceiptRepository, ReceiptRepository>();
 builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
 
+// ============================================================
+// SERVICES
+// ============================================================
 builder.Services.AddScoped<IMedicineCategoryService, MedicineCategoryService>();
 builder.Services.AddScoped<IBrandService, BrandService>();
 builder.Services.AddScoped<IMedicineMasterService, MedicineMasterService>();
@@ -70,8 +105,14 @@ builder.Services.AddScoped<IPaymentService, PaymentService>();
 builder.Services.AddScoped<IDashboardService, DashboardService>();
 builder.Services.AddScoped<IReportService, ReportService>();
 
+// ============================================================
+// BUILD APPLICATION
+// ============================================================
 var app = builder.Build();
 
+// ============================================================
+// HTTP PIPELINE
+// ============================================================
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
@@ -80,20 +121,29 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.UseStaticFiles();   // REQUIRED FOR VIDEO
+app.UseStaticFiles();
 
 app.UseRouting();
 
 app.UseSession();
 
 app.UseAuthentication();
+
 app.UseAuthorization();
 
+// ============================================================
+// DATABASE SEEDING
+// ============================================================
 using (var scope = app.Services.CreateScope())
 {
-    await DbInitializer.SeedAsync(scope.ServiceProvider);
+    var services = scope.ServiceProvider;
+
+    await DbInitializer.SeedAsync(services);
 }
 
+// ============================================================
+// DEFAULT ROUTE
+// ============================================================
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Account}/{action=Login}/{id?}");

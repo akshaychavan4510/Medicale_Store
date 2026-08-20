@@ -1,628 +1,1742 @@
 @* Views/Receipt/Index.cshtml *@
+
 @model IEnumerable<MedicalStore.Business.ViewModels.ReceiptVM>
 
 @{
     ViewData["Title"] = "Receipts";
     Layout = null;
+
+    var currentPage = ViewBag.CurrentPage is int cp ? cp : 1;
+    var totalPages = ViewBag.TotalPages is int tp ? tp : 1;
+    var totalRecords = ViewBag.TotalRecords is int tr ? tr : 0;
+    var pageSize = ViewBag.PageSize is int ps ? ps : 10;
+    var currentSearch = ViewBag.CurrentSearch as string ?? "";
+    var totalAmount = ViewBag.TotalAmount is decimal ta ? ta : 0m;
+
+    var startRecord = totalRecords == 0
+        ? 0
+        : ((currentPage - 1) * pageSize) + 1;
+
+    var endRecord = Math.Min(currentPage * pageSize, totalRecords);
 }
+
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, maximum-scale=1.5" />
+
     <title>@ViewData["Title"]</title>
-    <!-- Bootstrap 5 + Icons + Google Font -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+
+    <!-- Bootstrap 5 -->
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
+
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+
+    <!-- Google Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+          rel="stylesheet" />
+
     <style>
-            /* ── Reset & Base ── */
-            * {
-                margin: 0;
-                padding: 0;
-                box-sizing: border-box;
+
+        /* =========================================================
+           RESET
+           ========================================================= */
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+
+        /* =========================================================
+           BODY
+           ========================================================= */
+
+        body {
+            font-family: 'Inter',
+                -apple-system,
+                BlinkMacSystemFont,
+                'Segoe UI',
+                Roboto,
+                sans-serif;
+
+            background: linear-gradient(
+                145deg,
+                #f0fdf4 0%,
+                #dcfce7 100%
+            );
+
+            min-height: 100vh;
+            padding: 1.5rem;
+            margin: 0;
+        }
+
+
+        /* =========================================================
+           PAGE WRAPPER
+           ========================================================= */
+
+        .page-wrapper {
+            width: 100%;
+            max-width: 1250px;
+            margin: 0 auto;
+
+            animation:
+                fadeSlideUp
+                0.6s
+                cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+
+        @@keyframes fadeSlideUp {
+
+            0% {
+                opacity: 0;
+                transform: translateY(30px) scale(0.97);
             }
+
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+
+        /* =========================================================
+           HEADER
+           ========================================================= */
+
+        .header-icon {
+            width: 52px;
+            height: 52px;
+
+            background: #dcfce7;
+
+            border-radius: 15px;
+
+            display: inline-flex;
+
+            align-items: center;
+            justify-content: center;
+
+            flex-shrink: 0;
+        }
+
+        .header-icon i {
+            font-size: 1.6rem;
+            color: #15803d;
+        }
+
+        .page-title {
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: #172033;
+        }
+
+        .page-subtitle {
+            font-size: 0.82rem;
+            color: #64748b;
+        }
+
+
+        /* =========================================================
+           HEADER STATS
+           ========================================================= */
+
+        .header-stats {
+            display: inline-flex;
+
+            align-items: center;
+
+            gap: 0.45rem;
+
+            background: #ffffff;
+
+            padding: 0.5rem 1rem;
+
+            border-radius: 50px;
+
+            border: 1px solid #e2e8f0;
+
+            font-size: 0.8rem;
+
+            color: #475569;
+
+            box-shadow:
+                0 3px 10px rgba(0, 0, 0, 0.03);
+        }
+
+        .header-stats i {
+            color: #15803d;
+        }
+
+
+        /* =========================================================
+           NEW BUTTON
+           ========================================================= */
+
+        .btn-success-custom {
+
+            background: #15803d;
+
+            border: none;
+
+            border-radius: 50px;
+
+            padding: 0.58rem 1.4rem;
+
+            font-weight: 600;
+
+            font-size: 0.88rem;
+
+            color: #ffffff;
+
+            transition: all 0.25s ease;
+
+            box-shadow:
+                0 4px 12px rgba(21, 128, 61, 0.25);
+
+            display: inline-flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            gap: 0.4rem;
+
+            text-decoration: none;
+        }
+
+        .btn-success-custom:hover {
+
+            background: #166534;
+
+            color: #ffffff;
+
+            transform: translateY(-2px);
+
+            box-shadow:
+                0 8px 20px rgba(21, 128, 61, 0.30);
+        }
+
+
+        /* =========================================================
+           CARD
+           ========================================================= */
+
+        .card-modern {
+
+            background: #ffffff;
+
+            border: none;
+
+            border-radius: 24px;
+
+            overflow: hidden;
+
+            box-shadow:
+                0 20px 60px rgba(0, 0, 0, 0.06),
+                0 8px 28px rgba(0, 0, 0, 0.03),
+                0 0 0 1px rgba(0, 0, 0, 0.02);
+        }
+
+
+        /* =========================================================
+           SEARCH BAR
+           ========================================================= */
+
+        .search-card {
+
+            background: #ffffff;
+
+            border-radius: 20px;
+
+            padding: 1rem 1.15rem;
+
+            margin-bottom: 1rem;
+
+            box-shadow:
+                0 10px 30px rgba(0, 0, 0, 0.04),
+                0 0 0 1px rgba(0, 0, 0, 0.02);
+        }
+
+        .search-wrapper {
+
+            position: relative;
+        }
+
+        .search-wrapper i {
+
+            position: absolute;
+
+            left: 14px;
+
+            top: 50%;
+
+            transform: translateY(-50%);
+
+            color: #94a3b8;
+
+            pointer-events: none;
+        }
+
+        .search-input {
+
+            height: 44px;
+
+            border-radius: 12px;
+
+            border: 1px solid #dbe3ee;
+
+            padding-left: 42px;
+
+            font-size: 0.88rem;
+
+            transition: all 0.2s ease;
+        }
+
+        .search-input:focus {
+
+            border-color: #86efac;
+
+            box-shadow:
+                0 0 0 3px rgba(34, 197, 94, 0.10);
+        }
+
+        .btn-search {
+
+            height: 44px;
+
+            border-radius: 12px;
+
+            background: #15803d;
+
+            border: none;
+
+            color: #ffffff;
+
+            padding: 0 1.2rem;
+
+            font-weight: 600;
+
+            font-size: 0.85rem;
+        }
+
+        .btn-search:hover {
+
+            background: #166534;
+
+            color: #ffffff;
+        }
+
+        .btn-clear {
+
+            height: 44px;
+
+            border-radius: 12px;
+
+            border: 1px solid #dbe3ee;
+
+            background: #ffffff;
+
+            color: #475569;
+
+            padding: 0 1rem;
+
+            font-weight: 600;
+
+            font-size: 0.85rem;
+
+            text-decoration: none;
+
+            display: inline-flex;
+
+            align-items: center;
+
+            justify-content: center;
+        }
+
+        .btn-clear:hover {
+
+            background: #f8fafc;
+
+            color: #1e293b;
+        }
+
+
+        /* =========================================================
+           TABLE
+           ========================================================= */
+
+        .table-wrapper {
+
+            overflow-x: auto;
+
+            -webkit-overflow-scrolling: touch;
+        }
+
+        #receiptsTable {
+
+            width: 100%;
+
+            min-width: 850px;
+
+            font-size: 0.88rem;
+
+            border-collapse: separate;
+
+            border-spacing: 0;
+
+            margin-bottom: 0;
+        }
+
+        #receiptsTable thead th {
+
+            background: #f8faff;
+
+            border-bottom: 2px solid #e2e8f0;
+
+            font-weight: 600;
+
+            font-size: 0.72rem;
+
+            text-transform: uppercase;
+
+            letter-spacing: 0.04em;
+
+            color: #4a5d7a;
+
+            padding: 0.85rem 0.75rem;
+
+            white-space: nowrap;
+
+            position: sticky;
+
+            top: 0;
+
+            z-index: 5;
+        }
+
+        #receiptsTable tbody td {
+
+            padding: 0.75rem;
+
+            vertical-align: middle;
+
+            border-bottom: 1px solid #f0f3f9;
+        }
+
+        #receiptsTable tbody tr {
+
+            background: #ffffff;
+
+            transition:
+                background 0.15s ease,
+                transform 0.15s ease;
+        }
+
+        #receiptsTable tbody tr:hover {
+
+            background: #f8fbff;
+        }
+
+        #receiptsTable tfoot td {
+
+            padding: 0.8rem 0.75rem;
+
+            border-top: 2px solid #e2e8f0;
+
+            background: #fafcff;
+
+            font-weight: 600;
+        }
+
+
+        /* =========================================================
+           BADGES
+           ========================================================= */
+
+        .badge-mode {
+
+            display: inline-flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            background: #e8edf5;
+
+            color: #1f3a5f;
+
+            padding: 0.25rem 0.75rem;
+
+            border-radius: 40px;
+
+            font-size: 0.73rem;
+
+            font-weight: 600;
+
+            white-space: nowrap;
+        }
+
+
+        /* =========================================================
+           ACTION BUTTONS
+           ========================================================= */
+
+        .action-btn {
+
+            width: 34px;
+
+            height: 34px;
+
+            border-radius: 9px;
+
+            display: inline-flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            text-decoration: none;
+
+            transition: all 0.2s ease;
+
+            margin: 0 2px;
+        }
+
+        .action-btn:hover {
+
+            transform: translateY(-2px);
+        }
+
+        .btn-view {
+
+            color: #0369a1;
+
+            background: #e0f2fe;
+        }
+
+        .btn-view:hover {
+
+            color: #075985;
+
+            background: #bae6fd;
+        }
+
+        .btn-edit {
+
+            color: #4338ca;
+
+            background: #e0e7ff;
+        }
+
+        .btn-edit:hover {
+
+            color: #3730a3;
+
+            background: #c7d2fe;
+        }
+
+        .btn-delete {
+
+            color: #b91c1c;
+
+            background: #fee2e2;
+        }
+
+        .btn-delete:hover {
+
+            color: #991b1b;
+
+            background: #fecaca;
+        }
+
+
+        /* =========================================================
+           EMPTY STATE
+           ========================================================= */
+
+        .empty-state {
+
+            color: #94a3b8;
+
+            padding: 3.5rem 1rem !important;
+        }
+
+        .empty-state i {
+
+            font-size: 3.2rem;
+
+            display: block;
+
+            margin-bottom: 0.7rem;
+
+            opacity: 0.55;
+        }
+
+        .empty-title {
+
+            font-weight: 600;
+
+            color: #64748b;
+
+            margin-bottom: 0.25rem;
+        }
+
+
+        /* =========================================================
+           PAGINATION
+           ========================================================= */
+
+        .pagination-wrapper {
+
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            gap: 1rem;
+
+            padding: 1rem 1.2rem;
+
+            border-top: 1px solid #edf1f6;
+
+            background: #ffffff;
+        }
+
+        .record-info {
+
+            font-size: 0.78rem;
+
+            color: #64748b;
+        }
+
+        .pagination {
+
+            margin: 0;
+        }
+
+        .page-link {
+
+            border: 1px solid #e2e8f0;
+
+            color: #475569;
+
+            min-width: 36px;
+
+            height: 36px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            font-size: 0.8rem;
+
+            border-radius: 8px !important;
+
+            margin-left: 4px;
+
+            transition: all 0.2s ease;
+        }
+
+        .page-link:hover {
+
+            background: #f0fdf4;
+
+            color: #15803d;
+
+            border-color: #bbf7d0;
+        }
+
+        .page-item.active .page-link {
+
+            background: #15803d;
+
+            border-color: #15803d;
+
+            color: #ffffff;
+        }
+
+        .page-item.disabled .page-link {
+
+            color: #cbd5e1;
+
+            background: #f8fafc;
+
+            border-color: #e2e8f0;
+        }
+
+
+        /* =========================================================
+           ALERT
+           ========================================================= */
+
+        .alert-custom {
+
+            border-radius: 16px;
+
+            border: none;
+
+            padding: 0.75rem 1rem;
+
+            font-size: 0.88rem;
+
+            font-weight: 500;
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 0.5rem;
+
+            box-shadow:
+                0 4px 12px rgba(0, 0, 0, 0.04);
+        }
+
+
+        /* =========================================================
+           SCROLLBAR
+           ========================================================= */
+
+        .table-wrapper::-webkit-scrollbar {
+
+            height: 6px;
+        }
+
+        .table-wrapper::-webkit-scrollbar-track {
+
+            background: #f1f5f9;
+
+            border-radius: 10px;
+        }
+
+        .table-wrapper::-webkit-scrollbar-thumb {
+
+            background: #d1dbe8;
+
+            border-radius: 10px;
+        }
+
+        .table-wrapper::-webkit-scrollbar-thumb:hover {
+
+            background: #b8c6d6;
+        }
+
+
+        /* =========================================================
+           ROW ANIMATION
+           ========================================================= */
+
+        #receiptsTable tbody tr {
+
+            animation:
+                fadeInRow
+                0.3s
+                ease
+                forwards;
+
+            opacity: 0;
+        }
+
+        #receiptsTable tbody tr:nth-child(1) {
+            animation-delay: 0.04s;
+        }
+
+        #receiptsTable tbody tr:nth-child(2) {
+            animation-delay: 0.08s;
+        }
+
+        #receiptsTable tbody tr:nth-child(3) {
+            animation-delay: 0.12s;
+        }
+
+        #receiptsTable tbody tr:nth-child(4) {
+            animation-delay: 0.16s;
+        }
+
+        #receiptsTable tbody tr:nth-child(5) {
+            animation-delay: 0.20s;
+        }
+
+        #receiptsTable tbody tr:nth-child(6) {
+            animation-delay: 0.24s;
+        }
+
+        #receiptsTable tbody tr:nth-child(7) {
+            animation-delay: 0.28s;
+        }
+
+        #receiptsTable tbody tr:nth-child(8) {
+            animation-delay: 0.32s;
+        }
+
+        #receiptsTable tbody tr:nth-child(9) {
+            animation-delay: 0.36s;
+        }
+
+        #receiptsTable tbody tr:nth-child(10) {
+            animation-delay: 0.40s;
+        }
+
+        @@keyframes fadeInRow {
+
+            from {
+                opacity: 0;
+                transform: translateX(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+
+        /* =========================================================
+           RESPONSIVE
+           ========================================================= */
+
+        @@media (max-width: 768px) {
 
             body {
-                font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-                background: linear-gradient(145deg, #f0fdf4 0%, #dcfce7 100%);
-                min-height: 100vh;
-                padding: 1.5rem;
-                margin: 0;
+                padding: 1rem;
             }
 
-            /* ── Main Container ── */
-            .page-wrapper {
-                max-width: 1200px;
-                margin: 0 auto;
-                animation: fadeSlideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            .header-stats {
+                display: none;
             }
 
-            @@keyframes fadeSlideUp {
-                0% {
-                    opacity: 0;
-                    transform: translateY(30px) scale(0.97);
-                }
-
-                100% {
-                    opacity: 1;
-                    transform: translateY(0) scale(1);
-                }
+            .page-title {
+                font-size: 1.15rem;
             }
 
-            /* ── Cards & Shadows ── */
-            .card-modern {
-                background: #ffffff;
-                border: none;
-                border-radius: 24px;
-                box-shadow: 0 20px 60px rgba(0, 0, 0, 0.06), 0 8px 28px rgba(0, 0, 0, 0.03), 0 0 0 1px rgba(0, 0, 0, 0.02);
-                transition: box-shadow 0.3s ease, transform 0.2s ease;
-                overflow: hidden;
+            .pagination-wrapper {
+
+                flex-direction: column;
+
+                align-items: flex-start;
             }
 
-                .card-modern:hover {
-                    box-shadow: 0 32px 80px rgba(0, 0, 0, 0.08), 0 12px 36px rgba(0, 0, 0, 0.04), 0 0 0 1px rgba(0, 0, 0, 0.02);
-                    transform: translateY(-2px);
-                }
+            .pagination {
 
-            .card-body-custom {
-                padding: 0;
-            }
-
-            /* ── Table ── */
-            .table-wrapper {
-                overflow-x: auto;
-                -webkit-overflow-scrolling: touch;
+                flex-wrap: wrap;
             }
 
             #receiptsTable {
-                width: 100%;
-                min-width: 700px;
-                font-size: 0.9rem;
-                border-collapse: separate;
-                border-spacing: 0;
-                margin-bottom: 0;
-            }
 
-                #receiptsTable thead th {
-                    background: #f8faff;
-                    border-bottom: 2px solid #e2e8f0;
-                    font-weight: 600;
-                    font-size: 0.75rem;
-                    text-transform: uppercase;
-                    letter-spacing: 0.04em;
-                    color: #4a5d7a;
-                    padding: 0.75rem 0.75rem;
-                    white-space: nowrap;
-                    position: sticky;
-                    top: 0;
-                    z-index: 5;
-                }
+                min-width: 800px;
 
-                #receiptsTable tbody td {
-                    padding: 0.7rem 0.75rem;
-                    vertical-align: middle;
-                    border-bottom: 1px solid #f0f3f9;
-                }
-
-                #receiptsTable tbody tr {
-                    background: #ffffff;
-                    transition: background 0.15s;
-                }
-
-                    #receiptsTable tbody tr:hover {
-                        background: #f8fbff;
-                    }
-
-                #receiptsTable tfoot td {
-                    padding: 0.7rem 0.75rem;
-                    border-top: 2px solid #e2e8f0;
-                    font-weight: 600;
-                }
-
-            /* ── Empty state ── */
-            .empty-state {
-                color: #9aabbe;
-                padding: 2.5rem 0;
-            }
-
-                .empty-state i {
-                    font-size: 3rem;
-                    display: block;
-                    margin-bottom: 0.5rem;
-                    opacity: 0.6;
-                }
-
-            /* ── Header & Buttons ── */
-            .header-icon {
-                background: #dcfce7;
-                padding: 0.6rem;
-                border-radius: 14px;
-                display: inline-flex;
-                align-items: center;
-                justify-content: center;
-            }
-
-                .header-icon i {
-                    font-size: 1.6rem;
-                    color: #15803d;
-                }
-
-            .header-stats {
-                display: flex;
-                align-items: center;
-                gap: 0.5rem;
-                background: #f8faff;
-                padding: 0.3rem 1rem;
-                border-radius: 60px;
-                border: 1px solid #e2e8f0;
                 font-size: 0.8rem;
-                color: #4a5d7a;
             }
 
-                .header-stats i {
-                    color: #15803d;
-                }
+            #receiptsTable thead th {
+
+                font-size: 0.65rem;
+
+                padding: 0.6rem;
+            }
+
+            #receiptsTable tbody td {
+
+                padding: 0.55rem;
+            }
+
+            .action-btn {
+
+                width: 30px;
+
+                height: 30px;
+
+                font-size: 0.75rem;
+            }
+        }
+
+
+        @@media (max-width: 576px) {
+
+            body {
+                padding: 0.7rem;
+            }
+
+            .header-icon {
+
+                width: 44px;
+
+                height: 44px;
+            }
+
+            .header-icon i {
+
+                font-size: 1.3rem;
+            }
 
             .btn-success-custom {
-                background: #15803d;
-                border: none;
-                border-radius: 60px;
-                padding: 0.5rem 1.5rem;
-                font-weight: 600;
-                font-size: 0.9rem;
-                color: #fff;
-                transition: all 0.25s ease;
-                box-shadow: 0 4px 12px rgba(21, 128, 61, 0.25);
-                display: inline-flex;
-                align-items: center;
-                gap: 0.4rem;
-                text-decoration: none;
+
+                font-size: 0.78rem;
+
+                padding:
+                    0.45rem
+                    1rem;
             }
 
-                .btn-success-custom:hover {
-                    background: #166534;
-                    transform: translateY(-2px);
-                    box-shadow: 0 8px 20px rgba(21, 128, 61, 0.30);
-                    color: #fff;
-                }
+            .search-card {
 
-            .btn-outline-info-custom {
-                border: 1.5px solid #b3d9f7;
-                border-radius: 60px;
-                padding: 0.25rem 0.9rem;
-                font-weight: 600;
-                font-size: 0.8rem;
-                color: #0d47a1;
-                transition: all 0.2s ease;
-                background: transparent;
-                text-decoration: none;
-                display: inline-flex;
-                align-items: center;
-                justify-content: center;
-                gap: 0.3rem;
+                padding: 0.75rem;
             }
 
-                .btn-outline-info-custom:hover {
-                    background: #e3f2fd;
-                    border-color: #64b5f6;
-                    color: #0a3a8a;
-                }
+            .search-row {
 
-            .btn-outline-primary-custom {
-                border: 1.5px solid #b3d9f7;
-                border-radius: 60px;
-                padding: 0.25rem 0.9rem;
-                font-weight: 600;
-                font-size: 0.8rem;
-                color: #0d47a1;
-                transition: all 0.2s ease;
-                background: transparent;
-                text-decoration: none;
-                display: inline-flex;
-                align-items: center;
-                justify-content: center;
-                gap: 0.3rem;
+                flex-direction: column;
             }
 
-                .btn-outline-primary-custom:hover {
-                    background: #e3f2fd;
-                    border-color: #64b5f6;
-                    color: #0a3a8a;
-                }
+            .search-row > * {
 
-            .btn-outline-danger-custom {
-                border: 1.5px solid #ffcdd2;
-                border-radius: 60px;
-                padding: 0.25rem 0.9rem;
-                font-weight: 600;
-                font-size: 0.8rem;
-                color: #c62828;
-                transition: all 0.2s ease;
-                background: transparent;
-                text-decoration: none;
-                display: inline-flex;
-                align-items: center;
-                justify-content: center;
-                gap: 0.3rem;
+                width: 100%;
             }
 
-                .btn-outline-danger-custom:hover {
-                    background: #ffebee;
-                    border-color: #ef9a9a;
-                    color: #b71c1c;
-                }
+            .page-link {
 
-            /* ── Badge styling ── */
-            .badge-mode {
-                background: #e8edf5;
-                color: #1f3a5f;
-                padding: 0.15rem 0.8rem;
-                border-radius: 40px;
-                font-size: 0.75rem;
-                font-weight: 500;
+                min-width: 32px;
+
+                height: 32px;
+
+                font-size: 0.72rem;
             }
+        }
 
-            /* ── Alert styling ── */
-            .alert-custom {
-                border-radius: 16px;
-                border: none;
-                padding: 0.7rem 1rem;
-                font-size: 0.9rem;
-                font-weight: 500;
-                display: flex;
-                align-items: center;
-                gap: 0.5rem;
-                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+
+        /* =========================================================
+           REDUCED MOTION
+           ========================================================= */
+
+        @@media (prefers-reduced-motion: reduce) {
+
+            * {
+
+                animation-duration:
+                    0.01ms !important;
+
+                transition-duration:
+                    0.01ms !important;
             }
+        }
 
-            /* ── Footer Info ── */
-            .footer-info {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                margin-top: 1rem;
-            }
-
-            /* ── Responsive tweaks ── */
-            @@media (max-width: 768px) {
-                body {
-                    padding: 1rem;
-                }
-
-                #receiptsTable {
-                    min-width: 550px;
-                    font-size: 0.8rem;
-                }
-
-                    #receiptsTable thead th {
-                        font-size: 0.65rem;
-                        padding: 0.5rem 0.4rem;
-                    }
-
-                    #receiptsTable tbody td {
-                        padding: 0.4rem 0.4rem;
-                    }
-
-                    #receiptsTable tfoot td {
-                        padding: 0.4rem 0.4rem;
-                        font-size: 0.8rem;
-                    }
-
-                .btn-success-custom {
-                    font-size: 0.8rem;
-                    padding: 0.4rem 1.2rem;
-                }
-
-                .btn-outline-info-custom,
-                .btn-outline-primary-custom,
-                .btn-outline-danger-custom {
-                    font-size: 0.7rem;
-                    padding: 0.2rem 0.6rem;
-                }
-
-                .header-icon i {
-                    font-size: 1.2rem;
-                }
-
-                h5 {
-                    font-size: 1.1rem;
-                }
-
-                .d-flex.justify-content-between {
-                    flex-wrap: wrap;
-                    gap: 0.5rem;
-                }
-
-                .footer-info {
-                    flex-direction: column;
-                    gap: 0.5rem;
-                    align-items: flex-start;
-                }
-
-                .header-stats {
-                    font-size: 0.7rem;
-                    padding: 0.2rem 0.8rem;
-                }
-            }
-
-            @@media (max-width: 576px) {
-                #receiptsTable {
-                    min-width: 400px;
-                    font-size: 0.7rem;
-                }
-
-                    #receiptsTable thead th {
-                        padding: 0.3rem 0.2rem;
-                        font-size: 0.6rem;
-                    }
-
-                    #receiptsTable tbody td {
-                        padding: 0.3rem 0.2rem;
-                    }
-
-                    #receiptsTable tfoot td {
-                        padding: 0.3rem 0.2rem;
-                        font-size: 0.7rem;
-                    }
-
-                .btn-outline-info-custom,
-                .btn-outline-primary-custom,
-                .btn-outline-danger-custom {
-                    padding: 0.15rem 0.4rem;
-                    font-size: 0.65rem;
-                }
-
-                    .btn-outline-info-custom i,
-                    .btn-outline-primary-custom i,
-                    .btn-outline-danger-custom i {
-                        font-size: 0.7rem;
-                    }
-
-                .header-stats {
-                    font-size: 0.65rem;
-                    padding: 0.15rem 0.6rem;
-                }
-
-                .badge-mode {
-                    font-size: 0.65rem;
-                    padding: 0.1rem 0.5rem;
-                }
-            }
-
-            /* ── Reduced Motion ── */
-            @@media (prefers-reduced-motion: reduce) {
-                * {
-                    animation-duration: 0.01ms !important;
-                    transition-duration: 0.01ms !important;
-                }
-            }
-
-            /* Custom Scrollbar for table */
-            .table-wrapper::-webkit-scrollbar {
-                height: 6px;
-            }
-
-            .table-wrapper::-webkit-scrollbar-track {
-                background: #f1f5f9;
-                border-radius: 10px;
-            }
-
-            .table-wrapper::-webkit-scrollbar-thumb {
-                background: #d1dbe8;
-                border-radius: 10px;
-            }
-
-                .table-wrapper::-webkit-scrollbar-thumb:hover {
-                    background: #b8c6d6;
-                }
-
-            /* Table row animation */
-            #receiptsTable tbody tr {
-                animation: fadeInRow 0.3s ease forwards;
-                opacity: 0;
-            }
-
-                #receiptsTable tbody tr:nth-child(1) {
-                    animation-delay: 0.05s;
-                }
-
-                #receiptsTable tbody tr:nth-child(2) {
-                    animation-delay: 0.08s;
-                }
-
-                #receiptsTable tbody tr:nth-child(3) {
-                    animation-delay: 0.11s;
-                }
-
-                #receiptsTable tbody tr:nth-child(4) {
-                    animation-delay: 0.14s;
-                }
-
-                #receiptsTable tbody tr:nth-child(5) {
-                    animation-delay: 0.17s;
-                }
-
-                #receiptsTable tbody tr:nth-child(6) {
-                    animation-delay: 0.20s;
-                }
-
-                #receiptsTable tbody tr:nth-child(7) {
-                    animation-delay: 0.23s;
-                }
-
-                #receiptsTable tbody tr:nth-child(8) {
-                    animation-delay: 0.26s;
-                }
-
-                #receiptsTable tbody tr:nth-child(9) {
-                    animation-delay: 0.29s;
-                }
-
-                #receiptsTable tbody tr:nth-child(10) {
-                    animation-delay: 0.32s;
-                }
-
-            @@keyframes fadeInRow {
-                from {
-                    opacity: 0;
-                    transform: translateX(-10px);
-                }
-
-                to {
-                    opacity: 1;
-                    transform: translateX(0);
-                }
-            }
     </style>
+
 </head>
+
 <body>
 
-    <div class="page-wrapper">
+<div class="page-wrapper">
 
-        <!-- ── Header ── -->
-        <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
-            <div class="d-flex align-items-center gap-3">
-                <div class="header-icon">
-                    <i class="bi bi-receipt"></i>
-                </div>
-                <div>
-                    <h5 class="mb-0 fw-bold">Receipts</h5>
-                    <small class="text-muted">Manage customer receipts</small>
-                </div>
+    <!-- =========================================================
+         HEADER
+         ========================================================= -->
+
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+
+        <div class="d-flex align-items-center gap-3">
+
+            <div class="header-icon">
+                <i class="bi bi-receipt-cutoff"></i>
             </div>
-            <div class="d-flex align-items-center gap-3">
-                <div class="header-stats">
-                    <i class="bi bi-database"></i>
-                    <span>@Model.Count() record(s) found</span>
+
+            <div>
+
+                <div class="page-title">
+                    Receipts
                 </div>
-                <a asp-action="Create" class="btn btn-success-custom">
-                    <i class="bi bi-plus-lg"></i> New Receipt
-                </a>
+
+                <div class="page-subtitle">
+                    Manage customer payment receipts
+                </div>
+
             </div>
+
         </div>
 
-        <!-- ── Alerts ── -->
-        @if (TempData["Success"] != null)
-        {
-            <div class="alert alert-success alert-dismissible fade show alert-custom" role="alert">
-                <i class="bi bi-check-circle-fill"></i> @TempData["Success"]
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-        }
-        @if (TempData["Error"] != null)
-        {
-            <div class="alert alert-danger alert-dismissible fade show alert-custom" role="alert">
-                <i class="bi bi-exclamation-circle-fill"></i> @TempData["Error"]
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-        }
 
-        <!-- ── Table Card ── -->
-        <div class="card-modern">
-            <div class="card-body-custom">
-                <div class="table-wrapper">
-                    <table class="table" id="receiptsTable">
-                        <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>Date</th>
-                                <th>Customer</th>
-                                <th>Pay Mode</th>
-                                <th>Ref No.</th>
-                                <th class="text-end">Amount (₹)</th>
-                                <th class="text-center">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @if (!Model.Any())
-                            {
-                                <tr>
-                                    <td colspan="7" class="text-center empty-state">
-                                        <i class="bi bi-inbox"></i>
-                                        No receipts found.
-                                    </td>
-                                </tr>
-                            }
-                            else
-                            {
-                                @foreach (var r in Model)
-                                {
-                                    <tr>
-                                        <td class="fw-semibold text-muted">@r.ReceiptId</td>
-                                        <td>@r.ReceiptDate.ToString("dd-MM-yyyy")</td>
-                                        <td class="fw-semibold">
-                                            @if (!string.IsNullOrWhiteSpace(r.CustomerName))
-                                            {
-                                                @r.CustomerName
-                                            }
-                                            else
-                                            {
-                                                <span class="text-muted fst-italic">—</span>
-                                            }
-                                        </td>
-                                        <td>
-                                            <span class="badge-mode">
-                                                @(r.PayMode ?? "Cash")
-                                            </span>
-                                        </td>
-                                        <td class="text-muted small">@(string.IsNullOrWhiteSpace(r.RefNo) ? "—" : r.RefNo)</td>
-                                        <td class="text-end fw-bold text-success">
-                                            ₹@r.Amount.ToString("N2")
-                                        </td>
-                                        <td class="text-center">
-                                            <a asp-action="Details" asp-route-id="@r.ReceiptId"
-                                               class="btn-outline-info-custom me-1" title="View Details">
-                                                <i class="bi bi-eye"></i>
-                                            </a>
-                                            <a asp-action="Edit" asp-route-id="@r.ReceiptId"
-                                               class="btn-outline-primary-custom me-1" title="Edit Receipt">
-                                                <i class="bi bi-pencil"></i>
-                                            </a>
-                                            <a asp-action="Delete" asp-route-id="@r.ReceiptId"
-                                               class="btn-outline-danger-custom" title="Delete Receipt">
-                                                <i class="bi bi-trash"></i>
-                                            </a>
-                                        </td>
-                                    </tr>
-                                }
-                            }
-                        </tbody>
-                        @if (Model.Any())
-                        {
-                            <tfoot>
-                                <tr>
-                                    <td colspan="5" class="text-end fw-bold">Total Receipts:</td>
-                                    <td class="text-end fw-bold text-success">₹@Model.Sum(r => r.Amount).ToString("N2")</td>
-                                    <td></td>
-                                </tr>
-                            </tfoot>
-                        }
-                    </table>
-                </div>
+        <div class="d-flex align-items-center gap-3">
+
+            <div class="header-stats">
+
+                <i class="bi bi-database"></i>
+
+                <span>
+                    @totalRecords record@(totalRecords == 1 ? "" : "s")
+                </span>
+
             </div>
+
+
+            <a asp-action="Create"
+               class="btn-success-custom">
+
+                <i class="bi bi-plus-lg"></i>
+
+                New Receipt
+
+            </a>
+
         </div>
-
-       
 
     </div>
 
-    <!-- Bootstrap JS Bundle -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js">
-    </script>
 
-    <script>
-            // Auto-dismiss alerts after 5 seconds
-            document.addEventListener('DOMContentLoaded', function() {
-                const alerts = document.querySelectorAll('.alert');
-                alerts.forEach(function(alert) {
-                    setTimeout(function() {
-                        const bsAlert = new bootstrap.Alert(alert);
-                        bsAlert.close();
-                    }, 5000);
-                });
+    <!-- =========================================================
+         ALERTS
+         ========================================================= -->
+
+    @if (TempData["Success"] != null)
+    {
+
+        <div class="alert alert-success alert-dismissible fade show alert-custom mb-3"
+             role="alert">
+
+            <i class="bi bi-check-circle-fill"></i>
+
+            <span>
+                @TempData["Success"]
+            </span>
+
+            <button type="button"
+                    class="btn-close"
+                    data-bs-dismiss="alert">
+            </button>
+
+        </div>
+    }
+
+
+    @if (TempData["Error"] != null)
+    {
+
+        <div class="alert alert-danger alert-dismissible fade show alert-custom mb-3"
+             role="alert">
+
+            <i class="bi bi-exclamation-circle-fill"></i>
+
+            <span>
+                @TempData["Error"]
+            </span>
+
+            <button type="button"
+                    class="btn-close"
+                    data-bs-dismiss="alert">
+            </button>
+
+        </div>
+    }
+
+
+    <!-- =========================================================
+         SEARCH CARD
+         ========================================================= -->
+
+    <div class="search-card">
+
+        <form asp-action="Index"
+              method="get">
+
+            <div class="d-flex gap-2 search-row">
+
+                <div class="flex-grow-1 search-wrapper">
+
+                    <i class="bi bi-search"></i>
+
+                    <input type="text"
+                           name="searchTerm"
+                           value="@currentSearch"
+                           class="form-control search-input"
+                           placeholder="Search by Receipt ID, Customer, Date or Amount..."
+                           autocomplete="off" />
+
+                </div>
+
+
+                <button type="submit"
+                        class="btn btn-search">
+
+                    <i class="bi bi-search me-1"></i>
+
+                    Search
+
+                </button>
+
+
+                @if (!string.IsNullOrWhiteSpace(currentSearch))
+                {
+
+                    <a asp-action="Index"
+                       class="btn-clear">
+
+                        <i class="bi bi-x-circle me-1"></i>
+
+                        Clear
+
+                    </a>
+                }
+
+            </div>
+
+        </form>
+
+    </div>
+
+
+    <!-- =========================================================
+         RECEIPTS TABLE
+         ========================================================= -->
+
+    <div class="card-modern">
+
+        <div class="table-wrapper">
+
+            <table class="table"
+                   id="receiptsTable">
+
+                <thead>
+
+                    <tr>
+
+                        <th style="width:80px;">
+                            #
+                        </th>
+
+                        <th>
+                            Receipt Date
+                        </th>
+
+                        <th>
+                            Customer
+                        </th>
+
+                        <th>
+                            Payment Mode
+                        </th>
+
+                        <th>
+                            Reference No.
+                        </th>
+
+                        <th class="text-end">
+                            Amount (₹)
+                        </th>
+
+                        <th class="text-center"
+                            style="width:150px;">
+                            Actions
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    @if (Model == null || !Model.Any())
+                    {
+
+                        <tr>
+
+                            <td colspan="7"
+                                class="text-center empty-state">
+
+                                <i class="bi bi-receipt"></i>
+
+                                <div class="empty-title">
+                                    No receipts found
+                                </div>
+
+                                <div class="small">
+                                    @if (!string.IsNullOrWhiteSpace(currentSearch))
+                                    {
+                                        <span>
+                                            No receipts match
+                                            "<strong>@currentSearch</strong>".
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span>
+                                            There are no receipts available.
+                                        </span>
+                                    }
+                                </div>
+
+                            </td>
+
+                        </tr>
+
+                    }
+                    else
+                    {
+
+                        foreach (var r in Model)
+                        {
+
+                            <tr>
+
+                                <!-- Receipt ID -->
+
+                                <td class="fw-semibold text-muted">
+
+                                    #@r.ReceiptId
+
+                                </td>
+
+
+                                <!-- Receipt Date -->
+
+                                <td>
+
+                                    <span class="fw-medium">
+
+                                        @r.ReceiptDate.ToString("dd-MM-yyyy")
+
+                                    </span>
+
+                                    <small class="text-muted d-block">
+
+                                        @r.ReceiptDate.ToString("hh:mm tt")
+
+                                    </small>
+
+                                </td>
+
+
+                                <!-- Customer -->
+
+                                <td>
+
+                                    @if (!string.IsNullOrWhiteSpace(r.CustomerName))
+                                    {
+
+                                        <span class="fw-semibold">
+
+                                            @r.CustomerName
+
+                                        </span>
+
+                                    }
+                                    else
+                                    {
+
+                                        <span class="text-muted fst-italic">
+
+                                            Customer unavailable
+
+                                        </span>
+
+                                    }
+
+                                </td>
+
+
+                                <!-- Payment Mode -->
+
+                                <td>
+
+                                    <span class="badge-mode">
+
+                                        <i class="bi bi-wallet2 me-1"></i>
+
+                                        @(string.IsNullOrWhiteSpace(r.PayMode)
+                                            ? "Cash"
+                                            : r.PayMode)
+
+                                    </span>
+
+                                </td>
+
+
+                                <!-- Reference -->
+
+                                <td>
+
+                                    @if (!string.IsNullOrWhiteSpace(r.RefNo))
+                                    {
+
+                                        <span class="text-muted small">
+
+                                            @r.RefNo
+
+                                        </span>
+
+                                    }
+                                    else
+                                    {
+
+                                        <span class="text-muted">
+                                            —
+                                        </span>
+
+                                    }
+
+                                </td>
+
+
+                                <!-- Amount -->
+
+                                <td class="text-end">
+
+                                    <span class="fw-bold text-success">
+
+                                        ₹@r.Amount.ToString("N2")
+
+                                    </span>
+
+                                </td>
+
+
+                                <!-- Actions -->
+
+                                <td class="text-center">
+
+                                    <a asp-action="Details"
+                                       asp-route-id="@r.ReceiptId"
+                                       class="action-btn btn-view"
+                                       title="View Receipt">
+
+                                        <i class="bi bi-eye"></i>
+
+                                    </a>
+
+
+                                    <a asp-action="Edit"
+                                       asp-route-id="@r.ReceiptId"
+                                       class="action-btn btn-edit"
+                                       title="Edit Receipt">
+
+                                        <i class="bi bi-pencil"></i>
+
+                                    </a>
+
+
+                                    <a asp-action="Delete"
+                                       asp-route-id="@r.ReceiptId"
+                                       class="action-btn btn-delete"
+                                       title="Delete Receipt">
+
+                                        <i class="bi bi-trash"></i>
+
+                                    </a>
+
+                                </td>
+
+                            </tr>
+
+                        }
+
+                    }
+
+                </tbody>
+
+
+                @if (Model != null && Model.Any())
+                {
+
+                    <tfoot>
+
+                        <tr>
+
+                            <td colspan="5"
+                                class="text-end">
+
+                                Page Total:
+
+                            </td>
+
+                            <td class="text-end text-success">
+
+                                ₹@Model.Sum(r => r.Amount).ToString("N2")
+
+                            </td>
+
+                            <td></td>
+
+                        </tr>
+
+                    </tfoot>
+
+                }
+
+            </table>
+
+        </div>
+
+
+        <!-- =====================================================
+             PAGINATION
+             ===================================================== -->
+
+        @if (totalRecords > 0)
+        {
+
+            <div class="pagination-wrapper">
+
+                <div class="record-info">
+
+                    Showing
+                    <strong>@startRecord</strong>
+                    -
+                    <strong>@endRecord</strong>
+                    of
+                    <strong>@totalRecords</strong>
+                    receipts
+
+                </div>
+
+
+                @if (totalPages > 1)
+                {
+
+                    <nav aria-label="Receipt pagination">
+
+                        <ul class="pagination mb-0">
+
+                            <!-- First -->
+
+                            <li class="page-item @(currentPage <= 1 ? "disabled" : "")">
+
+                                @if (currentPage > 1)
+                                {
+
+                                    <a class="page-link"
+                                       asp-action="Index"
+                                       asp-route-page="1"
+                                       asp-route-searchTerm="@currentSearch"
+                                       title="First Page">
+
+                                        <i class="bi bi-chevron-double-left"></i>
+
+                                    </a>
+
+                                }
+                                else
+                                {
+
+                                    <span class="page-link">
+
+                                        <i class="bi bi-chevron-double-left"></i>
+
+                                    </span>
+
+                                }
+
+                            </li>
+
+
+                            <!-- Previous -->
+
+                            <li class="page-item @(currentPage <= 1 ? "disabled" : "")">
+
+                                @if (currentPage > 1)
+                                {
+
+                                    <a class="page-link"
+                                       asp-action="Index"
+                                       asp-route-page="@(currentPage - 1)"
+                                       asp-route-searchTerm="@currentSearch">
+
+                                        <i class="bi bi-chevron-left"></i>
+
+                                    </a>
+
+                                }
+                                else
+                                {
+
+                                    <span class="page-link">
+
+                                        <i class="bi bi-chevron-left"></i>
+
+                                    </span>
+
+                                }
+
+                            </li>
+
+
+                            <!-- Page Numbers -->
+
+                            @{
+                                var startPage = Math.Max(1, currentPage - 2);
+                                var endPage = Math.Min(totalPages, currentPage + 2);
+                            }
+
+
+                            @if (startPage > 1)
+                            {
+
+                                <li class="page-item">
+
+                                    <a class="page-link"
+                                       asp-action="Index"
+                                       asp-route-page="1"
+                                       asp-route-searchTerm="@currentSearch">
+
+                                        1
+
+                                    </a>
+
+                                </li>
+
+
+                                @if (startPage > 2)
+                                {
+
+                                    <li class="page-item disabled">
+
+                                        <span class="page-link">
+                                            ...
+                                        </span>
+
+                                    </li>
+
+                                }
+
+                            }
+
+
+                            @for (var p = startPage; p <= endPage; p++)
+                            {
+
+                                <li class="page-item @(p == currentPage ? "active" : "")">
+
+                                    <a class="page-link"
+                                       asp-action="Index"
+                                       asp-route-page="@p"
+                                       asp-route-searchTerm="@currentSearch">
+
+                                        @p
+
+                                    </a>
+
+                                </li>
+
+                            }
+
+
+                            @if (endPage < totalPages)
+                            {
+
+                                @if (endPage < totalPages - 1)
+                                {
+
+                                    <li class="page-item disabled">
+
+                                        <span class="page-link">
+                                            ...
+                                        </span>
+
+                                    </li>
+
+                                }
+
+
+                                <li class="page-item">
+
+                                    <a class="page-link"
+                                       asp-action="Index"
+                                       asp-route-page="@totalPages"
+                                       asp-route-searchTerm="@currentSearch">
+
+                                        @totalPages
+
+                                    </a>
+
+                                </li>
+
+                            }
+
+
+                            <!-- Next -->
+
+                            <li class="page-item @(currentPage >= totalPages ? "disabled" : "")">
+
+                                @if (currentPage < totalPages)
+                                {
+
+                                    <a class="page-link"
+                                       asp-action="Index"
+                                       asp-route-page="@(currentPage + 1)"
+                                       asp-route-searchTerm="@currentSearch">
+
+                                        <i class="bi bi-chevron-right"></i>
+
+                                    </a>
+
+                                }
+                                else
+                                {
+
+                                    <span class="page-link">
+
+                                        <i class="bi bi-chevron-right"></i>
+
+                                    </span>
+
+                                }
+
+                            </li>
+
+
+                            <!-- Last -->
+
+                            <li class="page-item @(currentPage >= totalPages ? "disabled" : "")">
+
+                                @if (currentPage < totalPages)
+                                {
+
+                                    <a class="page-link"
+                                       asp-action="Index"
+                                       asp-route-page="@totalPages"
+                                       asp-route-searchTerm="@currentSearch"
+                                       title="Last Page">
+
+                                        <i class="bi bi-chevron-double-right"></i>
+
+                                    </a>
+
+                                }
+                                else
+                                {
+
+                                    <span class="page-link">
+
+                                        <i class="bi bi-chevron-double-right"></i>
+
+                                    </span>
+
+                                }
+
+                            </li>
+
+                        </ul>
+
+                    </nav>
+
+                }
+
+            </div>
+
+        }
+
+    </div>
+
+
+    <!-- =========================================================
+         SUMMARY
+         ========================================================= -->
+
+    <div class="d-flex justify-content-between align-items-center mt-3 px-2">
+
+        <small class="text-muted">
+
+            <i class="bi bi-info-circle me-1"></i>
+
+            Showing page @currentPage of @Math.Max(totalPages, 1)
+
+        </small>
+
+
+        <small class="text-muted">
+
+            Total receipt amount:
+
+            <strong class="text-success">
+
+                ₹@totalAmount.ToString("N2")
+
+            </strong>
+
+        </small>
+
+    </div>
+
+</div>
+
+
+<!-- =============================================================
+     BOOTSTRAP JS
+     ============================================================= -->
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+
+<script>
+
+    document.addEventListener("DOMContentLoaded", function () {
+
+        // Automatically close alerts after 5 seconds
+
+        const alerts = document.querySelectorAll(".alert");
+
+        alerts.forEach(function (alertElement) {
+
+            setTimeout(function () {
+
+                if (typeof bootstrap !== "undefined") {
+
+                    const alert =
+                        bootstrap.Alert.getOrCreateInstance(alertElement);
+
+                    alert.close();
+
+                }
+
+            }, 5000);
+
+        });
+
+
+        // Prevent double submit on search form
+
+        const searchForm =
+            document.querySelector('form[method="get"]');
+
+        if (searchForm) {
+
+            searchForm.addEventListener("submit", function () {
+
+                const button =
+                    searchForm.querySelector("button[type='submit']");
+
+                if (button) {
+
+                    button.disabled = true;
+
+                    button.innerHTML =
+                        '<span class="spinner-border spinner-border-sm me-1"></span> Searching...';
+
+                }
+
             });
-    </script>
+
+        }
+
+    });
+
+</script>
 
 </body>
+
 </html>
