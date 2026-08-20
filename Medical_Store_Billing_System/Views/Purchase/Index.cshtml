@@ -5,9 +5,12 @@
     Layout = null;
 
     var purchases = Model ?? Enumerable.Empty<MedicalStore.Business.ViewModels.PurchaseMasterVM>();
+    var allPurchasesData = ViewBag.AllPurchases as IEnumerable<MedicalStore.Business.ViewModels.PurchaseMasterVM> ?? Model;
 
     var totalPurchases = purchases.Count();
     var totalAmount = purchases.Sum(x => x.NetTotal);
+    var totalGrandTotal = purchases.Sum(x => x.GrandTotal);
+    var totalDiscount = purchases.Sum(x => x.Discount);
     var latestPurchase = purchases.Any()
         ? purchases.Max(x => x.PurchaseDate)
         : DateTime.Now;
@@ -18,407 +21,934 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
     <title>@ViewData["Title"] - Medical Store</title>
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-          rel="stylesheet" />
-
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
-          rel="stylesheet" />
-
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap"
-          rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800;14..32,900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
 
-            * {
-                font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-                box-sizing: border-box;
+        body {
+            background: linear-gradient(135deg, #f0f4fa 0%, #e2e8f0 100%);
+            padding: 30px;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at 20% 30%, rgba(46, 125, 50, 0.03) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 70%, rgba(46, 125, 50, 0.03) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .purchase-container {
+            max-width: 1350px;
+            width: 100%;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+            animation: fadeUp 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+
+        @@keyframes fadeUp {
+            0% {
+                opacity: 0;
+                transform: translateY(20px);
             }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
 
+        /* ── Enhanced Header ── */
+        .page-header {
+            background: linear-gradient(135deg, #0a2e1a 0%, #2e7d32 50%, #1b5e20 100%);
+            border-radius: 28px;
+            padding: 32px 40px;
+            margin-bottom: 28px;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 20px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, .18), 0 25px 70px rgba(46, 125, 50, .2);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .page-header:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, .22), 0 30px 80px rgba(46, 125, 50, .25);
+        }
+
+        .page-header::before {
+            content: '';
+            position: absolute;
+            top: -60%;
+            right: -10%;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.08) 0%, transparent 70%);
+            pointer-events: none;
+            animation: floatShapes 8s ease-in-out infinite;
+        }
+
+        .page-header::after {
+            content: '';
+            position: absolute;
+            bottom: -40%;
+            left: 5%;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.05) 0%, transparent 70%);
+            pointer-events: none;
+            animation: floatShapes 10s ease-in-out infinite reverse;
+        }
+
+        @@keyframes floatShapes {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(20px, -20px) scale(1.1); }
+        }
+
+        .header-icon {
+            width: 68px;
+            height: 68px;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(8px);
+            border-radius: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            color: #fff;
+            flex-shrink: 0;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            z-index: 1;
+        }
+
+        .page-header:hover .header-icon {
+            transform: rotate(-8deg) scale(1.05);
+            background: rgba(255, 255, 255, 0.25);
+        }
+
+        .header-title h5 {
+            font-weight: 800;
+            margin: 0;
+            color: #fff;
+            font-size: 1.8rem;
+            letter-spacing: -0.03em;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: relative;
+            z-index: 1;
+        }
+
+        .header-title h5 .badge-count {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(8px);
+            padding: 6px 18px;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .page-header:hover .badge-count {
+            background: rgba(255, 255, 255, 0.25);
+            transform: scale(1.02);
+        }
+
+        .header-title small {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.95rem;
+            display: block;
+            margin-top: 2px;
+        }
+
+        .btn-new {
+            margin-left: auto;
+            background: linear-gradient(135deg, #ffffff, #f0f5fa);
+            border: none;
+            padding: 12px 32px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: #0a2e1a;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 6px 24px rgba(0, 0, 0, 0.2);
+            text-decoration: none;
+            position: relative;
+            z-index: 1;
+            letter-spacing: 0.3px;
+        }
+
+        .btn-new:hover {
+            transform: translateY(-3px) scale(1.03);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            color: #0a2e1a;
+            background: linear-gradient(135deg, #ffffff, #e8eff6);
+        }
+
+        .btn-new:active {
+            transform: translateY(0) scale(0.98);
+        }
+
+        /* ── Enhanced Stats Row ── */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 28px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            border-radius: 20px;
+            padding: 20px 24px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, .06), 0 4px 12px rgba(0, 0, 0, .03);
+            cursor: default;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: 0 15px 50px rgba(0, 0, 0, .10), 0 6px 18px rgba(0, 0, 0, .05);
+            background: rgba(255, 255, 255, 0.95);
+        }
+
+        .stat-icon {
+            width: 52px;
+            height: 52px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            flex-shrink: 0;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover .stat-icon {
+            transform: scale(1.1) rotate(-5deg);
+        }
+
+        .stat-icon.blue {
+            background: linear-gradient(135deg, #e8f4fd, #d0e8f8);
+            color: #0d6efd;
+        }
+
+        .stat-icon.green {
+            background: linear-gradient(135deg, #e6f7ed, #c8f0d8);
+            color: #2e7d32;
+        }
+
+        .stat-icon.orange {
+            background: linear-gradient(135deg, #fef3e8, #fde5d0);
+            color: #e97c07;
+        }
+
+        .stat-icon.purple {
+            background: linear-gradient(135deg, #f0ebff, #e0d8f5);
+            color: #7c3aed;
+        }
+
+        .stat-number {
+            font-weight: 800;
+            font-size: 1.5rem;
+            line-height: 1.2;
+            color: #0a2e1a;
+            letter-spacing: -0.02em;
+        }
+
+        .stat-label {
+            display: block;
+            font-size: 0.78rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: #6c7e96;
+        }
+
+        /* ── Enhanced Toolbar ── */
+        .toolbar {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(16px);
+            border-radius: 24px;
+            padding: 18px 24px;
+            margin-bottom: 28px;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, .06), 0 4px 12px rgba(0, 0, 0, .03);
+            transition: all 0.3s ease;
+        }
+
+        .toolbar:hover {
+            box-shadow: 0 15px 50px rgba(0, 0, 0, .08), 0 6px 16px rgba(0, 0, 0, .04);
+            background: rgba(255, 255, 255, 0.92);
+        }
+
+        .search-wrap {
+            flex: 1;
+            min-width: 280px;
+            position: relative;
+        }
+
+        .search-wrap i {
+            position: absolute;
+            left: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #8aadc9;
+            font-size: 1.1rem;
+            pointer-events: none;
+            transition: color 0.3s ease;
+        }
+
+        .search-wrap input {
+            width: 100%;
+            padding: 13px 50px 13px 50px;
+            border: 2px solid #e9edf2;
+            border-radius: 50px;
+            font-size: 1rem;
+            background: rgba(255, 255, 255, 0.9);
+            transition: all 0.3s ease;
+            outline: none;
+            font-weight: 500;
+            color: #0a2e1a;
+        }
+
+        .search-wrap input:focus {
+            border-color: #2e7d32;
+            background: #ffffff;
+            box-shadow: 0 0 0 5px rgba(46, 125, 50, 0.08), 0 8px 24px rgba(0, 0, 0, 0.04);
+            transform: scale(1.01);
+        }
+
+        .search-wrap input:focus + i {
+            color: #2e7d32;
+        }
+
+        .search-wrap input::placeholder {
+            color: #a5b9cd;
+            font-weight: 400;
+        }
+
+        .clear-search {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            border: none;
+            background: transparent;
+            color: #9aa8b5;
+            cursor: pointer;
+            display: none;
+            font-size: 18px;
+            padding: 4px 8px;
+            transition: all 0.3s ease;
+            border-radius: 50%;
+            line-height: 1;
+        }
+
+        .clear-search:hover {
+            color: #dc3545;
+            transform: translateY(-50%) scale(1.2);
+        }
+
+        .clear-search.show {
+            display: block;
+        }
+
+        .result-badge {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #5a738a;
+            background: #eef2f7;
+            padding: 8px 24px;
+            border-radius: 50px;
+            white-space: nowrap;
+            transition: all 0.3s ease;
+            border: 1px solid #e5e9ef;
+        }
+
+        .result-badge:hover {
+            background: #dce4ed;
+            transform: scale(1.02);
+        }
+
+        /* ── Enhanced Table Card ── */
+        .table-card {
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(12px);
+            border-radius: 24px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 15px 50px rgba(0, 0, 0, .06), 0 6px 18px rgba(0, 0, 0, .03);
+        }
+
+        .table-card:hover {
+            box-shadow: 0 25px 70px rgba(0, 0, 0, .10), 0 8px 24px rgba(0, 0, 0, .05);
+            transform: translateY(-2px);
+        }
+
+        /* ── Enhanced Table ── */
+        .purchase-table {
+            margin: 0;
+            font-size: 0.95rem;
+            border-collapse: separate;
+            border-spacing: 0;
+            width: 100%;
+        }
+
+        .purchase-table thead {
+            background: linear-gradient(135deg, #f8faff, #eef2f7);
+            border-bottom: 2px solid #e5e9ef;
+        }
+
+        .purchase-table thead th {
+            font-weight: 700;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #4a6a8a;
+            padding: 18px 22px;
+            border: 0;
+            position: relative;
+            white-space: nowrap;
+        }
+
+        .purchase-table thead th::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #2e7d32, transparent);
+            transition: width 0.3s ease;
+        }
+
+        .purchase-table thead:hover th::after {
+            width: 60%;
+        }
+
+        .purchase-table thead th:first-child {
+            padding-left: 24px;
+        }
+
+        .purchase-table thead th:last-child {
+            padding-right: 24px;
+        }
+
+        .purchase-table tbody td {
+            padding: 16px 22px;
+            vertical-align: middle;
+            border-bottom: 1px solid #f0f3f9;
+            background: transparent;
+            transition: all 0.2s ease;
+        }
+
+        .purchase-table tbody tr {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: default;
+        }
+
+        .purchase-table tbody tr:hover td {
+            background: rgba(46, 125, 50, 0.04);
+            transform: scale(1.003);
+        }
+
+        .purchase-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .purchase-table tbody td:first-child {
+            padding-left: 24px;
+        }
+
+        .purchase-table tbody td:last-child {
+            padding-right: 24px;
+        }
+
+        /* ── Purchase ID Badge ── */
+        .purchase-id {
+            background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
+            color: #2e7d32;
+            border: 1px solid #a5d6a7;
+            padding: 5px 16px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
+
+        .purchase-table tbody tr:hover .purchase-id {
+            transform: scale(1.02);
+            box-shadow: 0 2px 12px rgba(46, 125, 50, 0.15);
+        }
+
+        .supplier-name {
+            font-weight: 700;
+            color: #0a2e1a;
+            font-size: 0.95rem;
+        }
+
+        .invoice-number {
+            color: #4a5d7a;
+            font-weight: 500;
+        }
+
+        .amount {
+            color: #2e7d32;
+            font-weight: 800;
+            font-size: 1.05rem;
+            letter-spacing: -0.3px;
+        }
+
+        /* ── Enhanced Actions ── */
+        .action-group {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 14px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            color: #71869a;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid transparent;
+            position: relative;
+            background: transparent;
+        }
+
+        .btn-icon:hover {
+            transform: translateY(-3px) scale(1.08);
+            text-decoration: none;
+        }
+
+        .btn-icon::after {
+            content: attr(title);
+            position: absolute;
+            bottom: -28px;
+            left: 50%;
+            transform: translateX(-50%) scale(0);
+            background: #0a2e1a;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 8px;
+            font-size: 0.7rem;
+            font-weight: 500;
+            white-space: nowrap;
+            opacity: 0;
+            transition: all 0.3s ease;
+            pointer-events: none;
+        }
+
+        .btn-icon:hover::after {
+            transform: translateX(-50%) scale(1);
+            opacity: 1;
+        }
+
+        .btn-icon.view {
+            border-color: #d4e3f0;
+            color: #3a6b8f;
+        }
+
+        .btn-icon.view:hover {
+            background: #eaf3fa;
+            border-color: #b0cfe0;
+            color: #1f4a6b;
+            box-shadow: 0 6px 20px rgba(58, 107, 143, 0.15);
+        }
+
+        .btn-icon.edit {
+            border-color: #dce3ef;
+            color: #3d5a80;
+        }
+
+        .btn-icon.edit:hover {
+            background: #eef3fc;
+            border-color: #b6c8e0;
+            color: #1f3a5f;
+            box-shadow: 0 6px 20px rgba(61, 90, 128, 0.15);
+        }
+
+        .btn-icon.delete {
+            border-color: #f1e0e0;
+            color: #b34a4a;
+        }
+
+        .btn-icon.delete:hover {
+            background: #fef0f0;
+            border-color: #e8c4c4;
+            color: #9e2d2d;
+            box-shadow: 0 6px 20px rgba(179, 74, 74, 0.15);
+        }
+
+        /* ── Empty State ── */
+        .empty-state {
+            padding: 70px 20px;
+            text-align: center;
+            color: #8a99b0;
+        }
+
+        .empty-state i {
+            font-size: 72px;
+            color: #c5d5e5;
+            display: block;
+            margin-bottom: 20px;
+            animation: float 4s ease-in-out infinite;
+        }
+
+        @@keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-12px) rotate(2deg); }
+        }
+
+        .empty-state h6 {
+            font-weight: 800;
+            color: #1a3a5a;
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+            letter-spacing: -0.5px;
+        }
+
+        .empty-state p {
+            color: #7a93ab;
+            font-size: 1rem;
+            max-width: 400px;
+            margin: 0 auto 24px;
+            line-height: 1.6;
+        }
+
+        .empty-state .btn-success {
+            border-radius: 50px;
+            padding: 10px 28px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .empty-state .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(46, 125, 50, 0.25);
+        }
+
+        /* ── Footer ── */
+        .table-footer {
+            background: rgba(248, 250, 252, 0.9);
+            padding: 16px 24px;
+            border-top: 1px solid #e5e9ef;
+            font-size: 0.9rem;
+            color: #5a7a9a;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .table-footer .total-badge {
+            background: #eef2f7;
+            padding: 6px 20px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: #2a5a7a;
+            transition: all 0.3s ease;
+        }
+
+        .table-footer .total-badge:hover {
+            background: #dce4ed;
+            transform: scale(1.02);
+        }
+
+        /* ── Animations ── */
+        .fade-in {
+            animation: fadeInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+            opacity: 0;
+        }
+
+        @@keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px) scale(0.98);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .fade-in:nth-child(1) { animation-delay: 0.03s; }
+        .fade-in:nth-child(2) { animation-delay: 0.06s; }
+        .fade-in:nth-child(3) { animation-delay: 0.09s; }
+        .fade-in:nth-child(4) { animation-delay: 0.12s; }
+        .fade-in:nth-child(5) { animation-delay: 0.15s; }
+        .fade-in:nth-child(6) { animation-delay: 0.18s; }
+        .fade-in:nth-child(7) { animation-delay: 0.21s; }
+        .fade-in:nth-child(8) { animation-delay: 0.24s; }
+        .fade-in:nth-child(9) { animation-delay: 0.27s; }
+        .fade-in:nth-child(10) { animation-delay: 0.30s; }
+
+        /* ── Toast Notification ── */
+        .toast-container {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 9999;
+        }
+
+        .toast-message {
+            background: rgba(10, 46, 26, 0.95);
+            backdrop-filter: blur(12px);
+            color: white;
+            padding: 16px 28px;
+            border-radius: 16px;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.2);
+            font-weight: 500;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .toast-message.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        /* ── Responsive ── */
+        @@media (max-width: 992px) {
             body {
-                background: #f4f7fc;
                 padding: 20px;
-                min-height: 100vh;
             }
-
-            .purchase-container {
-                max-width: 1250px;
-                margin: 0 auto;
-            }
-
-            /* HEADER */
 
             .page-header {
-                background: #fff;
+                padding: 24px 28px;
+            }
+
+            .page-header .header-title h5 {
+                font-size: 1.5rem;
+            }
+        }
+
+        @@media (max-width: 768px) {
+            body {
+                padding: 16px;
+            }
+
+            .page-header {
+                padding: 20px 18px;
                 border-radius: 20px;
-                padding: 18px 24px;
-                margin-bottom: 24px;
-                box-shadow: 0 4px 20px rgba(0,0,0,.04);
-                display: flex;
-                flex-wrap: wrap;
-                align-items: center;
+                flex-direction: column;
+                align-items: stretch;
                 gap: 16px;
             }
 
             .header-icon {
-                width: 48px;
-                height: 48px;
-                background: #e8f5e9;
-                border-radius: 14px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                font-size: 24px;
-                color: #2e7d32;
+                width: 56px;
+                height: 56px;
+                font-size: 26px;
             }
 
             .header-title h5 {
-                font-weight: 700;
-                margin: 0;
-                color: #0b2a3e;
-                font-size: 1.2rem;
-            }
-
-            .header-title small {
-                color: #6c7e96;
+                font-size: 1.3rem;
             }
 
             .btn-new {
-                margin-left: auto;
-                background: linear-gradient(135deg,#1b5e20,#2e7d32);
-                border: none;
-                padding: 9px 22px;
-                border-radius: 40px;
-                font-weight: 600;
-                color: #fff;
-                text-decoration: none;
-                display: inline-flex;
-                align-items: center;
-                gap: 8px;
-                transition: .25s;
+                margin-left: 0;
+                justify-content: center;
+                width: 100%;
             }
 
-                .btn-new:hover {
-                    color: #fff;
-                    transform: translateY(-2px);
-                    box-shadow: 0 8px 25px rgba(46,125,50,.3);
-                }
-
-            /* STATS */
-
             .stats-row {
-                display: flex;
-                flex-wrap: wrap;
-                gap: 16px;
-                margin-bottom: 20px;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 14px;
             }
 
             .stat-card {
-                background: #fff;
-                border-radius: 16px;
-                padding: 16px 22px;
-                flex: 1 1 200px;
-                box-shadow: 0 2px 12px rgba(0,0,0,.04);
-                display: flex;
-                align-items: center;
-                gap: 14px;
-                border: 1px solid #eef2f6;
+                padding: 16px 18px;
             }
 
             .stat-icon {
                 width: 44px;
                 height: 44px;
-                border-radius: 12px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
                 font-size: 20px;
             }
 
-            .blue {
-                background: #e8f4fd;
-                color: #0d6efd;
-            }
-
-            .green {
-                background: #e6f7ed;
-                color: #2e7d32;
-            }
-
-            .orange {
-                background: #fef3e8;
-                color: #e97c07;
-            }
-
             .stat-number {
-                font-weight: 700;
-                font-size: 1.25rem;
-                color: #0b2a3e;
+                font-size: 1.2rem;
             }
-
-            .stat-label {
-                display: block;
-                font-size: .75rem;
-                font-weight: 500;
-                text-transform: uppercase;
-                letter-spacing: .4px;
-                color: #6c7e96;
-            }
-
-            /* TOOLBAR */
 
             .toolbar {
-                background: #fff;
-                border-radius: 16px;
-                padding: 12px 20px;
-                margin-bottom: 20px;
-                display: flex;
-                align-items: center;
+                padding: 16px 18px;
+                flex-direction: column;
+                align-items: stretch;
                 gap: 12px;
-                border: 1px solid #eef2f6;
-                box-shadow: 0 2px 12px rgba(0,0,0,.04);
             }
 
             .search-wrap {
-                flex: 1;
-                position: relative;
+                min-width: 100%;
             }
-
-                .search-wrap i {
-                    position: absolute;
-                    left: 15px;
-                    top: 50%;
-                    transform: translateY(-50%);
-                    color: #9db0c0;
-                }
-
-                .search-wrap input {
-                    width: 100%;
-                    padding: 9px 40px;
-                    border: 1.5px solid #e2e8f0;
-                    border-radius: 40px;
-                    background: #f8fafc;
-                    outline: none;
-                }
-
-                    .search-wrap input:focus {
-                        border-color: #2e7d32;
-                        background: #fff;
-                        box-shadow: 0 0 0 4px rgba(46,125,50,.08);
-                    }
 
             .result-badge {
-                background: #f0f4f9;
-                color: #5a738a;
-                padding: 5px 16px;
-                border-radius: 40px;
-                white-space: nowrap;
-            }
-
-            /* TABLE */
-
-            .table-card {
-                background: #fff;
-                border-radius: 20px;
-                overflow: hidden;
-                border: 1px solid #eef2f6;
-                box-shadow: 0 4px 20px rgba(0,0,0,.04);
-            }
-
-            .purchase-table {
-                margin: 0;
-                font-size: .9rem;
-            }
-
-                .purchase-table thead {
-                    background: #f8fafc;
-                }
-
-                .purchase-table th {
-                    padding: 14px 18px;
-                    border: 0;
-                    color: #5a738a;
-                    font-size: .75rem;
-                    text-transform: uppercase;
-                    letter-spacing: .5px;
-                }
-
-                .purchase-table td {
-                    padding: 14px 18px;
-                    vertical-align: middle;
-                    border-bottom: 1px solid #f0f3f7;
-                }
-
-                .purchase-table tbody tr:hover {
-                    background: #fafcff;
-                }
-
-            /* BADGES */
-
-            .purchase-id {
-                background: #e8f5e9;
-                color: #2e7d32;
-                border: 1px solid #c8e6c9;
-                padding: 5px 12px;
-                border-radius: 40px;
-                font-weight: 600;
-            }
-
-            .supplier-name {
-                font-weight: 600;
-                color: #243b53;
-            }
-
-            .invoice-number {
-                color: #607d8b;
-            }
-
-            .amount {
-                color: #2e7d32;
-                font-weight: 700;
-            }
-
-            /* ACTIONS */
-
-            .action-group {
-                display: flex;
-                justify-content: center;
-                gap: 5px;
-            }
-
-            .btn-icon {
-                width: 34px;
-                height: 34px;
-                border-radius: 10px;
-                display: inline-flex;
-                align-items: center;
-                justify-content: center;
-                text-decoration: none;
-                color: #71869a;
-                transition: .2s;
-            }
-
-                .btn-icon:hover {
-                    transform: scale(1.05);
-                }
-
-                .btn-icon.view:hover {
-                    background: #e8f4fd;
-                    color: #0d6efd;
-                }
-
-                .btn-icon.edit:hover {
-                    background: #fef3e8;
-                    color: #e97c07;
-                }
-
-                .btn-icon.delete:hover {
-                    background: #fde8e8;
-                    color: #d93025;
-                }
-
-            /* EMPTY */
-
-            .empty-state {
-                padding: 60px 20px;
                 text-align: center;
             }
 
-            .empty-icon {
-                font-size: 50px;
-                color: #d0dce8;
-                margin-bottom: 12px;
+            .table-card {
+                border-radius: 18px;
             }
 
-            .empty-state h6 {
-                color: #1a3a5a;
-                font-weight: 600;
+            .purchase-table thead {
+                display: none;
             }
 
-            .empty-state p {
-                color: #7a93ab;
+            .purchase-table tbody tr {
+                display: block;
+                padding: 20px 16px 16px;
+                border-bottom: 1px solid #eef2f6;
+                background: transparent;
             }
 
-            /* FOOTER */
+            .purchase-table tbody tr:last-child {
+                border-bottom: 0;
+            }
+
+            .purchase-table tbody td {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                padding: 8px 0;
+                border: 0;
+                background: transparent;
+                font-size: 0.95rem;
+            }
+
+            .purchase-table tbody td::before {
+                content: attr(data-label);
+                font-weight: 700;
+                color: #5a7a9a;
+                font-size: 0.8rem;
+                text-transform: uppercase;
+                letter-spacing: 0.8px;
+            }
+
+            .purchase-table tbody td:first-child {
+                padding-top: 0;
+            }
+
+            .purchase-table tbody td:last-child {
+                padding-bottom: 0;
+                border-top: 1px solid #f0f3f7;
+                margin-top: 12px;
+                padding-top: 14px;
+                justify-content: center;
+            }
+
+            .purchase-table tbody td:last-child::before {
+                display: none;
+            }
+
+            .btn-icon {
+                width: 48px;
+                height: 48px;
+                font-size: 1.15rem;
+            }
+
+            .btn-icon::after {
+                display: none;
+            }
 
             .table-footer {
-                background: #fafcfe;
-                padding: 14px 20px;
-                border-top: 1px solid #eef2f6;
-                display: flex;
-                justify-content: space-between;
-                color: #5a738a;
-                font-size: .85rem;
+                flex-direction: column;
+                text-align: center;
+                padding: 14px 18px;
+                gap: 6px;
             }
 
-            /* RESPONSIVE */
-
-            @@media(max-width:768px) {
-
-                body {
-                    padding: 12px;
-                }
-
-                .page-header {
-                    padding: 14px 16px;
-                }
-
-                .btn-new {
-                    margin-left: 0;
-                    width: 100%;
-                    justify-content: center;
-                }
-
-                .toolbar {
-                    flex-direction: column;
-                    align-items: stretch;
-                }
-
-                .purchase-table thead {
-                    display: none;
-                }
-
-                .purchase-table tbody tr {
-                    display: block;
-                    padding: 15px;
-                    border-bottom: 1px solid #eef2f6;
-                }
-
-                .purchase-table td {
-                    display: flex;
-                    justify-content: space-between;
-                    padding: 5px 0;
-                    border: 0;
-                }
-
-                    .purchase-table td::before {
-                        content: attr(data-label);
-                        color: #5a738a;
-                        font-size: .7rem;
-                        font-weight: 600;
-                        text-transform: uppercase;
-                    }
-
-                    .purchase-table td:last-child {
-                        justify-content: center;
-                        border-top: 1px solid #f0f3f7;
-                        margin-top: 8px;
-                        padding-top: 10px;
-                    }
-
-                        .purchase-table td:last-child::before {
-                            display: none;
-                        }
-
-                .table-footer {
-                    flex-direction: column;
-                    text-align: center;
-                    gap: 5px;
-                }
+            .empty-state {
+                padding: 44px 16px;
             }
 
+            .empty-state i {
+                font-size: 52px;
+            }
+        }
+
+        @@media (max-width: 480px) {
+            .stats-row {
+                grid-template-columns: 1fr;
+            }
+
+            .header-title h5 {
+                font-size: 1.1rem;
+            }
+        }
+
+        /* ── Scrollbar Styling ── */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #eef2f7;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #c5d5e5;
+            border-radius: 10px;
+            transition: background 0.3s ease;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #8aadc9;
+        }
     </style>
 </head>
 
@@ -426,414 +956,436 @@
 
     <div class="purchase-container">
 
-        <!-- HEADER -->
-
+        <!-- ─── HEADER ─── -->
         <div class="page-header">
-
             <div class="header-icon">
-                <i class="bi bi-cart-check"></i>
+                <i class="bi bi-cart-check-fill"></i>
             </div>
-
             <div class="header-title">
-
                 <h5>
                     Purchases
-
-                    <span class="badge bg-success ms-2">
+                    <span class="badge-count">
+                        <i class="bi bi-database me-1"></i>
                         @totalPurchases total
                     </span>
                 </h5>
-
-                <small>All purchase transactions</small>
-
+                <small><i class="bi bi-clock-history me-1"></i> Manage all purchase transactions</small>
             </div>
-
-            <a asp-controller="Purchase"
-               asp-action="Create"
-               class="btn-new">
-
-                <i class="bi bi-plus-circle"></i>
-
+            <a asp-controller="Purchase" asp-action="Create" class="btn-new">
+                <i class="bi bi-plus-lg"></i>
                 New Purchase
-
             </a>
-
         </div>
 
-
-        <!-- STATS -->
-
+        <!-- ─── STATS ROW ─── -->
         <div class="stats-row">
-
             <div class="stat-card">
-
                 <div class="stat-icon blue">
                     <i class="bi bi-cart-check"></i>
                 </div>
-
                 <div>
-                    <span class="stat-number">
-                        @totalPurchases
-                    </span>
-
-                    <span class="stat-label">
-                        Total Purchases
-                    </span>
+                    <span class="stat-number">@totalPurchases</span>
+                    <span class="stat-label">Total Purchases</span>
                 </div>
-
             </div>
 
-
             <div class="stat-card">
-
                 <div class="stat-icon green">
                     <i class="bi bi-currency-rupee"></i>
                 </div>
-
                 <div>
-
-                    <span class="stat-number">
-                        ₹@totalAmount.ToString("N2")
-                    </span>
-
-                    <span class="stat-label">
-                        Net Purchase Amount
-                    </span>
-
+                    <span class="stat-number">₹@totalAmount.ToString("N2")</span>
+                    <span class="stat-label">Net Purchase Amount</span>
                 </div>
-
             </div>
 
+            <div class="stat-card">
+                <div class="stat-icon purple">
+                    <i class="bi bi-tag"></i>
+                </div>
+                <div>
+                    <span class="stat-number">₹@totalDiscount.ToString("N2")</span>
+                    <span class="stat-label">Total Discount</span>
+                </div>
+            </div>
 
             <div class="stat-card">
-
                 <div class="stat-icon orange">
                     <i class="bi bi-calendar-event"></i>
                 </div>
-
                 <div>
-
                     <span class="stat-number">
                         @(totalPurchases > 0
                             ? latestPurchase.ToString("dd MMM yyyy")
                             : "—")
                     </span>
-
-                    <span class="stat-label">
-                        Latest Purchase
-                    </span>
-
+                    <span class="stat-label">Latest Purchase</span>
                 </div>
-
             </div>
-
         </div>
 
-
-        <!-- SEARCH -->
-
+        <!-- ─── TOOLBAR ─── -->
         <div class="toolbar">
-
             <div class="search-wrap">
-
                 <i class="bi bi-search"></i>
-
                 <input type="text"
                        id="purchaseSearch"
-                       placeholder="Search purchase, supplier, invoice..."
-                       autocomplete="off" />
-
+                       placeholder="Search by ID, supplier, invoice..."
+                       autocomplete="off"
+                       value="@ViewBag.CurrentSearch" />
+                <button type="button" id="clearSearch" class="clear-search" title="Clear Search">
+                    <i class="bi bi-x-lg"></i>
+                </button>
             </div>
-
-            <span class="result-badge"
-                  id="resultCount">
-
+            <span class="result-badge" id="resultCount">
+                <i class="bi bi-funnel me-1"></i>
                 @totalPurchases results
-
             </span>
-
         </div>
 
-
-        <!-- TABLE -->
-
+        <!-- ─── TABLE ─── -->
         <div class="table-card">
-
             <div class="table-responsive">
-
-                <table class="table purchase-table">
-
+                <table class="table purchase-table" id="purchaseTable">
                     <thead>
-
                         <tr>
-
-                            <th>Purchase ID</th>
-
-                            <th>Date</th>
-
-                            <th>Supplier</th>
-
-                            <th>Invoice No</th>
-
-                            <th class="text-end">Grand Total</th>
-
-                            <th class="text-end">Discount</th>
-
-                            <th class="text-end">Net Total</th>
-
-                            <th class="text-center">
-                                Actions
-                            </th>
-
+                            <th style="width:110px">Purchase ID</th>
+                            <th style="min-width:120px">Date</th>
+                            <th style="min-width:150px">Supplier</th>
+                            <th style="min-width:120px">Invoice No</th>
+                            <th class="text-end" style="width:120px">Grand Total</th>
+                            <th class="text-end" style="width:100px">Discount</th>
+                            <th class="text-end" style="width:120px">Net Total</th>
+                            <th class="text-center" style="width:150px">Actions</th>
                         </tr>
-
                     </thead>
-
                     <tbody id="purchaseTableBody">
-
                         @if (!purchases.Any())
                         {
                             <tr>
-
                                 <td colspan="8">
-
                                     <div class="empty-state">
-
-                                        <i class="bi bi-cart-x empty-icon"></i>
-
-                                        <h6>
-                                            No purchase records found
-                                        </h6>
-
-                                        <p>
-                                            Start by creating your first purchase.
-                                        </p>
-
-                                        <a asp-controller="Purchase"
-                                           asp-action="Create"
-                                           class="btn btn-success btn-sm">
-
-                                            <i class="bi bi-plus-circle me-1"></i>
-
-                                            New Purchase
-
-                                        </a>
-
+                                        @if (!string.IsNullOrEmpty(ViewBag.CurrentSearch))
+                                        {
+                                            <i class="bi bi-search"></i>
+                                            <h6>No matching purchases</h6>
+                                            <p>No purchases found matching "<strong>@ViewBag.CurrentSearch</strong>". Try adjusting your search.</p>
+                                            <a asp-controller="Purchase" asp-action="Index" class="btn btn-success btn-sm">
+                                                <i class="bi bi-arrow-left me-1"></i> Clear Search
+                                            </a>
+                                        }
+                                        else
+                                        {
+                                            <i class="bi bi-cart-x"></i>
+                                            <h6>No purchase records found</h6>
+                                            <p>Start by creating your first purchase transaction.</p>
+                                            <a asp-controller="Purchase" asp-action="Create" class="btn btn-success btn-sm">
+                                                <i class="bi bi-plus-lg me-1"></i> New Purchase
+                                            </a>
+                                        }
                                     </div>
-
                                 </td>
-
                             </tr>
                         }
                         else
                         {
-                            foreach (var item in purchases)
+                            @foreach (var item in purchases)
                             {
-                                <tr class="purchase-row"
-                                    data-search="
-                                    @item.PurId
-                                    @item.SupplierName
-                                    @item.InvoiceNo
-                                    @item.PurchaseDate.ToString("dd-MM-yyyy")
-                                    ">
-
+                                <tr class="fade-in purchase-row"
+                                    data-search="@item.PurId @item.SupplierName @item.InvoiceNo @item.PurchaseDate.ToString("dd-MM-yyyy")">
                                     <td data-label="Purchase ID">
-
                                         <span class="purchase-id">
-
                                             PUR-@item.PurId.ToString("D4")
-
                                         </span>
-
                                     </td>
-
                                     <td data-label="Date">
-
+                                        <i class="bi bi-calendar3 me-1" style="font-size:0.8rem; opacity:0.6;"></i>
                                         @item.PurchaseDate.ToString("dd-MM-yyyy")
-
                                     </td>
-
                                     <td data-label="Supplier">
-
                                         <span class="supplier-name">
-
+                                            <i class="bi bi-building me-1" style="font-size:0.8rem; opacity:0.6;"></i>
                                             @(item.SupplierName ?? "N/A")
-
                                         </span>
-
                                     </td>
-
                                     <td data-label="Invoice No">
-
                                         <span class="invoice-number">
-
-                                            @(string.IsNullOrWhiteSpace(item.InvoiceNo)
-                                                ? "—"
-                                                : item.InvoiceNo)
-
+                                            <i class="bi bi-receipt me-1" style="font-size:0.8rem; opacity:0.6;"></i>
+                                            @(string.IsNullOrWhiteSpace(item.InvoiceNo) ? "—" : item.InvoiceNo)
                                         </span>
-
                                     </td>
-
-                                    <td data-label="Grand Total"
-                                        class="text-end">
-
+                                    <td data-label="Grand Total" class="text-end">
                                         ₹@item.GrandTotal.ToString("N2")
-
                                     </td>
-
-                                    <td data-label="Discount"
-                                        class="text-end">
-
-                                        ₹@item.Discount.ToString("N2")
-
+                                    <td data-label="Discount" class="text-end">
+                                        <span style="color:#e97c07;">₹@item.Discount.ToString("N2")</span>
                                     </td>
-
-                                    <td data-label="Net Total"
-                                        class="text-end amount">
-
+                                    <td data-label="Net Total" class="text-end amount">
                                         ₹@item.NetTotal.ToString("N2")
-
                                     </td>
-
-                                    <td data-label="Actions">
-
+                                    <td data-label="Actions" class="text-center">
                                         <div class="action-group">
-
-                                            <a asp-controller="Purchase"
-                                               asp-action="Details"
-                                               asp-route-id="@item.PurId"
-                                               class="btn-icon view"
-                                               title="View">
-
+                                            <a asp-controller="Purchase" asp-action="Details" asp-route-id="@item.PurId"
+                                               class="btn-icon view" title="View Details">
                                                 <i class="bi bi-eye"></i>
-
                                             </a>
-
-                                            <a asp-controller="Purchase"
-                                               asp-action="Edit"
-                                               asp-route-id="@item.PurId"
-                                               class="btn-icon edit"
-                                               title="Edit">
-
-                                                <i class="bi bi-pencil-square"></i>
-
+                                            <a asp-controller="Purchase" asp-action="Edit" asp-route-id="@item.PurId"
+                                               class="btn-icon edit" title="Edit Purchase">
+                                                <i class="bi bi-pencil"></i>
                                             </a>
-
-                                            <a asp-controller="Purchase"
-                                               asp-action="Delete"
-                                               asp-route-id="@item.PurId"
-                                               class="btn-icon delete"
-                                               title="Delete">
-
+                                            <a asp-controller="Purchase" asp-action="Delete" asp-route-id="@item.PurId"
+                                               class="btn-icon delete" title="Delete Purchase">
                                                 <i class="bi bi-trash"></i>
-
                                             </a>
-
                                         </div>
-
                                     </td>
-
                                 </tr>
                             }
                         }
-
                     </tbody>
-
                 </table>
-
             </div>
 
-
+            <!-- ─── FOOTER ─── -->
             <div class="table-footer">
-
                 <span>
-
                     <i class="bi bi-list-ul me-1"></i>
-
-                    Showing
-
-                    <strong id="visibleCount">
-                        @totalPurchases
-                    </strong>
-
-                    purchases
-
+                    Showing <strong id="visibleCount">@totalPurchases</strong> of <strong id="totalCount">@ViewBag.TotalRecords</strong> purchases
                 </span>
-
-                <span>
-
+                <span class="total-badge">
                     <i class="bi bi-shield-check me-1"></i>
-
                     Secure Medical Store Management
-
                 </span>
-
             </div>
-
         </div>
 
     </div>
 
-
     <script>
+        (function() {
+            'use strict';
 
-            (function() {
+            const allPurchases = @Html.Raw(Json.Serialize(allPurchasesData));
+            const searchInput = document.getElementById('purchaseSearch');
+            const clearButton = document.getElementById('clearSearch');
+            const tbody = document.getElementById('purchaseTableBody');
+            const visibleCount = document.getElementById('visibleCount');
+            const totalCount = document.getElementById('totalCount');
+            const resultCount = document.getElementById('resultCount');
+            const currentPage = @ViewBag.CurrentPage;
 
-                const searchInput =
-                    document.getElementById("purchaseSearch");
+            let searchTimeout;
 
-                const resultCount =
-                    document.getElementById("resultCount");
+            function escapeHtml(text) {
+                if (!text) return '';
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            }
 
-                const rows =
-                    document.querySelectorAll(".purchase-row");
+            function toggleClearButton() {
+                if (searchInput.value.trim().length > 0) {
+                    clearButton.classList.add('show');
+                } else {
+                    clearButton.classList.remove('show');
+                }
+            }
 
-                const visibleCount =
-                    document.getElementById("visibleCount");
+            function showToast(message, type) {
+                const existingToast = document.querySelector('.toast-container');
+                if (existingToast) {
+                    existingToast.remove();
+                }
 
+                const container = document.createElement('div');
+                container.className = 'toast-container';
+                const toast = document.createElement('div');
+                toast.className = 'toast-message';
+                const icon = type === 'success' ? 'check-circle' : type === 'warning' ? 'exclamation-triangle' : 'info-circle';
+                toast.innerHTML = `<i class="bi bi-${icon} me-2"></i> ${message}`;
+                container.appendChild(toast);
+                document.body.appendChild(container);
 
-                searchInput.addEventListener("input", function() {
+                setTimeout(() => toast.classList.add('show'), 10);
 
-                    const search =
-                        this.value.trim().toLowerCase();
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                    setTimeout(() => container.remove(), 500);
+                }, 3000);
+            }
 
-                    let count = 0;
+            function renderFilteredPurchases(searchTerm) {
+                const trimmedTerm = searchTerm.trim();
 
+                if (trimmedTerm === "") {
+                    window.location.href = '@Url.Action("Index", new { page = -1 })'.replace('-1', currentPage);
+                    return;
+                }
 
-                    rows.forEach(function(row) {
+                const lowerSearch = trimmedTerm.toLowerCase();
 
-                        const text =
-                            row.getAttribute("data-search")
-                                .toLowerCase();
+                const filtered = allPurchases.filter(p =>
+                    (p.purId && p.purId.toString().includes(lowerSearch)) ||
+                    (p.supplierName && p.supplierName.toLowerCase().includes(lowerSearch)) ||
+                    (p.invoiceNo && p.invoiceNo.toLowerCase().includes(lowerSearch)) ||
+                    (p.purchaseDate && new Date(p.purchaseDate).toLocaleDateString('en-IN').includes(lowerSearch))
+                );
 
-                        if (text.includes(search)) {
+                const total = allPurchases.length;
+                const shown = filtered.length;
 
-                            row.style.display = "";
+                if (visibleCount) visibleCount.textContent = shown;
+                if (totalCount) totalCount.textContent = total;
+                if (resultCount) {
+                    resultCount.innerHTML = `<i class="bi bi-funnel me-1"></i> ${shown} result${shown !== 1 ? 's' : ''}`;
+                }
 
-                            count++;
+                toggleClearButton();
 
-                        }
-                        else {
+                if (filtered.length === 0) {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="8">
+                                <div class="empty-state">
+                                    <i class="bi bi-search"></i>
+                                    <h6>No matching purchases</h6>
+                                    <p>No purchases found matching "<strong>${escapeHtml(trimmedTerm)}</strong>". Try adjusting your search.</p>
+                                    <button type="button" id="clearSearchFromMsg" class="btn btn-success btn-sm">
+                                        <i class="bi bi-arrow-left me-1"></i> Clear Search
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                    
+                    const clearBtnMsg = document.getElementById('clearSearchFromMsg');
+                    if (clearBtnMsg) {
+                        clearBtnMsg.addEventListener('click', function() {
+                            clearButton.click();
+                        });
+                    }
+                    
+                    showToast('No purchases found matching your search', 'warning');
+                    return;
+                }
 
-                            row.style.display = "none";
-
-                        }
-
+                let html = '';
+                filtered.forEach(function(p, index) {
+                    const delay = Math.min(index * 0.03, 0.3);
+                    const formattedDate = new Date(p.purchaseDate).toLocaleDateString('en-IN', {
+                        day: '2-digit',
+                        month: '2-digit',
+                        year: 'numeric'
                     });
 
-
-                    visibleCount.textContent = count;
-
-                    resultCount.textContent =
-                        count +
-                        " result" +
-                        (count !== 1 ? "s" : "");
-
+                    html += `
+                        <tr class="fade-in purchase-row" style="animation-delay: ${delay}s">
+                            <td data-label="Purchase ID">
+                                <span class="purchase-id">PUR-${String(p.purId).padStart(4, '0')}</span>
+                            </td>
+                            <td data-label="Date">
+                                <i class="bi bi-calendar3 me-1" style="font-size:0.8rem; opacity:0.6;"></i>
+                                ${formattedDate}
+                            </td>
+                            <td data-label="Supplier">
+                                <span class="supplier-name">
+                                    <i class="bi bi-building me-1" style="font-size:0.8rem; opacity:0.6;"></i>
+                                    ${p.supplierName ? escapeHtml(p.supplierName) : 'N/A'}
+                                </span>
+                            </td>
+                            <td data-label="Invoice No">
+                                <span class="invoice-number">
+                                    <i class="bi bi-receipt me-1" style="font-size:0.8rem; opacity:0.6;"></i>
+                                    ${p.invoiceNo ? escapeHtml(p.invoiceNo) : '—'}
+                                </span>
+                            </td>
+                            <td data-label="Grand Total" class="text-end">
+                                ₹${parseFloat(p.grandTotal).toFixed(2)}
+                            </td>
+                            <td data-label="Discount" class="text-end">
+                                <span style="color:#e97c07;">₹${parseFloat(p.discount).toFixed(2)}</span>
+                            </td>
+                            <td data-label="Net Total" class="text-end amount">
+                                ₹${parseFloat(p.netTotal).toFixed(2)}
+                            </td>
+                            <td data-label="Actions" class="text-center">
+                                <div class="action-group">
+                                    <a href="/Purchase/Details/${p.purId}" class="btn-icon view" title="View Details">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    <a href="/Purchase/Edit/${p.purId}" class="btn-icon edit" title="Edit Purchase">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <a href="/Purchase/Delete/${p.purId}" class="btn-icon delete" title="Delete Purchase">
+                                        <i class="bi bi-trash"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    `;
                 });
 
-            })();
+                tbody.innerHTML = html;
+                
+                if (shown > 0) {
+                    showToast(`Found ${shown} purchase${shown > 1 ? 's' : ''} matching your search`, 'success');
+                }
+            }
 
+            // ── Event Listeners ──
+
+            searchInput.addEventListener('input', function() {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => {
+                    renderFilteredPurchases(this.value);
+                }, 300);
+            });
+
+            clearButton.addEventListener('click', function() {
+                searchInput.value = '';
+                clearButton.classList.remove('show');
+                window.location.href = '@Url.Action("Index", new { page = -1 })'.replace('-1', currentPage);
+            });
+
+            searchInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    clearTimeout(searchTimeout);
+                    renderFilteredPurchases(this.value);
+                }
+                if (e.key === 'Escape') {
+                    clearButton.click();
+                }
+            });
+
+            // ── Initial state ──
+            toggleClearButton();
+
+            const currentSearchTerm = '@ViewBag.CurrentSearch';
+            if (currentSearchTerm && currentSearchTerm.trim() !== '') {
+                searchInput.value = currentSearchTerm;
+                setTimeout(function() {
+                    renderFilteredPurchases(currentSearchTerm);
+                }, 150);
+            }
+
+            // ── Keyboard shortcuts ──
+            document.addEventListener('keydown', function(e) {
+                if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
+                    e.preventDefault();
+                    searchInput.focus();
+                    searchInput.select();
+                }
+                if (e.key === 'Escape' && document.activeElement === searchInput) {
+                    if (searchInput.value.trim() !== '') {
+                        clearButton.click();
+                    }
+                }
+            });
+
+            console.log('🛒 Purchase Management System loaded successfully!');
+            console.log(`📊 Total purchases: ${allPurchases.length}`);
+        })();
     </script>
 
 </body>
