@@ -27,7 +27,7 @@
 
             body {
                 font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-                background: linear-gradient(145deg, #f6f9fc 0%, #e9eef4 100%);
+                background: linear-gradient(145deg, #f0f5fe 0%, #e3ecf7 100%);
                 min-height: 100vh;
                 display: flex;
                 align-items: center;
@@ -39,7 +39,7 @@
             /* ── Form Container ── */
             .form-wrapper {
                 width: 100%;
-                max-width: 640px;
+                max-width: 660px;
                 margin: 0 auto;
                 animation: fadeSlideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
             }
@@ -60,47 +60,64 @@
             .card-custom {
                 background: #ffffff;
                 border: none;
-                border-radius: 28px;
-                box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08), 0 8px 28px rgba(0, 0, 0, 0.04), 0 0 0 1px rgba(0, 0, 0, 0.02);
+                border-radius: 32px;
+                box-shadow: 0 20px 60px rgba(15, 34, 58, 0.10), 0 8px 28px rgba(0, 0, 0, 0.04), 0 0 0 1px rgba(255, 255, 255, 0.5);
                 transition: box-shadow 0.3s ease, transform 0.2s ease;
                 overflow: hidden;
+                backdrop-filter: blur(2px);
             }
 
                 .card-custom:hover {
-                    box-shadow: 0 32px 80px rgba(0, 0, 0, 0.12), 0 12px 36px rgba(0, 0, 0, 0.06), 0 0 0 1px rgba(0, 0, 0, 0.02);
-                    transform: translateY(-2px);
+                    box-shadow: 0 32px 80px rgba(15, 34, 58, 0.14), 0 12px 40px rgba(0, 0, 0, 0.06);
+                    transform: translateY(-3px);
                 }
 
             /* ── Card Header ── */
             .card-header-custom {
                 background: #ffffff;
-                border-bottom: 1px solid #f0f3f9;
-                padding: 1.25rem 1.75rem;
+                border-bottom: 1px solid #eaf0f8;
+                padding: 1.25rem 2rem;
                 font-weight: 700;
-                font-size: 1.15rem;
+                font-size: 1.2rem;
                 letter-spacing: -0.01em;
                 color: #0b1a33;
                 display: flex;
                 align-items: center;
-                gap: 0.6rem;
+                gap: 0.7rem;
+                position: relative;
             }
 
+                .card-header-custom::after {
+                    content: '';
+                    position: absolute;
+                    bottom: 0;
+                    left: 2rem;
+                    right: 2rem;
+                    height: 2px;
+                    background: linear-gradient(90deg, #3d7eb9, #8ab3d9, #3d7eb9);
+                    opacity: 0.15;
+                }
+
                 .card-header-custom i {
-                    font-size: 1.4rem;
-                    color: #3d7eb9;
+                    font-size: 1.5rem;
+                    color: #2a6b9c;
+                    background: #eaf2fc;
+                    padding: 0.4rem;
+                    border-radius: 14px;
+                    box-shadow: inset 0 1px 3px rgba(0,0,0,0.03);
                 }
 
             /* ── Card Body ── */
             .card-body-custom {
-                padding: 1.75rem 1.75rem 2rem;
+                padding: 1.75rem 2rem 2rem;
             }
 
             /* ── Form Labels ── */
             .form-label-custom {
                 font-weight: 600;
-                font-size: 0.82rem;
+                font-size: 0.8rem;
                 text-transform: uppercase;
-                letter-spacing: 0.04em;
+                letter-spacing: 0.05em;
                 color: #2d405b;
                 margin-bottom: 0.4rem;
             }
@@ -116,7 +133,7 @@
             .form-select-custom {
                 border: 1.5px solid #e2e8f0;
                 border-radius: 14px;
-                padding: 0.7rem 1rem;
+                padding: 0.7rem 1.1rem;
                 font-size: 0.95rem;
                 font-weight: 500;
                 color: #0b1a33;
@@ -142,7 +159,7 @@
 
                 /* ── Readonly Field ── */
                 .form-control-custom[readonly] {
-                    background: #f4f7fc;
+                    background: #f4f8fd;
                     color: #4a5d7a;
                     cursor: not-allowed;
                     opacity: 0.85;
@@ -246,7 +263,7 @@
 
                 .btn-update:hover {
                     background: #3269a0;
-                    transform: translateY(-2px);
+                    transform: translateY(-3px);
                     box-shadow: 0 10px 28px rgba(61, 126, 185, 0.35);
                     color: #fff;
                 }
@@ -301,6 +318,7 @@
 
                     .card-header-custom i {
                         font-size: 1.2rem;
+                        padding: 0.3rem;
                     }
 
                 .card-body-custom {
@@ -354,7 +372,7 @@
 
             @@media (max-width: 400px) {
                 .card-custom {
-                    border-radius: 20px;
+                    border-radius: 24px;
                 }
 
                 .card-header-custom {
@@ -494,9 +512,8 @@
                             <i class="bi bi-check-lg"></i>
                             Update Supplier
                         </button>
-                        <!-- ✅ FIXED: Cancel now goes to Index instead of Details -->
                         <a asp-action="Index" class="btn-cancel">
-                            Cancel
+                            <i class="bi bi-x-lg"></i> Cancel
                         </a>
                     </div>
 
